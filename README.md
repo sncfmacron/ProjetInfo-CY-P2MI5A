@@ -1,7 +1,7 @@
 # ProjetInfo-CY-P2MI5A
 
-Projet d'informatique de PREING-2
-Sujet : C-Wire
+Projet d'informatique de PREING-2<br>
+Sujet : C-Wire<br>
 Réalisé par le trinôme A de MI-5
 
 # Contributeurs
@@ -12,7 +12,7 @@ Réalisé par le trinôme A de MI-5
 
 ## Utilisation
 
-Pour compiler la solution, utiliser `make`.
+Pour compiler le programme, utiliser `make`.
 
 ## Description du programme
 
