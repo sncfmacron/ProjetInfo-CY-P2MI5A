@@ -1,0 +1,5 @@
+/*
+
+Constantes pour la sécurisation
+
+*/
