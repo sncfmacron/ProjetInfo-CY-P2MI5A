@@ -3,14 +3,13 @@
     {
       "name": "linux-gcc-x64",
       "includePath": [
-        "${workspaceFolder}/**",        // Inclut tous les fichiers dans votre projet
-        "/usr/include",                 // Répertoire standard pour les en-têtes systèmes
-        "/usr/local/include",           // Si vous avez des bibliothèques locales installées
-        "/usr/lib/gcc/x86_64-linux-gnu/7/include"  // Chemin pour le compilateur GCC, ajustez selon votre version
+        "${workspaceFolder}/**",
+        "/usr/include",
+        "/usr/bin/gcc"
       ],
-      "compilerPath": "/usr/bin/gcc",  // Compilateur GCC
-      "cStandard": "c11",               // Version de la norme C que vous utilisez
-      "cppStandard": "c++17",           // Version de la norme C++ que vous utilisez
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "c11",
+      "cppStandard": "c++17",
       "intelliSenseMode": "linux-gcc-x64",
       "compilerArgs": [
         ""

@@ -17,8 +17,8 @@ Basic structures and functions for the program
 #include "settings.h"
 
 // Structure
-typedef struct Centrale
-    uint64 id;
+typedef struct Centrale {
+    uint64_t id;
 
 } Centrale;
 
