@@ -1,3 +1,6 @@
+# Script shell pour trier les données
+
+
 #!/bin/bash
 
 # Fonction pour afficher un message d'erreur et le manuel
