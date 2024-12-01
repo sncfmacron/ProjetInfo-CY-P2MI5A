@@ -1,0 +1,3 @@
+/*
+    Contient des fonctions de base 
+*/

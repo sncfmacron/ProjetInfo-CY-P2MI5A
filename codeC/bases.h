@@ -1,8 +1,7 @@
 /*
-
     Structures et bibliothèques de base
-    
 */
+
 
 #ifndef BASIC_H
 #define BASIC_H
@@ -15,7 +14,7 @@
 #include <unistd.h>
 
 
-#include "settings.h"
+#include "paramètres.h"
 
 // Structures
 typedef struct Station {
@@ -32,7 +31,7 @@ typedef struct {
 } Consommateur;
 
 typedef struct {
-    void* data;                 // Pointeur générique : peut être une station ou un consommateur
+
     struct AVL *fg;
     struct AVL *fd;
     int equilibre;

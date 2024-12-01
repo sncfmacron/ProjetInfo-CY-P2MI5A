@@ -1,7 +1,5 @@
 /*
-
-Constantes pour la sécurisation
-
+    Contient des constantes pour la sécurisation
 */
 
 #ifndef SETTINGS_H

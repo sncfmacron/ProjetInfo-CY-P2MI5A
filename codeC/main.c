@@ -1,11 +1,9 @@
 /*
-
     Programme principal
-
 */
 
 
-#include "basic.h"
+#include "bases.h"
 
 int main() {
 

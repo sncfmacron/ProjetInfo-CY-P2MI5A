@@ -4,7 +4,7 @@
 afficherErreur() {
 
     echo "ERREUR : $1" >&2
-    cat manual.txt
+    cat manuel.txt
     exit 1
 }
 
@@ -14,7 +14,7 @@ verifArguments() {
     # Vérifie la présence de l'argument de "-h" dans l'entrée ; $@ représente tous les arguments passés en entrée
     for arg in "$@"; do
         if [ "$arg" = "-h" ]; then
-            cat manual.txt
+            cat manuel.txt
             exit 1
         fi
     done
@@ -40,14 +40,14 @@ verifArguments() {
 
     # Vérification du troisième argument
     case "$3" in
-        comb|indiv|all)
+        comp|indiv|all)
             # Empêcher des combinaisons invalides
             if [[ "$2" == "hvb" && "$3" == "all" ]] || [[ "$2" == "hvb" && "$3" == "indiv" ]] || [[ "$2" == "hva" && "$3" == "all" ]] || [[ "$2" == "hva" && "$3" == "indiv" ]]; then
                 afficherErreur "Les combinaisons 'hvb all', 'hvb indiv', 'hva all', et 'hva indiv' sont interdites."
             fi
             ;;
         *)
-            afficherErreur "Le troisième argument doit être 'comb', 'indiv', ou 'all'."
+            afficherErreur "Le troisième argument doit être 'comp', 'indiv', ou 'all'."
             ;;
     esac
 
