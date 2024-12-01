@@ -2,6 +2,7 @@
 
 # Fonction pour afficher un message d'erreur et le manuel stocké dans /src
 afficherErreur() {
+
     echo "ERREUR : $1" >&2
     cat src/manual.txt
     exit 1
@@ -9,6 +10,15 @@ afficherErreur() {
 
 # Fonction de vérification des arguments
 verifArguments() {
+
+    # Vérifie la présence de l'argument de "-h" dans l'entrée ; $@ représente tous les arguments passés en entrée
+    for arg in "$@"; do
+        if [ "$arg" = "-h" ]; then
+            cat src/manual.txt
+            exit 1
+        fi
+    done
+
     # Vérifier le nombre d'arguments
     if [ $# -gt 5 ] || [ $# -lt 1 ]; then
         afficherErreur "Vous devez entrer entre 1 et 5 arguments."
@@ -47,18 +57,53 @@ verifArguments() {
             afficherErreur "Le quatrième argument doit être un identifiant de centrale valide."
         fi
     fi
+
 }
 
-# Vérifie la présence de l'argument de "-h" dans l'entrée ; $@ représente tous les arguments passés en entrée
-for arg in "$@"; do
-    if [ "$arg" = "-h" ]; then
-        cat src/manual.txt
-        exit 0
+# Fonction pour vérifier la présence des dossiers temp et graphs
+verifDossier() {
+
+    if  [ ! -e "tmp" ] || [ ! -d "tmp" ]; then
+        mkdir tmp
+
+        # Si dossier tmp non-vide, on le nettoie
+        elif [ "$(ls -A tmp)" ]; then
+        rm -rf tmp
     fi
-done
+
+    if [ ! -e "graphs" ] || [ ! -d "graphs" ]; then
+        mkdir graphs
+    fi
+
+}
+
+# Fonction pour compiler les fichiers en C
+compilation () {
+
+    if [ ! -e "src/main.c" ]; then
+
+    echo "ERREUR : le fichier main.c est manquant"
+
+    else
+        echo "Msg de test : fichier main.c bien présent"
+        # IL FAUT MAKE ICI
+    fi
+
+    # Vérifie que la compilation s'est bien passée ; $? est la dernière commande exécutée (donc le make ici) alors si son code de sortie est différent de 0, il y a une erreur
+    if [ $? -ne 0 ]; then
+        echo "ERREUR : erreur de compilation !"
+        exit 1
+    fi
+
+}
 
 if verifArguments "$1" "$2" "$3" "$4" "$5"; then
 
-    echo "Shrek"
+    verifDossier
+
+
+
+
+
 
 fi
