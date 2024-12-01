@@ -16,7 +16,7 @@ Basic structures and functions for the program
 
 #include "settings.h"
 
-// Structure
+// Structures
 typedef struct Station {
     uint64_t id;
     long somme_consommation;

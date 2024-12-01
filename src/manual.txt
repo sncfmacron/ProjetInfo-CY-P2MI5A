@@ -1,0 +1,40 @@
+
+================
+C-WIRE
+================
+
+Ce script permet de traiter les données d'une distribution d'électricité.
+
+Arguments requis :
+1. Chemin du fichier de données (obligatoire)
+   - Indique l'endroit où se trouve du fichier d'entrée .csv .
+2. Type de station à traiter (obligatoire)
+   - Valeurs possibles :
+     * hvb (high-voltage B)
+     * hva (high-voltage A)
+     * lv (low-voltage)
+3. Type de consommateur à traiter (obligatoire)
+   - Valeurs possibles :
+     * comp (entreprises)
+     * indiv (particuliers)
+     * all (tous)
+   - ATTENTION :
+     * les options suivantes sont interdites car seules des entreprises
+       sont connectées aux stations HV-B et HV-A :
+       * hvb all
+       * hvb indiv
+       * hva all
+       * hva indiv
+4. Identifiant de centrale (optionnel)
+   - Filtre les résultats pour une centrale spécifique.
+   - Si cette option est absente, les traitements seront effectués sur toutes
+     les centrales du fichier.
+5. Option d'aide (-h) (optionnel et prioritaire)
+   - Si présente, toutes les autres options sont ignorées, quelle que soit
+     la position de l'option d'aide.
+   - Affiche cette aide détaillée.
+
+Exemples d'utilisation :
+./cy-wire.sh /input/fichier.csv hvb comp
+./cy-wire.sh /input/fichier.csv lv all -h
+
