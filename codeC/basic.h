@@ -1,6 +1,7 @@
 /*
-basic.h
-Basic structures and functions for the program
+
+    Structures et bibliothèques de base
+    
 */
 
 #ifndef BASIC_H

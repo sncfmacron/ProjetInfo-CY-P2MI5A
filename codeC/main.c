@@ -1,4 +1,11 @@
-#include <basic.h>
+/*
+
+    Programme principal
+
+*/
+
+
+#include "basic.h"
 
 int main() {
 

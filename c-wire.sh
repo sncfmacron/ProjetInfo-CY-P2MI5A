@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Fonction pour afficher un message d'erreur et le manuel stocké dans /src
+# Fonction pour afficher un message d'erreur et le manuel
 afficherErreur() {
 
     echo "ERREUR : $1" >&2
-    cat src/manual.txt
+    cat manual.txt
     exit 1
 }
 
@@ -14,7 +14,7 @@ verifArguments() {
     # Vérifie la présence de l'argument de "-h" dans l'entrée ; $@ représente tous les arguments passés en entrée
     for arg in "$@"; do
         if [ "$arg" = "-h" ]; then
-            cat src/manual.txt
+            cat manual.txt
             exit 1
         fi
     done
@@ -80,13 +80,13 @@ verifDossier() {
 # Fonction pour compiler les fichiers en C
 compilation () {
 
-    if [ ! -e "src/main.c" ]; then
+    if [ ! -e "codeC/main.c" ]; then
 
     echo "ERREUR : le fichier main.c est manquant"
 
     else
         echo "Msg de test : fichier main.c bien présent"
-        # IL FAUT MAKE ICI
+        # make
     fi
 
     # Vérifie que la compilation s'est bien passée ; $? est la dernière commande exécutée (donc le make ici) alors si son code de sortie est différent de 0, il y a une erreur
