@@ -60,7 +60,6 @@ verifArguments() {
             afficherErreur "Le quatrième argument doit être un identifiant de centrale valide."
         fi
     fi
-
 }
 
 # Fonction pour vérifier la présence des dossiers temp et graphs
@@ -71,13 +70,18 @@ verifDossier() {
 
         # Si dossier tmp non-vide, on le nettoie
         elif [ "$(ls -A tmp)" ]; then
-        rm -rf tmp
+        rm -rf tmp/*
     fi
 
     if [ ! -e "graphs" ] || [ ! -d "graphs" ]; then
         mkdir graphs
     fi
 
+    if [ ! -e "input" ] || [ ! -d "input" ] || [ ! -e "input/DATA_CWIRE.csv" ] || [ ! -f "input/DATA_CWIRE.csv" ]; then
+        echo "Le dossier input est absent ou mal configuré."
+        echo "Le fichier d'entrée doit être nomé 'DATA_CWIRE.csv'"
+        exit 1
+    fi
 }
 
 # Fonction pour compiler les fichiers en C
@@ -85,10 +89,10 @@ compilation () {
 
     if [ ! -e "codeC/main.c" ]; then
 
-    echo "ERREUR : le fichier main.c est manquant"
+    echo "ERREUR : le fichier main.c est manquant."
 
     else
-        echo "Msg de test : fichier main.c bien présent"
+        echo "Msg de test : fichier main.c bien présent."
         # make
     fi
 
@@ -97,6 +101,30 @@ compilation () {
         echo "ERREUR : erreur de compilation !"
         exit 1
     fi
+}
+
+#Tri et transmission des données au programme C
+triDonnées () {
+
+    case "$2" in
+        hva)
+            #tail pour commencer à écrire à la deuxième ligne ; cut pour ne récup. que les colonnes 3 (hva) et 5 (comp); grep pour ne pas afficher les "-"
+            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f3 | grep -v '^-*$' > tmp/hva_id_temporaire.txt
+            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f5 | grep -v '^-*$' > tmp/comp_load_temporaire.txt
+            ;;
+        hvb)
+            ;;
+        lv)
+
+            ;;
+        *)
+            echo "ERREUR : option non valide."
+            ;;
+    esac
+
+
+
+
 
 }
 
@@ -104,9 +132,10 @@ if verifArguments "$1" "$2" "$3" "$4" "$5"; then
 
     verifDossier
 
+    triDonnées "$1" "$2" "$3" "$4" "$5"
+
+
     echo "Shrek"
-
-
 
 
 fi

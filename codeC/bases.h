@@ -1,5 +1,5 @@
 /*
-    Structures et bibliothèques de base
+    Contient les tructures et bibliothèques de base
 */
 
 
@@ -20,14 +20,14 @@
 typedef struct Station {
     uint64_t id;
     long somme_consommation;
-    long capacite;              // Quantité d’énergie produite par une centrale ou transférée par une station HV-B, HV-A ou LV (en kWh)
-    char type[10];              // HV-B, HVA, LV, CENTRALE
+    long capacite;
+    char type[10];
 } Station;
 
 typedef struct {
     uint64_t id;
     long consommation;
-    char type[20];              // entreprise, particulier
+    char type[20];
 } Consommateur;
 
 typedef struct {

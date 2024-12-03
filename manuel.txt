@@ -35,6 +35,6 @@ Arguments requis :
    - Affiche cette aide détaillée.
 
 Exemples d'utilisation :
-./c-wire.sh codeC/fichier.csv hvb comp
-./c-wire.sh codeC/fichier.csv lv all -h
+./c-wire.sh input/DATA_CWIRE.csv hva comp
+./c-wire.sh input/DATA_CWIRE.csv all -h
 
