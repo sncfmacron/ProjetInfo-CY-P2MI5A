@@ -3,6 +3,7 @@
 
 #!/bin/bash
 
+
 # Fonction pour afficher un message d'erreur et le manuel
 afficherErreur() {
 
@@ -10,6 +11,7 @@ afficherErreur() {
     cat manuel.txt
     exit 1
 }
+
 
 # Fonction de vérification des arguments
 verifArguments() {
@@ -62,15 +64,16 @@ verifArguments() {
     fi
 }
 
+
 # Fonction pour vérifier la présence des dossiers temp et graphs
 verifDossier() {
 
-    if  [ ! -e "tmp" ] || [ ! -d "tmp" ]; then
-        mkdir tmp
+    if  [ ! -e "temp" ] || [ ! -d "temp" ]; then
+        mkdir temp
 
-        # Si dossier tmp non-vide, on le nettoie
-        elif [ "$(ls -A tmp)" ]; then
-        rm -rf tmp/*
+        # Si dossier temp non-vide, on le nettoie
+        elif [ "$(ls -A temp)" ]; then
+        rm -rf temp/*
     fi
 
     if [ ! -e "graphs" ] || [ ! -d "graphs" ]; then
@@ -83,6 +86,7 @@ verifDossier() {
         exit 1
     fi
 }
+
 
 # Fonction pour compiler les fichiers en C
 compilation () {
@@ -109,11 +113,13 @@ triDonnées () {
     case "$2" in
         hva)
             #tail pour commencer à écrire à la deuxième ligne ; cut pour ne récup. que les colonnes 3 (hva) et 5 (comp); grep pour ne pas afficher les "-"
-            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f3 | grep -v '^-*$' > tmp/hva_id_temporaire.txt
-            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f5 | grep -v '^-*$' > tmp/comp_load_temporaire.txt
+            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f3 | grep -v '^-*$' > temp/hva_id_temporaire.txt
+            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f5 | grep -v '^-*$' > temp/comp_load_temporaire.txt
+            # [...]
             ;;
         hvb)
             ;;
+
         lv)
 
             ;;
@@ -128,11 +134,22 @@ triDonnées () {
 
 }
 
+
+#Nettoyer les dossiers après utilisation
+nettoyage () {
+
+    # rm -rf temp/*
+    echo ""
+    echo "Nettoyage"
+}
+
 if verifArguments "$1" "$2" "$3" "$4" "$5"; then
 
     verifDossier
 
     triDonnées "$1" "$2" "$3" "$4" "$5"
+
+    nettoyage
 
 
     echo "Shrek"
