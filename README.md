@@ -1,22 +1,24 @@
-# Projet d'informatique de PREING-2
+# PREING-2 Computer Science Project
 
-Sujet : C-Wire<br>
-Réalisé par le trinôme A de MI-5
+**Topic:** C-Wire  
+**Developed by the MI-5 team (Group A)**
 
-# Contributeurs
+## Contributors
 
 - Romain MICHAUT-JOYEUX
 - Nathan CHOUPIN
 - Guirec VETIER
 
-## Description du programme
+---
 
-- (expliquer en bref ce qu'il fait)
+## Program Description
 
-## Utilisation
+- (Briefly explain what the program does)
 
-Pour compiler le programme, veuillez utiliser `make`.
+## Usage
 
-## Contenu
+To compile the program, please use `make`.
 
-- (explique en bref chacun des fichiers .c, .sh etc)
+## Content
+
+- (Briefly explain each of the .c, .sh files, etc.)

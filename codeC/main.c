@@ -1,9 +1,9 @@
 /*
-    Programme principal
+    Main program
 */
 
 
-#include "bases.h"
+#include "basics.h"
 
 int main(int argc, char *argv[]) {
     if (argc < 4) {

@@ -1,121 +1,152 @@
-# Script shell pour trier les données
-
-
 #!/bin/bash
 
 
-# Fonction pour afficher un message d'erreur et le manuel
-afficherErreur() {
+# Shell script to sort 
 
-    echo "ERREUR : $1" >&2
-    cat manuel.txt
+
+show_help() {
+    echo "================================="
+    echo "C-WIRE"
+    echo "================================="
+    echo "This script processes data for an electricity distribution."
+    echo
+    echo "Required arguments:"
+    echo "1. Path to the data file (mandatory)"
+    echo "   - Specifies the location of the input .csv file."
+    echo "2. Type of station to process (mandatory)"
+    echo "   - Possible values:"
+    echo "     * hvb (high-voltage B)"
+    echo "     * hva (high-voltage A)"
+    echo "     * lv (low-voltage)"
+    echo "3. Type of consumer to process (mandatory)"
+    echo "   - Possible values:"
+    echo "     * comp (businesses)"
+    echo "     * indiv (individuals)"
+    echo "     * all (all)"
+    echo "   - WARNING:"
+    echo "     The following options are prohibited:"
+    echo "     * hvb all"
+    echo "     * hvb indiv"
+    echo "     * hva all"
+    echo "     * hva indiv"
+    echo
+    echo "4. Power plant identifier (optional)"
+    echo "   - Filters the results for a specific power plant."
+    echo "5. Help option (-h) (optional and priority)"
+    echo "   - If present, all other options are ignored."
+    echo "   - Displays this detailed help information."
+    echo
+    echo "Usage examples:"
+    echo "./c-wire.sh input/DATA_CWIRE.csv hva comp"
+    echo "./c-wire.sh input/DATA_CWIRE.csv all -h"
+    echo "================================="
+    exit 0
+}
+
+
+show_mini_help() {
+    echo "Input error."
+    echo "Usage: $0 [options] <file_path> <station_type> <consumer_type> [plant_id]"
+    echo "Use the -h parameter to get full help."
     exit 1
 }
 
 
-# Fonction de vérification des arguments
-verifArguments() {
+# Parameters verification
+verifyParameters() {
 
-    # Vérifie la présence de l'argument de "-h" dans l'entrée ; $@ représente tous les arguments passés en entrée
-    for arg in "$@"; do
-        if [ "$arg" = "-h" ]; then
-            cat manuel.txt
-            exit 1
-        fi
+    # Verify is "-h" is present
+    while getopts ":h" option; do
+        case $option in
+            h) 
+                show_mini_help
+            ;;
+        esac
     done
 
-    # Vérifier le nombre d'arguments
+    # Verify number of parameters
     if [ $# -gt 5 ] || [ $# -lt 1 ]; then
-        afficherErreur "Vous devez entrer entre 1 et 5 arguments."
+        echo "You must enter between 1 and 5 arguments"
+        show_mini_help
     fi
 
-    # Vérifier que le premier argument est un lien symbolique valide
-    if [ ! -e "$1" ] || [ ! -f "$1" ]; then
-        afficherErreur "Le premier argument doit indiquer le chemin d'un fichier valide."
+    if [ ! -f "$1" ]; then
+        echo "The first argument must indicate the path to a valid file."
+        show_mini_help
     fi
 
-    # Vérification du deuxième argument
+    # Check second parameter
     case "$2" in
         hva|hvb|lv)
             ;;
         *)
-            afficherErreur "Le deuxième argument doit être 'hva', 'hvb', ou 'lv'."
+            echo "Second argument must be 'hva', 'hvb', or 'lv'."
             ;;
     esac
 
-    # Vérification du troisième argument
+    # Check third parameter
     case "$3" in
         comp|indiv|all)
-            # Empêcher des combinaisons invalides
+            # Preventing invalid combinations
             if [[ "$2" == "hvb" && "$3" == "all" ]] || [[ "$2" == "hvb" && "$3" == "indiv" ]] || [[ "$2" == "hva" && "$3" == "all" ]] || [[ "$2" == "hva" && "$3" == "indiv" ]]; then
-                afficherErreur "Les combinaisons 'hvb all', 'hvb indiv', 'hva all', et 'hva indiv' sont interdites."
+                echo "Les combinaisons 'hvb all', 'hvb indiv', 'hva all', et 'hva indiv' sont interdites."
             fi
             ;;
         *)
-            afficherErreur "Le troisième argument doit être 'comp', 'indiv', ou 'all'."
+            echo "The third argument must be 'comp', 'indiv', or 'all'."
+            show_mini_help
             ;;
     esac
 
-    # Vérification du cinquième argument (identifiant de centrale valide)
+    # Check fifth parameter (valid plant identifier)
     if [ -n "$5" ]; then
         if [ ! -s "$5" ] || ! grep -q "^$5;" "$1"; then
-            afficherErreur "Le quatrième argument doit être un identifiant de centrale valide."
+            echo "The fourth argument must be a valid plant identifier."
         fi
     fi
 }
 
 
-# Fonction pour vérifier la présence des dossiers temp et graphs
-verifDossier() {
+# Function to check the presence of temp and graph folders
+verifyFolders() {
 
-    if  [ ! -e "temp" ] || [ ! -d "temp" ]; then
-        mkdir temp
-
-        # Si dossier temp non-vide, on le nettoie
-        elif [ "$(ls -A temp)" ]; then
         rm -rf temp/*
-    fi
 
-    if [ ! -e "graphs" ] || [ ! -d "graphs" ]; then
-        mkdir graphs
-    fi
+        mkdir -p graphs input temp
 
-    if [ ! -e "input" ] || [ ! -d "input" ] || [ ! -e "input/DATA_CWIRE.csv" ] || [ ! -f "input/DATA_CWIRE.csv" ]; then
-        echo "Le dossier input est absent ou mal configuré."
-        echo "Le fichier d'entrée doit être nomé 'DATA_CWIRE.csv'"
+    if [ ! -f "input/DATA_CWIRE.csv" ] ; then
+        echo "The input file must be named 'DATA_CWIRE.csv'"
         exit 1
     fi
 }
 
 
-# Fonction pour compiler les fichiers en C
+# Function to start C program compilation
 compilation () {
 
-    if [ ! -e "codeC/main.c" ]; then
-
+    if [ ! -f "codeC/main.c" ]; then
     echo "ERREUR : le fichier main.c est manquant."
 
     else
-        echo "Msg de test : fichier main.c bien présent."
         # make
     fi
 
-    # Vérifie que la compilation s'est bien passée ; $? est la dernière commande exécutée (donc le make ici) alors si son code de sortie est différent de 0, il y a une erreur
+    # Checks that compilation has gone well
     if [ $? -ne 0 ]; then
-        echo "ERREUR : erreur de compilation !"
+        echo "ERREUR : erreur de compilation."
         exit 1
     fi
 }
 
-#Tri et transmission des données au programme C
-triDonnées () {
+# Sorting function
+sortingData () {
+
+    # Utilisation de la commande "time programme" elle est très précise mais sort trop d'infos qu'il est possible de filtrer
+
 
     case "$2" in
         hva)
-            #tail pour commencer à écrire à la deuxième ligne ; cut pour ne récup. que les colonnes 3 (hva) et 5 (comp); grep pour ne pas afficher les "-"
-            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f3 | grep -v '^-*$' > temp/hva_id_temporaire.txt
-            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f5 | grep -v '^-*$' > temp/comp_load_temporaire.txt
-            # [...]
+
             ;;
         hvb)
             ;;
@@ -124,35 +155,33 @@ triDonnées () {
 
             ;;
         *)
-            echo "ERREUR : option non valide."
+            echo "ERREUR : invalid input."
             ;;
     esac
 
 
 
-
-
 }
 
 
-#Nettoyer les dossiers après utilisation
-nettoyage () {
+# Clean folders after execution
+clean () {
 
     # rm -rf temp/*
-    echo ""
-    echo "Nettoyage"
+
 }
 
-if verifArguments "$1" "$2" "$3" "$4" "$5"; then
+# AWK
+# awk -F ";" '$1 == "1" && $2 == "1"' fichier.csv
 
-    verifDossier
+verifyParameters $@;
 
-    triDonnées "$1" "$2" "$3" "$4" "$5"
+    verifyFolders
 
-    nettoyage
+    sortingData $@
+
+    clean
 
 
     echo "Shrek"
 
-
-fi
