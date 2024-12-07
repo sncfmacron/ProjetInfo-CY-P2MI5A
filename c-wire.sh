@@ -1,8 +1,7 @@
-# Script shell pour trier les données
-
-
 #!/bin/bash
+# CMT: #!/bin/bash l'interpéteur shell est toujours en premiere ligne.
 
+# Script shell pour trier les données
 
 # Fonction pour afficher un message d'erreur et le manuel
 afficherErreur() {
@@ -17,12 +16,23 @@ afficherErreur() {
 verifArguments() {
 
     # Vérifie la présence de l'argument de "-h" dans l'entrée ; $@ représente tous les arguments passés en entrée
-    for arg in "$@"; do
-        if [ "$arg" = "-h" ]; then
-            cat manuel.txt
+#    for arg in "$@"; do
+#        if [ "$arg" = "-h" ]; then
+#            cat manuel.txt
+#            exit 1
+#       fi
+#    done
+
+#CMT:  Il est préférable d'utiliser la fonction standard getopts ( exemple prog.sh -h -a -v -f fichier) ou getopt (prog.sh --help --file fichier -v)
+while getopts ":h" option; do
+    case $option in
+        h) 
+            cat manuel.txt  # CMT: L'ideal c'est une mini aide de rappel des options  et non pas tout le manuel
             exit 1
-        fi
-    done
+        ;;
+    esac
+done
+
 
     # Vérifier le nombre d'arguments
     if [ $# -gt 5 ] || [ $# -lt 1 ]; then
@@ -30,7 +40,11 @@ verifArguments() {
     fi
 
     # Vérifier que le premier argument est un lien symbolique valide
-    if [ ! -e "$1" ] || [ ! -f "$1" ]; then
+    #CMT: Pourquoi lien symbolique ?, l'option pour chercher un lien symbolique c'est -L
+    #CMT: C'est un fichier en argument donc -f
+    #CMT: Il faut supprimer tout les tests en -e car cela test si le fichier/répertoire/lien existe.
+    #if [ ! -e "$1" ] || [ ! -f "$1" ]; then
+    if [ ! -f "$1" ]; then
         afficherErreur "Le premier argument doit indiquer le chemin d'un fichier valide."
     fi
 
@@ -66,23 +80,33 @@ verifArguments() {
 
 
 # Fonction pour vérifier la présence des dossiers temp et graphs
+#CMT: Suppression option -e
+#CMT: je préconise de supprimer temp puis le recréer
 verifDossier() {
 
-    if  [ ! -e "temp" ] || [ ! -d "temp" ]; then
-        mkdir temp
+    # if  [ ! -e "temp" ] || [ ! -d "temp" ]; then
+    #     mkdir temp
 
-        # Si dossier temp non-vide, on le nettoie
-        elif [ "$(ls -A temp)" ]; then
-        rm -rf temp/*
+    #     # Si dossier temp non-vide, on le nettoie
+    #     elif [ "$(ls -A temp)" ]; then
+    #     rm -rf temp/*
+    # fi
+
+    # if [ ! -e "graphs" ] || [ ! -d "graphs" ]; then
+    #     mkdir graphs
+    # fi
+
+    # CMT: suppression répertoire temp
+        rm -rf temp
     fi
 
-    if [ ! -e "graphs" ] || [ ! -d "graphs" ]; then
-        mkdir graphs
-    fi
+    # CMP : on recréé tous les répetoires si ils n'existent ou si les repertoires existent pas d'erreur
+    mkdir -p  temp graphs input
 
-    if [ ! -e "input" ] || [ ! -d "input" ] || [ ! -e "input/DATA_CWIRE.csv" ] || [ ! -f "input/DATA_CWIRE.csv" ]; then
-        echo "Le dossier input est absent ou mal configuré."
-        echo "Le fichier d'entrée doit être nomé 'DATA_CWIRE.csv'"
+    # if [ ! -e "input" ] || [ ! -d "input" ] || [ ! -e "input/DATA_CWIRE.csv" ] || [ ! -f "input/DATA_CWIRE.csv" ]; then
+    if  [ ! -f "input/DATA_CWIRE.csv" ]; then
+        # echo "Le dossier input est absent ou mal configuré."
+        echo "Le fichier d'entrée doit être nommé 'DATA_CWIRE.csv'"
         exit 1
     fi
 }
@@ -91,30 +115,37 @@ verifDossier() {
 # Fonction pour compiler les fichiers en C
 compilation () {
 
-    if [ ! -e "codeC/main.c" ]; then
-
-    echo "ERREUR : le fichier main.c est manquant."
+#CMT: remplacement de -e par -f
+    if [ ! -f "codeC/main.c" ]; then
+    echo "ERREUR : le fichier codeC/main.c est manquant."
 
     else
-        echo "Msg de test : fichier main.c bien présent."
-        # make
-    fi
-
+        echo "Msg de test : fichier codeC/main.c bien présent."
+        #make
+    
+    #CMT: Placer le test d'erreur de la commande make juste après la commande
     # Vérifie que la compilation s'est bien passée ; $? est la dernière commande exécutée (donc le make ici) alors si son code de sortie est différent de 0, il y a une erreur
-    if [ $? -ne 0 ]; then
-        echo "ERREUR : erreur de compilation !"
-        exit 1
+        if [ $? -ne 0 ]; then
+            echo "ERREUR : erreur de compilation !"
+            exit 1
+        fi
     fi
 }
 
 #Tri et transmission des données au programme C
-triDonnées () {
-
+#CMT: Pas de cara non ascii + anglais
+#CMT: .1 Tester les perf entre shell et code C car il y a +ieurs millions de lignes à traiter
+triDonnees () {
+# CMT: Traitement du temps. plusieurs méthodes possibles.
+# 1. utilisation de la commande "time programme" elle est très précise mais sort trop d'infos qu'il est possible de filtrer
+# 2. utilisation de la commande date (date +%s => nombre de secondes depuis 1970)
+# debut=$(date +%s)
+#CMT: A refaire
     case "$2" in
         hva)
             #tail pour commencer à écrire à la deuxième ligne ; cut pour ne récup. que les colonnes 3 (hva) et 5 (comp); grep pour ne pas afficher les "-"
-            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f3 | grep -v '^-*$' > temp/hva_id_temporaire.txt
-            tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f5 | grep -v '^-*$' > temp/comp_load_temporaire.txt
+            # tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f3 | grep -v '^-*$' > temp/hva_id_temporaire.txt
+            # tail -n +2 input/DATA_CWIRE.csv | cut -d';' -f5 | grep -v '^-*$' > temp/comp_load_temporaire.txt
             # [...]
             ;;
         hvb)
@@ -143,11 +174,13 @@ nettoyage () {
     echo "Nettoyage"
 }
 
-if verifArguments "$1" "$2" "$3" "$4" "$5"; then
+# CMT: Supprimer verifArguments et mettre dans le shell directement
+# if verifArguments "$1" "$2" "$3" "$4" "$5"; then
+verifArguments $@
 
     verifDossier
 
-    triDonnées "$1" "$2" "$3" "$4" "$5"
+    triDonnees $@
 
     nettoyage
 
@@ -155,4 +188,4 @@ if verifArguments "$1" "$2" "$3" "$4" "$5"; then
     echo "Shrek"
 
 
-fi
+# fi
