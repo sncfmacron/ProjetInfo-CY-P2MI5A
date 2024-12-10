@@ -15,25 +15,6 @@
 #include "parameters.h"
 
 // Structures
-typedef struct Station {
-    uint64_t id;
-    long consumption_sum;
-    long capacity;
-    char type[10];
-} Station;
 
-typedef struct {
-    uint64_t id;
-    long consumption;
-    char type[20];
-} Consumer;
-
-typedef struct {
-    struct AVL *left;
-    struct AVL *right;
-    int balance;
-} AVL;
-
-typedef AVL* pAVL;
 
 #endif

@@ -113,8 +113,11 @@ verifyFolders() {
 compilation () {
 
     if [ ! -f "codeC/main.c" ]; then
-    echo "ERROR : main.c is missing."
-
+        echo "ERROR : main.c is missing."
+        exit 1
+    elif [ -f program_c ]; then
+        echo "ERROR: program_c already exists."
+        exit 1
     else
         gcc codeC/main.c -o program_c
         # make
@@ -134,34 +137,30 @@ sortingData () {
     # awk 'pattern { action }' fichier
     # Utilisation de la commande "time programme" elle est très précise mais sort trop d'infos qu'il est possible de filtrer
 
-
     case "$2" in
-        hva)
-        # Supprimer les '-' directement avec la commande (grep) ?
-        # Il faut voir comment on va trier les données
-            awk -F ';' 'NR > 2 && $3 != "-" { print $3, $7 }' "$1" | ./program_c
-            ;;
         hvb)
-            awk -F ';' 'NR > 2 { print $2 }' "$1" | ./program_c
+            awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" | ./program_c
+            ;;
+        hva)
+
+            awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" | ./program_c
             ;;
         lv)
-            awk -F ';' 'NR > 2 { print $4 }' "$1" | ./program_c
-            ;;
+            case "$3" in
+                all)
+                    awk -F ';' 'NR > 2 { print $1, $4, $5, $6, $7, $8 }' "$1" | ./program_c
+                    ;;
+
+                comp)
+                    awk -F ';' 'NR > 2 && $5 != "-" { print $1, $4, $5, $7, $8 }' "$1" | ./program_c
+                    ;;
+
+                indiv)
+                    awk -F ';' 'NR > 2 && $6 != "-" { print $1, $4, $6, $7, $8 }' "$1" | ./program_c
+                    ;;
+            esac
+                ;;
     esac
-
-    case "$3" in
-        all)
-
-            ;;
-        comp)
-
-            ;;
-
-        indiv)
-
-            ;;
-    esac
-
 
 
 }
@@ -171,6 +170,7 @@ sortingData () {
 clean () {
 
     rm -rf temp/*
+    rm program_c
 
 }
 
@@ -179,11 +179,9 @@ verifyParameters $@;
 
     verifyFolders
 
-    sortingData $@
-
     compilation
 
-    clean
+    sortingData $@ && clean
 
 
 
