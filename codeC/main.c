@@ -5,14 +5,16 @@
 
 #include "basics.h"
 
-int main(int argc, char *argv[]) {
-    if (argc < 4) {
-        printf("\nUsage: ./c-wire.sh <type_station> <type_consommateur> <id_centrale>.\n");
-        return 1;
+
+int main() {
+
+    char buffer[BUFFER_SIZE];
+    while (fgets(buffer, BUFFER_SIZE, stdin)) {
+        printf("Traitement: %s", buffer);
     }
 
 
-    printf("\nShrek");
+    printf("\nBoumiz\n");
 
     return 0;
 }

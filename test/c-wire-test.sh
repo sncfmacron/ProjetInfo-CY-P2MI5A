@@ -110,17 +110,16 @@ verifyFolders() {
 # Function to start C program compilation
 compilation () {
 
-    if [ ! -f "codeC/main.c" ]; then
-    echo "ERROR : main.c is missing."
+    if [ ! -f "main-test.c" ]; then
+    echo "ERREUR : le fichier main.c est manquant."
 
     else
-        gcc codeC/main.c -o programme_c
-        # make
+        gcc main-test.c -o programme_c
     fi
 
     # Checks that compilation has gone well
     if [ $? -ne 0 ]; then
-        echo "ERROR : compilation error."
+        echo "ERREUR : erreur de compilation."
         exit 1
     fi
 }
@@ -135,28 +134,17 @@ sortingData () {
 
     case "$2" in
         hva)
-        # Supprimer les '-' directement avec la commande (grep) ?
-        # Il faut voir comment on va trier les données
-            awk -F ';' 'NR > 2 && $3 != "-" { print $3, $7 }' "$1" | ./programme_c
+            # echo "Test input" | ./programme_c
+            awk -F ';' 'NR > 2 { print $3 }' | ./programme_c
             ;;
         hvb)
-            awk -F ';' 'NR > 2 { print $2 }' "$1" | ./programme_c
             ;;
+
         lv)
-            awk -F ';' 'NR > 2 { print $4 }' "$1" | ./programme_c
-            ;;
-    esac
-
-    case "$3" in
-        all)
 
             ;;
-        comp)
-
-            ;;
-
-        indiv)
-
+        *)
+            echo "ERREUR : invalid input."
             ;;
     esac
 
@@ -177,9 +165,9 @@ verifyParameters $@;
 
     verifyFolders
 
-    sortingData $@
-
     compilation
+
+    sortingData $@
 
     clean
 
