@@ -5,7 +5,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#define MAX_BUFFER_SIZE 1024
+#define MAX_BUFFER_SIZE 512
 
 
 
