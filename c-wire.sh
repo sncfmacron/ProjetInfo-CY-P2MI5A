@@ -142,8 +142,8 @@ sortingData () {
             awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" | ./program_c
             ;;
         hva)
-
-            awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" | ./program_c
+            time(awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" | ./program_c) 2>&1
+            echo "Tri réussi"
             ;;
         lv)
             case "$3" in
