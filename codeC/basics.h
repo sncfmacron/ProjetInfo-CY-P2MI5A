@@ -20,7 +20,7 @@ typedef struct Station {
     uint32_t id;
     long consumption_sum;
     long capacity;
-    char type[10]; // HVA, HVB or LV
+    char type[MAX_STATION_TYPE]; // HVA, HVB or LV
 } Station;
 
 typedef struct {
@@ -37,6 +37,7 @@ typedef struct {
 
 typedef AVL* pAVL;
 
+void exit_with_message(const char *message, int error_code);
 
 pAVL createAVL(Station s);
 pAVL insertionAVL(pAVL a, Station s, int *h);
@@ -53,11 +54,10 @@ pAVL rotateDoubleRight(pAVL a);
 */
 void cleanAVL(pAVL a);
 
-max3(int a, int b, int c);
-min3(int a, int b, int c);
-max(int a, int b);
-min(int a, int b);
-
+int max3(int a, int b, int c);
+int min3(int a, int b, int c);
+int max(int a, int b);
+int min(int a, int b);
 
 
 #endif

@@ -6,6 +6,13 @@
 include "basics.h"
 
 
+// Exit program with an error message
+void exit_with_message(const char *message, int error_code) {
+    // Print the message to standard error
+    fprintf(stderr, "%s\n", message);
+    exit(error_code);
+}
+
 int max3(int a, int b, int c) {
     int max = a;
 
@@ -40,6 +47,7 @@ int max(int a, int b) {
     }
 }
 
+
 int min(int a, int b) {
     if(a > b) {
         return b;
@@ -53,8 +61,7 @@ pAVL createAVL(Station s) {
     pAVL a = malloc(sizeof(AVL));
     if(a == NULL)
     {
-        printf("\nERROR: AVL allocation failed.");
-        exit(EXIT_FAILURE);
+        exit_with_message("ERROR: AVL allocation failed.", -1);
     }
 
     a->station = s;

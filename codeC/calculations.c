@@ -1,3 +1,3 @@
 /*
-    Contient les fonctions de calcul [...]
+    Contains calculation functions
 */
