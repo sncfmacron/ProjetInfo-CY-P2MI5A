@@ -1,52 +1,38 @@
 #!/bin/bash
 
 
-# Shell script to sort 
+# Shell script to run and sort data
 
 
-show_help() {
-    echo "================================="
-    echo "C-WIRE"
-    echo "================================="
+display_help() {
     echo "This script processes data for an electricity distribution."
-    echo
-    echo "Required arguments:"
-    echo "1. Path to the data file (mandatory)"
-    echo "   - Specifies the location of the input .csv file."
-    echo "2. Type of station to process (mandatory)"
-    echo "   - Possible values:"
-    echo "     * hvb (high-voltage B)"
-    echo "     * hva (high-voltage A)"
-    echo "     * lv (low-voltage)"
-    echo "3. Type of consumer to process (mandatory)"
-    echo "   - Possible values:"
-    echo "     * comp (businesses)"
-    echo "     * indiv (individuals)"
-    echo "     * all (all)"
-    echo "   - WARNING:"
-    echo "     The following options are prohibited:"
-    echo "     * hvb all"
-    echo "     * hvb indiv"
-    echo "     * hva all"
-    echo "     * hva indiv"
-    echo
-    echo "4. Power plant identifier (optional)"
-    echo "   - Filters the results for a specific power plant."
-    echo "5. Help option (-h) (optional and priority)"
-    echo "   - If present, all other options are ignored."
-    echo "   - Displays this detailed help information."
-    echo
+    echo ""
+    echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
+    echo ""
+    echo "Parameters description:"
+    echo ""
+    echo "   <path_file.csv>  Specifies the location of the input .csv file (required)."
+    echo "   <station_type>   Type of station to process: hva, hvb or lv (required)."
+    echo "   <consumer_type>  Type of consumer to process: all, comp or indiv (required)."
+    echo "   [central_id]     Filters the results for a specific central (optional)."
+    echo "   -h               Displays c-wire help manual (optional)."
+    echo ""
+    echo "- WARNING: The following options are forbidden:"
+    echo "    * hvb all"
+    echo "    * hvb indiv"
+    echo "    * hva all"
+    echo "    * hva indiv"
+    echo ""
     echo "Usage examples:"
-    echo "./c-wire.sh input/DATA_CWIRE.csv hva comp"
-    echo "./c-wire.sh input/DATA_CWIRE.csv all -h"
-    echo "================================="
+    echo "$0 input/DATA_CWIRE.csv hva comp"
+    echo ""
     exit 0
 }
 
 
-show_mini_help() {
+display_mini_help() {
     echo "Input error."
-    echo "Usage: $0 [options] <file_path> <station_type> <consumer_type> [plant_id]"
+    echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
     echo "Use the -h parameter to get full help."
     exit 1
 }
@@ -59,7 +45,7 @@ verifyParameters() {
     while getopts ":h" option; do
         case $option in
             h) 
-                show_mini_help
+                display_help
             ;;
         esac
     done
@@ -67,12 +53,12 @@ verifyParameters() {
     # Verify number of parameters
     if [ $# -gt 5 ] || [ $# -lt 1 ]; then
         echo "You must enter between 1 and 5 arguments"
-        show_mini_help
+        display_mini_help
     fi
 
     if [ ! -f "$1" ]; then
         echo "The first argument must indicate the path to a valid file."
-        show_mini_help
+        display_mini_help
     fi
 
     # Check second parameter
@@ -94,7 +80,7 @@ verifyParameters() {
             ;;
         *)
             echo "The third argument must be 'comp', 'indiv', or 'all'."
-            show_mini_help
+            display_mini_help
             ;;
     esac
 
@@ -128,6 +114,7 @@ compilation () {
     echo "ERREUR : le fichier main.c est manquant."
 
     else
+    echo ""
         # make
     fi
 
@@ -167,7 +154,7 @@ sortingData () {
 # Clean folders after execution
 clean () {
 
-    # rm -rf temp/*
+    rm -rf temp/*
 
 }
 
@@ -185,3 +172,8 @@ verifyParameters $@;
 
     echo "Shrek"
 
+
+
+
+
+exit 0
