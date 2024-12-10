@@ -15,6 +15,25 @@
 #include "parameters.h"
 
 // Structures
+typedef struct Station {
+    uint32_t id;
+    long consumption_sum;
+    long capacity;
+    char type[10]; // HVA, HVB or LV
+} Station;
 
+typedef struct {
+    uint32_t id;
+    long consumption;
+} Consumer;
+
+typedef struct {
+    Station station;
+    struct AVL *left;
+    struct AVL *right;
+    int balance;
+} AVL;
+
+typedef AVL* pAVL;
 
 #endif
