@@ -4,6 +4,7 @@
 # Shell script to run and sort data
 
 
+# Displays the program help manual
 display_help() {
     echo "This script processes data for an electricity distribution."
     echo ""
@@ -30,6 +31,7 @@ display_help() {
 }
 
 
+# Displays reduced program help
 display_mini_help() {
     echo "Input error."
     echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
@@ -75,7 +77,7 @@ verifyParameters() {
         comp|indiv|all)
             # Preventing invalid combinations
             if [[ "$2" == "hvb" && "$3" == "all" ]] || [[ "$2" == "hvb" && "$3" == "indiv" ]] || [[ "$2" == "hva" && "$3" == "all" ]] || [[ "$2" == "hva" && "$3" == "indiv" ]]; then
-                echo "Les combinaisons 'hvb all', 'hvb indiv', 'hva all', et 'hva indiv' sont interdites."
+                echo "The following combinations are forbidden: 'hvb all', 'hvb indiv', 'hva all', and 'hva indiv'."
             fi
             ;;
         *)
@@ -93,7 +95,7 @@ verifyParameters() {
 }
 
 
-# Function to check the presence of temp and graph folders
+# Check the presence of temp and graph folders
 verifyFolders() {
 
         rm -rf temp/*
@@ -107,14 +109,14 @@ verifyFolders() {
 }
 
 
-# Function to start C program compilation
+# Start C program compilation
 compilation () {
 
     if [ ! -f "codeC/main.c" ]; then
     echo "ERROR : main.c is missing."
 
     else
-        gcc codeC/main.c -o programme_c
+        gcc codeC/main.c -o program_c
         # make
     fi
 
@@ -137,13 +139,13 @@ sortingData () {
         hva)
         # Supprimer les '-' directement avec la commande (grep) ?
         # Il faut voir comment on va trier les données
-            awk -F ';' 'NR > 2 && $3 != "-" { print $3, $7 }' "$1" | ./programme_c
+            awk -F ';' 'NR > 2 && $3 != "-" { print $3, $7 }' "$1" | ./program_c
             ;;
         hvb)
-            awk -F ';' 'NR > 2 { print $2 }' "$1" | ./programme_c
+            awk -F ';' 'NR > 2 { print $2 }' "$1" | ./program_c
             ;;
         lv)
-            awk -F ';' 'NR > 2 { print $4 }' "$1" | ./programme_c
+            awk -F ';' 'NR > 2 { print $4 }' "$1" | ./program_c
             ;;
     esac
 
