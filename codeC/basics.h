@@ -2,8 +2,9 @@
     Contains the basic structures and libraries
 */
 
-#ifndef BASIC_H
-#define BASIC_H
+
+#ifndef BASIC_HEADER
+#define BASIC_HEADER
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,11 +13,15 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "parameters.h"
+#include "settings.h"
+#include "input.h"
+#include "output.h"
+#include "calculations.h"
 
 
 // Structures
 typedef struct Station {
+    uint8_t linked_central;
     uint32_t id;
     unsigned long consumption_sum;
     unsigned long capacity;
@@ -24,6 +29,7 @@ typedef struct Station {
 } Station;
 
 typedef struct {
+    uint32_t linked_station;
     long id;
     unsigned long consumption;
 } Consumer;
@@ -32,7 +38,7 @@ typedef struct {
     Station station;
     struct AVL *left;
     struct AVL *right;
-    int balance; //  on verra
+    int balance;
 } AVL;
 
 typedef AVL* pAVL;
@@ -41,8 +47,9 @@ void exit_with_message(const char *message, int error_code);
 
 pAVL createAVL(Station s);
 pAVL insertionAVL(pAVL a, Station s, int *h);
-/* A coder
+/* A coder Nathan :DDDDD
 
+pAVL deleteAVL(pAVL a, int *h, int *pe);
 pAVL deleteMinAVL(pAVL a, int *h, int *pe);
 pAVL deleteAVL(pAVL a, Station s, int *h);
 pAVL equilibrateAVL(pAVL a);

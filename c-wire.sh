@@ -8,15 +8,13 @@
 display_help() {
     echo "This script processes data for an electricity distribution."
     echo ""
-    echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
-    echo ""
-    echo "Parameters description:"
+    echo "- Parameters description:"
     echo ""
     echo "   <path_file.csv>  Specifies the location of the input .csv file (required)."
     echo "   <station_type>   Type of station to process: hva, hvb or lv (required)."
     echo "   <consumer_type>  Type of consumer to process: all, comp or indiv (required)."
     echo "   [central_id]     Filters the results for a specific central (optional)."
-    echo "   -h               Displays c-wire help manual (optional)."
+    echo "   -h               Displays program help manual (optional)."
     echo ""
     echo "- WARNING: The following options are forbidden:"
     echo "    * hvb all"
@@ -24,8 +22,13 @@ display_help() {
     echo "    * hva all"
     echo "    * hva indiv"
     echo ""
-    echo "Usage examples:"
-    echo "$0 input/DATA_CWIRE.csv hva comp"
+    echo "Usage:"
+    echo ""
+    echo "$0 <path_file.csv> <station_type> <consumer_type> [central_id]"
+    echo ""
+    echo "Usage example:"
+    echo ""
+    echo "$0 input/DATA_CWIRE.csv hvb comp 3"
     echo ""
     exit 0
 }
@@ -44,9 +47,10 @@ display_mini_help() {
 verifyParameters() {
 
     # Verify is "-h" is present
-    while getopts ":h" option; do
+    # OU utiliser getops mais je ne comprends pas comment ça fonctionne
+    for option in "$@"; do
         case $option in
-            h) 
+            -h) 
                 display_help
             ;;
         esac
@@ -69,6 +73,7 @@ verifyParameters() {
             ;;
         *)
             echo "Second argument must be 'hva', 'hvb', or 'lv'."
+            display_mini_help
             ;;
     esac
 
@@ -78,6 +83,7 @@ verifyParameters() {
             # Preventing invalid combinations
             if [[ "$2" == "hvb" && "$3" == "all" ]] || [[ "$2" == "hvb" && "$3" == "indiv" ]] || [[ "$2" == "hva" && "$3" == "all" ]] || [[ "$2" == "hva" && "$3" == "indiv" ]]; then
                 echo "The following combinations are forbidden: 'hvb all', 'hvb indiv', 'hva all', and 'hva indiv'."
+                display_mini_help
             fi
             ;;
         *)
@@ -90,6 +96,7 @@ verifyParameters() {
     if [ -n "$5" ]; then
         if [ ! -s "$5" ] || ! grep -q "^$5;" "$1"; then
             echo "The fourth argument must be a valid plant identifier."
+            exit 1
         fi
     fi
 }
@@ -102,7 +109,7 @@ verifyFolders() {
 
         mkdir -p graphs input temp
 
-    if [ ! -f "input/DATA_CWIRE.csv" ] ; then
+    if [ ! -f "input/DATA_CWIRE.csv" ]; then
         echo "The input file must be named 'DATA_CWIRE.csv'"
         exit 1
     fi
@@ -119,8 +126,7 @@ compilation () {
         echo "ERROR: program_c already exists."
         exit 1
     else
-        gcc codeC/main.c -o program_c
-        # make
+        make --no-print-directory -C codeC run
     fi
 
     # Checks that compilation has gone well
@@ -130,20 +136,26 @@ compilation () {
     fi
 }
 
+displayTime () {
+
+    # configurer time ici pour pas faire une formule de 1000km dans sortingData()
+    echo ""
+}
+
 # Sorting function
 sortingData () {
 
-    # awk -F ";" '$1 == "1" && $2 == "1"' fichier.csv*
-    # awk 'pattern { action }' fichier
-    # Utilisation de la commande "time programme" elle est très précise mais sort trop d'infos qu'il est possible de filtrer
+    # awk 'pattern { action }' fichier ; exemple : awk -F ";" '$1 == "1" && $2 == "1"' fichier.csv*
 
     case "$2" in
         hvb)
-            awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" | ./program_c
+            # Ajouter conditions pour ne pas print le "-" dans fichiers triés
+            time(awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $7 }' "$1" > temp/sorted_hvb.txt) 2>&1
+            awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" > temp/sorted_comp.txt
             ;;
         hva)
-            time(awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" | ./program_c) 2>&1
-            echo "Tri réussi"
+            awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/sorted_hva.txt
+            awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/sorted_comp.txt
             ;;
         lv)
             case "$3" in
@@ -161,32 +173,27 @@ sortingData () {
             esac
                 ;;
     esac
-
-
 }
 
 
 # Clean folders after execution
 clean () {
 
-    rm -rf temp/*
-    rm program_c
+    # rm -rf temp/*
+    # rm codeC/progam_c
+    echo ""
 
 }
 
 
-verifyParameters $@;
+verifyParameters $@
 
-    verifyFolders
+verifyFolders
 
-    compilation
+sortingData $@
 
-    sortingData $@ && clean
+compilation
 
-
-
-
-
-
+clean
 
 exit 0

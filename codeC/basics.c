@@ -3,7 +3,7 @@
 */
 
 
-include "basics.h"
+# include "basics.h"
 
 
 // Exit program with an error message
@@ -56,12 +56,12 @@ int min(int a, int b) {
     }
 }
 
-
+/* Je mets ça en commentaire pour pouvoir make et faire des tests car il faut coder equilibrateAVL etc
 pAVL createAVL(Station s) {
     pAVL a = malloc(sizeof(AVL));
     if(a == NULL)
     {
-        exit_with_message("ERROR: AVL allocation failed.", -1);
+        exit_with_message("ERROR: AVL allocation failed.", 1);
     }
 
     a->station = s;
@@ -71,32 +71,7 @@ pAVL createAVL(Station s) {
     return a;
 }
 
-
-pAVL insertionAVL(pAVL a, Station s, int *h) {
-    if (a == NULL) {
-        *h = 1;
-        return createAVL(s);
-    } 
-    else if (s.id < a->station.id) {
-        a->left = insertionAVL(a->left, s, h);
-        *h = -*h;
-    } 
-    else if (s.id > a->station.id) {
-        a->right = insertionAVL(a->right, s, h);
-    } 
-    else {
-        *h = 0;
-        return a;
-    }
-
-    if (*h != 0) {
-        a->balance += *h;
-        a = equilibrerAVL(a);
-        *h = (a->balance == 0) ? 0 : 1;
-    }
-
-    return a;
-}
+*/
 
 
 void cleanAVL(pAVL a) {
