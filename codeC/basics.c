@@ -3,7 +3,11 @@
 */
 
 
+<<<<<<< HEAD
 # include "basics.h"
+=======
+#include "basics.h"
+>>>>>>> a02a652e4245e2446d8805e56819c2c37cac36f0
 
 
 // Exit program with an error message
