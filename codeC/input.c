@@ -13,13 +13,13 @@ void readDataHVB()
     char buffer[MAX_BUFFER_SIZE];
 
     FILE* file = NULL;
-    file = fopen("../temp/sorted_hvb.txt", "r");
+    file = fopen("../temp/lv_capacity_sorted.csv", "r");
     if(file == NULL)
     {
         exit_with_message("ERROR: allocation failed", 1);
     }
 
-    while (fgets(buffer, MAX_BUFFER_SIZE, file)) {
+    while (fgets(buffer, MAX_BUFFER_SIZE, file) != NULL) {
         // strok(str, delim) pour séparer l'entrée du shell en différentes chaines de caractères
         char *centrale_id = strtok(buffer, " ");
         char *station_id = strtok(NULL, " ");

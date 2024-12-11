@@ -140,6 +140,7 @@ displayTime () {
 
     # configurer time ici pour pas faire une formule de 1000km dans sortingData()
     echo ""
+    # time
 }
 
 # Sorting function
@@ -150,25 +151,26 @@ sortingData () {
     case "$2" in
         hvb)
             # Ajouter conditions pour ne pas print le "-" dans fichiers triés
-            time(awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $7 }' "$1" > temp/sorted_hvb.txt) 2>&1
-            awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" > temp/sorted_comp.txt
+            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/hvb_capacity_sorted.csv
+            awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" > temp/sorted_comp_load.csv
             ;;
         hva)
-            awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/sorted_hva.txt
-            awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/sorted_comp.txt
+            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/hva_capacity_sorted.csv
+            awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/sorted_comp_load.csv
             ;;
         lv)
             case "$3" in
                 all)
-                    awk -F ';' 'NR > 2 { print $1, $4, $5, $6, $7, $8 }' "$1" | ./program_c
+                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" > temp/lv_capacity_sorted.csv
+
                     ;;
 
                 comp)
-                    awk -F ';' 'NR > 2 && $5 != "-" { print $1, $4, $5, $7, $8 }' "$1" | ./program_c
+                    awk -F ';' 'NR > 2 && $5 != "-" { print $1, $4, $5, $7, $8 }' "$1"
                     ;;
 
                 indiv)
-                    awk -F ';' 'NR > 2 && $6 != "-" { print $1, $4, $6, $7, $8 }' "$1" | ./program_c
+                    awk -F ';' 'NR > 2 && $6 != "-" { print $1, $4, $6, $7, $8 }' "$1"
                     ;;
             esac
                 ;;
