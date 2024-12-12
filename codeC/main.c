@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
         exit_with_message("ERROR: invalid number of parameters", 1);
     }
 
+    // Lire les données triées par le shell
+    // Là getStationType(argv[1]) va permettre de connaitre le type de station qu'on traite ! (voir basics.h)
     readData(getStationType(argv[1]));
 
     printf("\nBoumiz\n");

@@ -123,7 +123,7 @@ compilation () {
         echo "ERROR: program_c already exists."
         exit 1
     else
-        make --no-print-directory -C codeC run TYPE=$1 CONSUMER=$2
+        make --no-print-directory -C codeC TYPE=$1 CONSUMER=$2
     fi
 
     # Checks that compilation has gone well
@@ -148,23 +148,20 @@ sortingData () {
 
     case "$2" in
         hvb)
-            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/stations_sorted.csv
+            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" | ./codeC/program_c "hvb" "comp"
             # awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" > temp/load_sorted.csv
-            compilation "hvb"
             ;;
 
         hva)
 
             awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/stations_sorted.csv
             # awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/load_sorted.csv
-            compilation "hva"
             ;;
 
         lv)
             case "$3" in
                 all)
-                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" > temp/stations_sorted.csv
-                    compilation "lv" "all"
+                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "all"
 
                     ;;
 
@@ -192,6 +189,8 @@ clean () {
 verifyParameters $@
 
 verifyFolders
+
+compilation $2 $3
 
 sortingData $@
 
