@@ -49,7 +49,7 @@ void exit_with_message(const char *message, int error_code);
 int getStationType(const char *station);
 pStation createStation(int centrale_id, int station_id, long capacity, int stationType);
 
-// pAVL createAVL(Station s);
+pAVL createAVL(pStation s);
 // pAVL insertionAVL(pAVL a, Station s, int *h);
 /* A coder, Nathan :DDDDDDDD
 

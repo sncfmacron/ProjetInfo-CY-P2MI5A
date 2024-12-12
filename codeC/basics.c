@@ -87,14 +87,14 @@ int min(int a, int b) {
     }
 }
 
-
-
-/* Je mets ça en commentaire pour pouvoir make et faire des tests car il faut coder equilibrateAVL etc
-pAVL createAVL(Station s) {
+pAVL createAVL(pStation s) {
+    if(s == NULL){
+        exit_with_message("ERROR: NULL pointer", 3);
+    }
     pAVL a = malloc(sizeof(AVL));
     if(a == NULL)
     {
-        exit_with_message("ERROR: AVL allocation failed.", 1);
+        exit_with_message("ERROR: AVL allocation failed.", 4);
     }
 
     a->station = s;
@@ -103,7 +103,24 @@ pAVL createAVL(Station s) {
     a->balance = 0;
     return a;
 }
-*/
+
+pAVL insertAVL(pAVL a, pStation s){
+    if(s == NULL){
+        exit_with_message("ERROR: Station doesn't exist", 5);
+    }
+
+    if(a == NULL){
+        return createAVL;
+    }
+    else if(s->id < a->station->id){
+        a->left=insertAVL(a->left, s);
+    }
+    else if(s->id > a->station->id){
+        a->right=insertAVL(a->right, s);
+    }
+    return s;
+}
+
 
 
 void cleanAVL(pAVL a) {
