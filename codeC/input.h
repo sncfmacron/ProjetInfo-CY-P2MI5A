@@ -8,8 +8,10 @@
 
 #include "basics.h"
 
+typedef struct Station Station;
 
 void readData(int stationType);
+void printStation(Station s);
 
 
 #endif

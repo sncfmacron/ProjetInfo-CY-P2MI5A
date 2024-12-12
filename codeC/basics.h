@@ -23,9 +23,9 @@
 typedef struct Station {
     uint8_t linked_central;
     uint32_t id;
-    unsigned long consumption_sum;
-    unsigned long capacity;
-    char type[MAX_STATION_TYPE]; // HVA, HVB or LV
+    long consumption_sum;
+    long capacity;
+    uint8_t type; // STATION_HVB, STATION_HVA or STATION_LV
 } Station;
 
 typedef struct {
@@ -47,6 +47,7 @@ typedef AVL* pAVL;
 // Functions declaration
 void exit_with_message(const char *message, int error_code);
 int getStationType(const char *station);
+Station createStation(int centrale_id, int station_id, long capacity, int stationType);
 
 pAVL createAVL(Station s);
 pAVL insertionAVL(pAVL a, Station s, int *h);

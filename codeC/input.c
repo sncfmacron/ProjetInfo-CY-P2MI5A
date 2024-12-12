@@ -10,20 +10,6 @@ void readData(int stationType)
 {
     char buffer[MAX_BUFFER_SIZE];
 
-    switch (stationType) {
-        case STATION_HVB:
-            printf("-- Il s'agit de HVB --\n\n");
-            break;
-
-        case STATION_HVA:
-            printf("-- Il s'agit de HVA --\n\n");
-            break;
-
-        case STATION_LV:
-            printf("-- Il s'agit de LV --\n\n");
-            break;
-    }
-
     FILE* file = NULL;
     file = fopen("../temp/stations_sorted.csv", "r");
     if(file == NULL)
@@ -37,17 +23,42 @@ void readData(int stationType)
         char *station_id = strtok(NULL, " ");
         char *capacity = strtok(NULL, "\n");
 
+        // Convertir chaine en entier ou long
+        int centrale_id_int = atoi(centrale_id);
+        int station_id_int = atoi(station_id);
+        long capacity_long = atol(capacity);
+
         if (centrale_id && station_id && capacity) {
-            printf("Central ID: %s\n", centrale_id);
-            printf("Station ID: %s\n", station_id);
-            printf("Capacity: %s kV\n", capacity);
+            Station s = createStation(centrale_id_int, station_id_int, capacity_long, stationType);
+            printStation(s);
+            //insertionAVL(s);
         }
-        
-        printf("----------------------\n");
+
     }
 
     fclose(file);
 
-
     printf("Affichage des données réussi");
+}
+
+
+// Je mets ça ici pour test, on pourra l'enlever
+void printStation(Station s) {
+
+    switch (s.type) {
+        case 0:
+            printf("Station type : HVB\n");
+            break;
+        case 1:
+            printf("Station type : HVA\n");
+            break;
+        case 2:
+            printf("Station type : LV\n");
+            break;
+    }
+
+    printf("Central ID: %d\n", s.linked_central);
+    printf("Station ID: %d\n", s.id);
+    printf("Capacity: %ld kV\n", s.capacity);
+    printf("----------------------\n");
 }

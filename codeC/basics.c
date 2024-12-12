@@ -26,10 +26,13 @@ int getStationType(const char *station) {
 }
 
 
-Station createStation(int station_id) {
+Station createStation(int centrale_id, int station_id, long capacity, int stationType) {
 
     Station s;
+    s.linked_central = centrale_id;
     s.id = station_id;
+    s.capacity = capacity;
+    s.type = stationType;
 
     return s;
 }

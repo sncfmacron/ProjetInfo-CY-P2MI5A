@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 
     readData(getStationType(argv[1]));
 
-    printf("\nBim Bam Boum Boumiz\n");
+    printf("\nBoumiz\n");
   
     return 0;
 }
