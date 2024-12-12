@@ -17,8 +17,8 @@
 
 ## Usage
 
-To run the program, please use `./c-wire.sh <path_file.csv> <station_type> <consumer_type> [central_id]`.
-Use the `-h` parameter to get full help.
+- To run the program, please use `./c-wire.sh <path_file.csv> <station_type> <consumer_type> [central_id]`.
+U- se the `-h` parameter to get full help.
 
 ## Content
 

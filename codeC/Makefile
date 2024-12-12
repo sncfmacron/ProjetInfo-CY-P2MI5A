@@ -27,5 +27,5 @@ $(EXEC): $(OBJ)
 run: $(EXEC)
 	@./$(EXEC) $(TYPE) $(CONSUMER)
 
-#clean:
-#	rm -f $(BUILD)/*.o $(EXEC) temp/*
+clean:
+	rm -f $(BUILD)/*.o $(EXEC) temp/*

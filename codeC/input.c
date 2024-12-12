@@ -17,6 +17,7 @@ void readData(int stationType) {
         char *station_id_str = strtok(NULL, " ");
         char *capacity_str = strtok(NULL, "\n");
 
+        // Convertir les chaines récupérées en haut en entier ou long
         int centrale_id = atoi(centrale_id_str);
         int station_id = atoi(station_id_str);
         long capacity = atol(capacity_str);

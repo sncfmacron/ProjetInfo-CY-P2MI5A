@@ -6,29 +6,29 @@
 
 # Displays the program help manual
 display_help() {
-    echo "This script processes data for an electricity distribution."
-    echo ""
-    echo "- Parameters description:"
-    echo ""
-    echo "   <path_file.csv>  Specifies the location of the input .csv file (required)."
-    echo "   <station_type>   Type of station to process: hva, hvb or lv (required)."
-    echo "   <consumer_type>  Type of consumer to process: all, comp or indiv (required)."
-    echo "   [central_id]     Filters the results for a specific central (optional)."
-    echo "   -h               Displays program help manual (optional)."
-    echo ""
-    echo "- WARNING: The following options are forbidden:"
-    echo "    * hvb all"
-    echo "    * hvb indiv"
-    echo "    * hva all"
-    echo "    * hva indiv"
+    bold=$(tput bold)
+    normal=$(tput sgr0)
+
+    echo "CWIRE: this script processes data for an electricity distribution."
     echo ""
     echo "Usage:"
+    echo "      $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
     echo ""
-    echo "$0 <path_file.csv> <station_type> <consumer_type> [central_id]"
+    echo "Options:"
+    echo "      <path_file.csv>  Specifies the location of the input .csv file (required)."
+    echo "      <station_type>   Type of station to process: hva, hvb or lv (required)."
+    echo "      <consumer_type>  Type of consumer to process: all, comp or indiv (required)."
+    echo "      [central_id]     Filters the results for a specific central (optional)."
+    echo "      -h               Displays program help manual (optional)."
+    echo ""
+    echo "WARNING: The following options are forbidden:"
+    echo "      * hvb all"
+    echo "      * hvb indiv"
+    echo "      * hva all"
+    echo "      * hva indiv"
     echo ""
     echo "Usage example:"
-    echo ""
-    echo "$0 input/DATA_CWIRE.csv hvb comp 3"
+    echo "      $0 input/DATA_CWIRE.csv hvb comp 3"
     echo ""
     exit 0
 }
@@ -36,7 +36,6 @@ display_help() {
 
 # Displays reduced program help
 display_mini_help() {
-    echo "Input error."
     echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
     echo "Use the -h parameter to get full help."
     exit 1
@@ -91,9 +90,9 @@ verifyParameters() {
             ;;
     esac
 
-    # Check fifth parameter (valid plant identifier)
-    if [ -n "$5" ]; then
-        if [ ! -s "$5" ] || ! grep -q "^$5;" "$1"; then
+    # Check fourth parameter (valid plant identifier)
+    if [ -n "$4" ]; then
+        if [ ! -s "$4" ] || ! grep -q "^$4;" "$1"; then
             echo "The fourth argument must be a valid plant identifier."
             exit 1
         fi
@@ -108,7 +107,7 @@ verifyFolders() {
         mkdir -p graphs input temp
 
     if [ ! -f "input/DATA_CWIRE.csv" ]; then
-        echo "The input file must be named 'DATA_CWIRE.csv'"
+        echo "You must put your input file in /input directory and name it 'DATA_CWIRE.csv'."
         exit 1
     fi
 }
@@ -119,7 +118,7 @@ compilation () {
     if [ ! -f "codeC/main.c" ]; then
         echo "ERROR: main.c is missing."
         exit 1
-    elif [ -f program_c ]; then # plutôt "codeC/program_c" mais je le coderai après
+    elif [ -f codeC/program_c ]; then
         echo "ERROR: program_c already exists."
         exit 1
     else
@@ -137,25 +136,27 @@ compilation () {
 # Displays time
 displayTime () {
     # configurer time ici pour pas faire une formule de 1000km dans sortingData()
-    echo ""
     # time
+    echo ""
 }
 
 
 # Sorting function
 sortingData () {
-    # awk 'pattern { action }' fichier ; exemple : awk -F ";" '$1 == "1" && $2 == "1"' fichier.csv*
+    # awk 'pattern { action }' fichier
+    # exemple : awk -F ";" '$1 == "1" && $2 == "1"' fichier.csv
+    # Il faudrait transmettre toutes les données en une ligne!
 
     case "$2" in
         hvb)
-            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" | ./codeC/program_c "hvb" "comp"
-            # awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" > temp/load_sorted.csv
+            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-" { print $1, $2, $7 }' "$1" | ./codeC/program_c "hvb" "comp"
+
             ;;
 
         hva)
 
-            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/stations_sorted.csv
-            # awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/load_sorted.csv
+            awk -F ';' 'NR > 2 && $3 != "-" && $7 != "-" && $2 == "-" { print $1, $3, $7 }' "$1" | ./codeC/program_c "hva" "comp"
+
             ;;
 
         lv)
@@ -166,10 +167,12 @@ sortingData () {
                     ;;
 
                 comp)
-                    
+                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "comp"
+
                     ;;
 
                 indiv)
+                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "indiv"
 
                     ;;
             esac
@@ -180,9 +183,8 @@ sortingData () {
 
 # Clean folders after execution
 clean () {
-    # rm -rf temp/*
-    # rm codeC/progam_c
-    echo ""
+    rm -rf temp/*
+    rm codeC/program_c
 }
 
 
