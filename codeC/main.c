@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Lire les données triées par le shell dans input.c
-    // Là getStationType(argv[1]) va permettre de connaitre le type de station qu'on traite ! (voir basics.h)
+    // Là getStationType(argv[1]) va permettre de connaitre le type de station qu'on traite ! (voir settings.h)
     readData(getStationType(argv[1]));
 
     printf("\nBoumiz\n");

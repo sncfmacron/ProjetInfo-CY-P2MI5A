@@ -82,23 +82,6 @@ int min(int a, int b) {
 }
 
 
-/* Je mets ça en commentaire pour pouvoir make et faire des tests car il faut coder equilibrateAVL etc
-pAVL createAVL(Station s) {
-    pAVL a = malloc(sizeof(AVL));
-    if(a == NULL)
-    {
-        exit_with_message("ERROR: AVL allocation failed.", 1);
-    }
-
-    a->station = s;
-    a->left = NULL;
-    a->right = NULL;
-    a->balance = 0;
-    return a;
-}
-*/
-
-
 void cleanAVL(pAVL a) {
     if(a == NULL)
     {

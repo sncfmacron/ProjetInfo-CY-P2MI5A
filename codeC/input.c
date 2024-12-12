@@ -15,7 +15,9 @@ void readData(int stationType) {
         // strok(str, delim) pour séparer l'entrée du shell en différentes chaines de caractères
         char *centrale_id_str = strtok(buffer, " ");
         char *station_id_str = strtok(NULL, " ");
-        char *capacity_str = strtok(NULL, "\n");
+        //char *consumer_id = strtok(NULL, " ");
+        char *capacity_str = strtok(NULL, " ");
+        // char *load = strtok(NULL, "\n");
 
         // Convertir les chaines récupérées en haut en entier ou long
         int centrale_id = atoi(centrale_id_str);
@@ -25,7 +27,7 @@ void readData(int stationType) {
         if (centrale_id && station_id && capacity) {
             Station s = createStation(centrale_id, station_id, capacity, stationType);
             printStation(s);
-            //insertionAVL(s);
+            //insertAVL(s);
 
         }
     }

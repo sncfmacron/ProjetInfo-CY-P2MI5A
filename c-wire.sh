@@ -6,13 +6,11 @@
 
 # Displays the program help manual
 display_help() {
-    bold=$(tput bold)
-    normal=$(tput sgr0)
-
-    echo "CWIRE: this script processes data for an electricity distribution."
+    echo "CWIRE: this program processes data for an electricity distribution."
     echo ""
     echo "Usage:"
     echo "      $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
+    echo "      Note : you must place your input file in /input directory and name it 'DATA_CWIRE.csv'."
     echo ""
     echo "Options:"
     echo "      <path_file.csv>  Specifies the location of the input .csv file (required)."
@@ -107,7 +105,8 @@ verifyFolders() {
         mkdir -p graphs input temp
 
     if [ ! -f "input/DATA_CWIRE.csv" ]; then
-        echo "You must put your input file in /input directory and name it 'DATA_CWIRE.csv'."
+        echo "You must place your input file in /input directory and name it 'DATA_CWIRE.csv'."
+        display_mini_help
         exit 1
     fi
 }
@@ -149,7 +148,8 @@ sortingData () {
 
     case "$2" in
         hvb)
-            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-" { print $1, $2, $7 }' "$1" | ./codeC/program_c "hvb" "comp"
+            awk -F ';' 'NR > 2 && $2 != "-" && $3 == "-" { print $1, $2, $5, $7, $8 }' "$1" | ./codeC/program_c "hvb" "comp"
+            awk -F ';' 'NR > 2 && $2 != "-" && $3 == "-" { print $1, $2, $5, $7, $8 }' "$1" > test.txt
 
             ;;
 
