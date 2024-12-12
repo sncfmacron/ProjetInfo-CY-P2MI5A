@@ -1,18 +1,39 @@
 /*
-    Basic functions and tree management bite
+    Basic functions and tree management
 */
 
 
-#include "basics.h"
 #include "basics.h"
 
 
 // Exit program with an error message
 void exit_with_message(const char *message, int error_code) {
-    // Print the message to standard error
-    fprintf(stderr, "%s\n", message);
+    printf("%s\n", message);
     exit(error_code);
 }
+
+
+int getStationType(const char *station) {
+    if(strcmp(station, "hvb") == 0) {
+        return STATION_HVB;
+    }
+    else if(strcmp(station, "hva") == 0) {
+        return STATION_HVA;
+    }
+    else {
+       return STATION_LV; 
+    }
+}
+
+
+Station createStation(int station_id) {
+
+    Station s;
+    s.id = station_id;
+
+    return s;
+}
+
 
 int max3(int a, int b, int c) {
     int max = a;
@@ -57,6 +78,7 @@ int min(int a, int b) {
     }
 }
 
+
 /* Je mets ça en commentaire pour pouvoir make et faire des tests car il faut coder equilibrateAVL etc
 pAVL createAVL(Station s) {
     pAVL a = malloc(sizeof(AVL));
@@ -71,7 +93,6 @@ pAVL createAVL(Station s) {
     a->balance = 0;
     return a;
 }
-
 */
 
 

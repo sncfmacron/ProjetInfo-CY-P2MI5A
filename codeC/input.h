@@ -8,7 +8,8 @@
 
 #include "basics.h"
 
-void readDataHVB();
+
+void readData(int stationType);
 
 
 #endif

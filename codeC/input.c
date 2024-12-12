@@ -6,17 +6,29 @@
 #include "input.h"
 
 
-// Ne fonctionne que pour les hvb -> c'est un test
-// ./c-wire.sh input/DATA_CWIRE.csv hvb comp
-void readDataHVB()
+void readData(int stationType)
 {
     char buffer[MAX_BUFFER_SIZE];
 
+    switch (stationType) {
+        case STATION_HVB:
+            printf("-- Il s'agit de HVB --\n\n");
+            break;
+
+        case STATION_HVA:
+            printf("-- Il s'agit de HVA --\n\n");
+            break;
+
+        case STATION_LV:
+            printf("-- Il s'agit de LV --\n\n");
+            break;
+    }
+
     FILE* file = NULL;
-    file = fopen("../temp/lv_capacity_sorted.csv", "r");
+    file = fopen("../temp/stations_sorted.csv", "r");
     if(file == NULL)
     {
-        exit_with_message("ERROR: allocation failed", 1);
+        exit_with_message("ERROR: allocation failed or file 'temp/stations_sorted.csv' is missing", 1);
     }
 
     while (fgets(buffer, MAX_BUFFER_SIZE, file) != NULL) {
@@ -37,5 +49,5 @@ void readDataHVB()
     fclose(file);
 
 
-    printf("Affichage données réussie");
+    printf("Affichage des données réussi");
 }

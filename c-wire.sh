@@ -45,9 +45,8 @@ display_mini_help() {
 
 # Parameters verification
 verifyParameters() {
-
     # Verify is "-h" is present
-    # OU utiliser getops mais je ne comprends pas comment ça fonctionne
+    # OU utiliser getops mais je ne comprends pas comment ça fonctionnev :(
     for option in "$@"; do
         case $option in
             -h) 
@@ -104,7 +103,6 @@ verifyParameters() {
 
 # Check the presence of temp and graph folders
 verifyFolders() {
-
         rm -rf temp/*
 
         mkdir -p graphs input temp
@@ -118,15 +116,14 @@ verifyFolders() {
 
 # Start C program compilation
 compilation () {
-
     if [ ! -f "codeC/main.c" ]; then
-        echo "ERROR : main.c is missing."
+        echo "ERROR: main.c is missing."
         exit 1
-    elif [ -f program_c ]; then
+    elif [ -f program_c ]; then # plutôt "codeC/program_c" mais je le coderai après
         echo "ERROR: program_c already exists."
         exit 1
     else
-        make --no-print-directory -C codeC run
+        make --no-print-directory -C codeC run TYPE=$1 CONSUMER=$2
     fi
 
     # Checks that compilation has gone well
@@ -136,41 +133,47 @@ compilation () {
     fi
 }
 
-displayTime () {
 
+# Displays time
+displayTime () {
     # configurer time ici pour pas faire une formule de 1000km dans sortingData()
     echo ""
     # time
 }
 
+
 # Sorting function
 sortingData () {
-
     # awk 'pattern { action }' fichier ; exemple : awk -F ";" '$1 == "1" && $2 == "1"' fichier.csv*
 
     case "$2" in
         hvb)
-            # Ajouter conditions pour ne pas print le "-" dans fichiers triés
-            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/hvb_capacity_sorted.csv
-            awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" > temp/sorted_comp_load.csv
+            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/stations_sorted.csv
+            # awk -F ';' 'NR > 2 && $2 != "-" { print $1, $2, $5, $7, $8 }' "$1" > temp/load_sorted.csv
+            compilation "hvb"
             ;;
+
         hva)
-            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/hva_capacity_sorted.csv
-            awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/sorted_comp_load.csv
+
+            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-"{ print $1, $2, $7 }' "$1" > temp/stations_sorted.csv
+            # awk -F ';' 'NR > 2 && $3 != "-" { print $1, $3, $5, $7, $8 }' "$1" > temp/load_sorted.csv
+            compilation "hva"
             ;;
+
         lv)
             case "$3" in
                 all)
-                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" > temp/lv_capacity_sorted.csv
+                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" > temp/stations_sorted.csv
+                    compilation "lv" "all"
 
                     ;;
 
                 comp)
-                    awk -F ';' 'NR > 2 && $5 != "-" { print $1, $4, $5, $7, $8 }' "$1"
+                    
                     ;;
 
                 indiv)
-                    awk -F ';' 'NR > 2 && $6 != "-" { print $1, $4, $6, $7, $8 }' "$1"
+
                     ;;
             esac
                 ;;
@@ -180,11 +183,9 @@ sortingData () {
 
 # Clean folders after execution
 clean () {
-
     # rm -rf temp/*
     # rm codeC/progam_c
     echo ""
-
 }
 
 
@@ -193,8 +194,6 @@ verifyParameters $@
 verifyFolders
 
 sortingData $@
-
-compilation
 
 clean
 

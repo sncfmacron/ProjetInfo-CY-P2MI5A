@@ -6,12 +6,15 @@
 #include "main.h"
 
 
-int main(void) {
+int main(int argc, char* argv[]) {
 
-    readDataHVB();
+    if(argc < 2) {
+        exit_with_message("ERROR: invalid number of parameters", 1);
+    }
 
+    readData(getStationType(argv[1]));
 
-    printf("\nBoumiz ez\n");
+    printf("\nBim Bam Boum Boumiz\n");
   
     return 0;
 }

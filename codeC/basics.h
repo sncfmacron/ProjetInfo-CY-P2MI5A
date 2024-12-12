@@ -43,11 +43,14 @@ typedef struct {
 
 typedef AVL* pAVL;
 
+
+// Functions declaration
 void exit_with_message(const char *message, int error_code);
+int getStationType(const char *station);
 
 pAVL createAVL(Station s);
 pAVL insertionAVL(pAVL a, Station s, int *h);
-/* A coder Nathan :DDDDD
+/* A coder, Nathan :DDDDDDDD
 
 pAVL deleteAVL(pAVL a, int *h, int *pe);
 pAVL deleteMinAVL(pAVL a, int *h, int *pe);
@@ -61,10 +64,10 @@ pAVL rotateDoubleRight(pAVL a);
 */
 void cleanAVL(pAVL a);
 
-int max3(int a, int b, int c);
-int min3(int a, int b, int c);
 int max(int a, int b);
+int max3(int a, int b, int c);
 int min(int a, int b);
+int min3(int a, int b, int c);
 
 
 #endif

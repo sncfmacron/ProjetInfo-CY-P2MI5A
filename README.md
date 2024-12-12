@@ -1,7 +1,7 @@
-# PREING-2 Computer Science Project
+# C-WIRE
 
-**Topic:** C-Wire  
-**Developed by the MI-5 team (Group A)**
+**PREING-2 Computer Science Project**
+**Developed by the MI-5 group A team**
 
 ## Contributors
 
@@ -17,7 +17,8 @@
 
 ## Usage
 
-To compile the program, please use `make`.
+To run the program, please use `./c-wire.sh <path_file.csv> <station_type> <consumer_type> [central_id]`.
+Use the `-h` parameter to get full help.
 
 ## Content
 
