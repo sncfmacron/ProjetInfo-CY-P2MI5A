@@ -23,7 +23,7 @@ void readData(int stationType) {
         long capacity = atol(capacity_str);
 
         if (centrale_id && station_id && capacity) {
-            Station s = createStation(centrale_id, station_id, capacity, stationType);
+            pStation s = createStation(centrale_id, station_id, capacity, stationType);
             printStation(s);
             //insertionAVL(s);
 
@@ -35,22 +35,25 @@ void readData(int stationType) {
 
 
 // Je mets ça ici pour test, on pourra l'enlever
-void printStation(Station s) {
+void printStation(pStation s) {
 
-    switch (s.type) {
-        case 0:
+    switch (s->type) {
+        case 2:
             printf("Station type : HVB\n");
             break;
         case 1:
             printf("Station type : HVA\n");
             break;
-        case 2:
+        case 0:
             printf("Station type : LV\n");
+            break;
+        default:
+            exit_with_message("ERROR: Printed station doesn't exist", 3);
             break;
     }
 
-    printf("Central ID: %d\n", s.linked_central);
-    printf("Station ID: %d\n", s.id);
-    printf("Capacity: %ld kV\n", s.capacity);
+    printf("Central ID: %d\n", s->linked_central);
+    printf("Station ID: %d\n", s->id);
+    printf("Capacity: %ld kV\n", s->capacity);
     printf("----------------------\n");
 }

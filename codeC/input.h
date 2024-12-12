@@ -11,7 +11,7 @@
 typedef struct Station Station;
 
 void readData(int stationType);
-void printStation(Station s);
+void printStation(pStation s);
 
 
 #endif

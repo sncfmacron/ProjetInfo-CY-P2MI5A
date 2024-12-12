@@ -35,22 +35,22 @@ typedef struct {
 } Consumer;
 
 typedef struct {
-    Station station;
+    pStation station;
     struct AVL *left;
     struct AVL *right;
     int balance;
 } AVL;
 
 typedef AVL* pAVL;
-
+typedef Station* pStation;
 
 // Functions declaration
 void exit_with_message(const char *message, int error_code);
 int getStationType(const char *station);
-Station createStation(int centrale_id, int station_id, long capacity, int stationType);
+pStation createStation(int centrale_id, int station_id, long capacity, int stationType);
 
-pAVL createAVL(Station s);
-pAVL insertionAVL(pAVL a, Station s, int *h);
+// pAVL createAVL(Station s);
+// pAVL insertionAVL(pAVL a, Station s, int *h);
 /* A coder, Nathan :DDDDDDDD
 
 pAVL deleteAVL(pAVL a, int *h, int *pe);
