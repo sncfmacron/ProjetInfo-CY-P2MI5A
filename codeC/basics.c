@@ -1,5 +1,5 @@
 /*
-    Basic functions and tree management
+    Basic functions
 */
 
 
@@ -29,13 +29,13 @@ int getStationType(const char *station) {
 }
 
 
-pStation createStation(int centrale_id, int station_id, long capacity, int stationType) {
+pStation createStation(int power_plant_id, int station_id, long capacity, int stationType) {
 
     pStation s = malloc(sizeof(Station));
     if(s == NULL){
         exit_with_message("ERROR: Sation allocation failed", 2);
     }
-    s->linked_central = centrale_id;
+    s->linked_power_plant = power_plant_id;
     s->id = station_id;
     s->capacity = capacity;
     s->type = stationType;

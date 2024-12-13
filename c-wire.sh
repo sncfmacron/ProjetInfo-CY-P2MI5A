@@ -6,13 +6,11 @@
 
 # Displays the program help manual
 display_help() {
-    bold=$(tput bold)
-    normal=$(tput sgr0)
-
-    echo "CWIRE: this script processes data for an electricity distribution."
+    echo "CWIRE: this program processes data for an electricity distribution."
     echo ""
     echo "Usage:"
     echo "      $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
+    echo "      Note : you must place your input file in /input directory and name it 'DATA_CWIRE.csv'."
     echo ""
     echo "Options:"
     echo "      <path_file.csv>  Specifies the location of the input .csv file (required)."
@@ -92,7 +90,7 @@ verifyParameters() {
 
     # Check fourth parameter (valid plant identifier)
     if [ -n "$4" ]; then
-        if [ ! -s "$4" ] || ! grep -q "^$4;" "$1"; then
+        if ! grep -q "^$4;" "$1"; then
             echo "The fourth argument must be a valid plant identifier."
             exit 1
         fi
@@ -107,7 +105,8 @@ verifyFolders() {
         mkdir -p graphs input temp
 
     if [ ! -f "input/DATA_CWIRE.csv" ]; then
-        echo "You must put your input file in /input directory and name it 'DATA_CWIRE.csv'."
+        echo "You must place your input file in /input directory and name it 'DATA_CWIRE.csv'."
+        display_mini_help
         exit 1
     fi
 }
@@ -144,35 +143,36 @@ displayTime () {
 # Sorting function
 sortingData () {
     # awk 'pattern { action }' fichier
+    # -F pour indiquer car. de séparation, -v pour indiquer une variable a awk
     # exemple : awk -F ";" '$1 == "1" && $2 == "1"' fichier.csv
-    # Il faudrait transmettre toutes les données en une ligne!
 
     case "$2" in
         hvb)
-            awk -F ';' 'NR > 2 && $2 != "-" && $7 != "-" && $3 == "-" { print $1, $2, $7 }' "$1" | ./codeC/program_c "hvb" "comp"
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $1, $2, $5, $7, $8 }' "$1" | ./codeC/program_c "hvb" "comp"
+            #awk -F ';' 'NR > 2 && $2 != "-" && $3 == "-" { print $1, $2, $5, $7, $8 }' "$1" > test.txt
 
             ;;
 
         hva)
 
-            awk -F ';' 'NR > 2 && $3 != "-" && $7 != "-" && $2 == "-" { print $1, $3, $7 }' "$1" | ./codeC/program_c "hva" "comp"
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $7 != "-" && $2 == "-" { print $1, $3, $7 }' "$1" | ./codeC/program_c "hva" "comp"
 
             ;;
 
         lv)
             case "$3" in
                 all)
-                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "all"
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "all"
 
                     ;;
 
                 comp)
-                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "comp"
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "comp"
 
                     ;;
 
                 indiv)
-                    awk -F ';' 'NR > 2 && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "indiv"
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "indiv"
 
                     ;;
             esac

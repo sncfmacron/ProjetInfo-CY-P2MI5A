@@ -13,19 +13,21 @@ void readData(int stationType) {
     // On passe pour une pipe pour transmettre les données du shell vers program_c
     while (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL) {
         // strok(str, delim) pour séparer l'entrée du shell en différentes chaines de caractères
-        char *centrale_id_str = strtok(buffer, " ");
+        char *power_plant_str = strtok(buffer, " ");
         char *station_id_str = strtok(NULL, " ");
-        char *capacity_str = strtok(NULL, "\n");
+        //char *consumer_id = strtok(NULL, " ");
+        char *capacity_str = strtok(NULL, " ");
+        // char *load = strtok(NULL, "\n");
 
         // Convertir les chaines récupérées en haut en entier ou long
-        int centrale_id = atoi(centrale_id_str);
+        int power_plant_id = atoi(power_plant_str);
         int station_id = atoi(station_id_str);
         long capacity = atol(capacity_str);
 
-        if (centrale_id && station_id && capacity) {
-            pStation s = createStation(centrale_id, station_id, capacity, stationType);
+        if (power_plant_id && station_id && capacity) {
+            pStation s = createStation(power_plant_id, station_id, capacity, stationType);
             printStation(s);
-            //insertionAVL(s);
+            //insertAVL(s);
 
         }
     }
@@ -52,7 +54,7 @@ void printStation(pStation s) {
             break;
     }
 
-    printf("Central ID: %d\n", s->linked_central);
+    printf("Central ID: %d\n", s->linked_power_plant);
     printf("Station ID: %d\n", s->id);
     printf("Capacity: %ld kV\n", s->capacity);
     printf("----------------------\n");
