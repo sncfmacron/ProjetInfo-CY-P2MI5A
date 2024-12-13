@@ -130,7 +130,7 @@ void cleanAVL(pAVL a) {
     }
 
     free(a->left);
-    free(a->right);
+    free(a->right); // EDIT : faire une fonction recursive je pense free(a-left) -> cleanAVL(a->left)
 
     free(a);
 }
