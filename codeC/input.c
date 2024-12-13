@@ -40,13 +40,13 @@ void readData(int stationType) {
 void printStation(pStation s) {
 
     switch (s->type) {
-        case 0:
+        case 2:
             printf("Station type : HVB\n");
             break;
         case 1:
             printf("Station type : HVA\n");
             break;
-        case 2:
+        case 0:
             printf("Station type : LV\n");
             break;
     }
