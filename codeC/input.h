@@ -1,5 +1,5 @@
 /*
-
+    Library for input.c
 */
 
 
@@ -9,9 +9,10 @@
 #include "basics.h"
 
 typedef struct Station Station;
+typedef struct Station* pStation;
 
 void readData(int stationType);
-void printStation(Station s);
+void printStation(pStation s);
 
 
 #endif

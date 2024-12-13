@@ -1,5 +1,5 @@
 /*
-    Basic functions and tree management
+    Basic functions
 */
 
 
@@ -20,19 +20,26 @@ int getStationType(const char *station) {
     else if(strcmp(station, "hva") == 0) {
         return STATION_HVA;
     }
+    else if(strcmp(station, "lv") == 0) {
+        return STATION_LV;
+    }
     else {
-       return STATION_LV; 
+       exit_with_message("ERROR: Unrecognised station", 1);
+       return 1;
     }
 }
 
 
-Station createStation(int centrale_id, int station_id, long capacity, int stationType) {
+pStation createStation(int power_plant_id, int station_id, long capacity, int stationType) {
 
-    Station s;
-    s.linked_central = centrale_id;
-    s.id = station_id;
-    s.capacity = capacity;
-    s.type = stationType;
+    pStation s = malloc(sizeof(Station));
+    if(s == NULL){
+        exit_with_message("ERROR: Sation allocation failed", 2);
+    }
+    s->linked_power_plant = power_plant_id;
+    s->id = station_id;
+    s->capacity = capacity;
+    s->type = stationType;
 
     return s;
 }
@@ -79,17 +86,4 @@ int min(int a, int b) {
     } else {
         return a;
     }
-}
-
-
-void cleanAVL(pAVL a) {
-    if(a == NULL)
-    {
-        return;
-    }
-
-    free(a->left);
-    free(a->right);
-
-    free(a);
 }

@@ -13,15 +13,16 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "settings.h"
+#include "calculations.h"
 #include "input.h"
 #include "output.h"
-#include "calculations.h"
+#include "settings.h"
+#include "tree.h"
 
 
 // Structures
 typedef struct Station {
-    uint8_t linked_central;
+    uint8_t linked_power_plant;
     uint32_t id;
     long consumption_sum;
     long capacity;
@@ -42,28 +43,13 @@ typedef struct {
 } AVL;
 
 typedef AVL* pAVL;
+typedef Station* pStation;
 
 
 // Functions declaration
 void exit_with_message(const char *message, int error_code);
 int getStationType(const char *station);
-Station createStation(int centrale_id, int station_id, long capacity, int stationType);
-
-/* A coder, Nathan :DDDDDDDD
-
-pAVL createAVL(Station s);
-pAVL insertAVL(Station s);
-pAVL deleteAVL(pAVL a, int *h, int *pe);
-pAVL deleteMinAVL(pAVL a, int *h, int *pe);
-pAVL deleteAVL(pAVL a, Station s, int *h);
-pAVL equilibrateAVL(pAVL a);
-pAVL rotateLeft(pAVL a);
-pAVL rotateRight(pAVL a);
-pAVL rotateDoubleLeft(pAVL a);
-pAVL rotateDoubleRight(pAVL a);
-
-*/
-void cleanAVL(pAVL a);
+pStation createStation(int power_plant_id, int station_id, long capacity, int stationType);
 
 int max(int a, int b);
 int max3(int a, int b, int c);
