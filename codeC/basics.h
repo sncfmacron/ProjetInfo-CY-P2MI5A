@@ -19,32 +19,7 @@
 #include "settings.h"
 #include "tree.h"
 
-
 // Structures
-typedef struct Station {
-    uint8_t linked_power_plant;
-    uint32_t id;
-    long consumption_sum;
-    long capacity;
-    uint8_t type; // STATION_HVB, STATION_HVA or STATION_LV
-} Station;
-
-typedef struct {
-    uint32_t linked_station;
-    long id;
-    unsigned long consumption;
-} Consumer;
-
-typedef struct {
-    pStation station;
-    struct AVL *left;
-    struct AVL *right;
-    int balance;
-} AVL;
-
-typedef AVL* pAVL;
-typedef Station* pStation;
-
 
 // Functions declaration
 void exit_with_message(const char *message, int error_code);

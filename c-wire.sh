@@ -8,15 +8,19 @@
 display_help() {
     echo "CWIRE: this program processes data for an electricity distribution."
     echo ""
-    echo "Usage:"
-    echo "      $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
-    echo "      Note : you must place your input file in /input directory and name it 'DATA_CWIRE.csv'."
+    echo "Usage example:"
+    echo "      $0 input/DATA_CWIRE.csv lv comp 3"
     echo ""
-    echo "Options:"
-    echo "      <path_file.csv>  Specifies the location of the input .csv file (required)."
-    echo "      <station_type>   Type of station to process: hva, hvb or lv (required)."
-    echo "      <consumer_type>  Type of consumer to process: all, comp or indiv (required)."
-    echo "      [central_id]     Filters the results for a specific central (optional)."
+    echo "Usage:"
+    echo "      $0 <path_file.csv> <station_type> <consumer_type> [power_plant_id]"
+    echo "      Note : you must place your input file in '/input' directory and name it 'DATA_CWIRE.csv'."
+    echo ""
+    echo "Arguments:"
+    echo "      <path_file.csv>  Specifies the location of the input .csv file (mandatory)."
+    echo "      <station_type>   Type of station to process: hva, hvb or lv (mandatory)."
+    echo "      <consumer_type>  Type of consumer to process: all, comp or indiv (mandatory)."
+    echo "      [power_plant_id]     Filters the results for a specific power plant (optional)."
+    echo ""
     echo "      -h               Displays program help manual (optional)."
     echo ""
     echo "WARNING: The following options are forbidden:"
@@ -25,16 +29,13 @@ display_help() {
     echo "      * hva all"
     echo "      * hva indiv"
     echo ""
-    echo "Usage example:"
-    echo "      $0 input/DATA_CWIRE.csv hvb comp 3"
-    echo ""
     exit 0
 }
 
 
 # Displays reduced program help
 display_mini_help() {
-    echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [central_id]"
+    echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [power_plant_id]"
     echo "Use the -h parameter to get full help."
     exit 1
 }
@@ -91,7 +92,7 @@ verifyParameters() {
     # Check fourth parameter (valid plant identifier)
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
-            echo "The fourth argument must be a valid plant identifier."
+            echo "The fourth argument must be a valid power plant identifier."
             exit 1
         fi
     fi
@@ -102,7 +103,7 @@ verifyParameters() {
 verifyFolders() {
         rm -rf temp/*
 
-        mkdir -p graphs input temp
+        mkdir -p graphs input temp output
 
     if [ ! -f "input/DATA_CWIRE.csv" ]; then
         echo "You must place your input file in /input directory and name it 'DATA_CWIRE.csv'."
@@ -142,37 +143,33 @@ displayTime () {
 
 # Sorting function
 sortingData () {
-    # awk 'pattern { action }' fichier
-    # -F pour indiquer car. de séparation, -v pour indiquer une variable a awk
-    # exemple : awk -F ";" '$1 == "1" && $2 == "1"' fichier.csv
+
+    # We use the awk function to sort data. Usage : awk 'pattern { action }' file.
+    # Options : -F to indicate separating character, -v to indicate a variable.
+    # We send the sorted data through a pipe (standard input) for fast data transmission.
+    # The condition using the “custom_id” variable allows information to be sorted for a single plant only.
 
     case "$2" in
         hvb)
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $5, $7, $8 }' "$1" | ./codeC/program_c "hvb" "comp"
-
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }' "$1" | ./codeC/program_c "hvb" "comp"
             ;;
 
         hva)
-
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $7 != "-" && $2 == "-" { print $1, $3, $7 }' "$1" | ./codeC/program_c "hva" "comp"
-
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $2 == "-" { print $3, $7, $8 }' "$1" | ./codeC/program_c "hva" "comp"
             ;;
 
         lv)
             case "$3" in
                 all)
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "all"
-
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }' "$1" | ./codeC/program_c "lv" "all"
                     ;;
 
                 comp)
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "comp"
-
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }' "$1" | ./codeC/program_c "lv" "comp"
                     ;;
 
                 indiv)
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $7 != "-" { print $1, $4, $7 }' "$1" | ./codeC/program_c "lv" "indiv"
-
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }' "$1" | ./codeC/program_c "lv" "indiv"
                     ;;
             esac
                 ;;
@@ -187,6 +184,12 @@ clean () {
 }
 
 
+#makeGraphs () {
+#
+#}
+
+
+
 verifyParameters $@
 
 verifyFolders
@@ -196,5 +199,7 @@ compilation $2 $3
 sortingData $@
 
 clean
+
+#makeGraphs
 
 exit 0

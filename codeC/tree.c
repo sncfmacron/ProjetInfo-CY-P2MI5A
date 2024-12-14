@@ -5,7 +5,9 @@
 
 #include "tree.h"
 
-pAVL createAVL(pStation s) {
+// Je te laisse compléter cette partie -/////////////////////////////////////////-
+
+/*pAVL createAVL(pStation s) {
     if(s == NULL){
         exit_with_message("ERROR: NULL pointer", 3);
     }
@@ -75,4 +77,4 @@ void cleanAVL(pAVL a) {
     free(a->right); // EDIT : faire une fonction recursive je pense free(a-left) -> cleanAVL(a->left)
 
     free(a);
-}
+}*/

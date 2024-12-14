@@ -30,9 +30,7 @@ int getStationType(const char *station) {
 }
 
 
-
 pStation createStation(int station_id, long capacity, int stationType) {
-
 
     pStation s = malloc(sizeof(Station));
     if(s == NULL){
@@ -87,51 +85,4 @@ int min(int a, int b) {
     } else {
         return a;
     }
-}
-
-pAVL createAVL(pStation s) {
-    if(s == NULL){
-        exit_with_message("ERROR: NULL pointer", 3);
-    }
-    pAVL a = malloc(sizeof(AVL));
-    if(a == NULL)
-    {
-        exit_with_message("ERROR: AVL allocation failed.", 4);
-    }
-
-    a->station = s;
-    a->left = NULL;
-    a->right = NULL;
-    a->balance = 0;
-    return a;
-}
-
-pAVL insertAVL(pAVL a, pStation s){
-    if(s == NULL){
-        exit_with_message("ERROR: Station doesn't exist", 5);
-    }
-
-    if(a == NULL){
-        return createAVL;
-    }
-    else if(s->id < a->station->id){
-        a->left=insertAVL(a->left, s);
-    }
-    else if(s->id > a->station->id){
-        a->right=insertAVL(a->right, s);
-    }
-    return s;
-}
-
-
-
-void cleanAVL(pAVL a) {
-    if(a == NULL)
-    {
-        return;
-    }
-
-    free(a->left);
-    free(a->right);
-    free(a);
 }

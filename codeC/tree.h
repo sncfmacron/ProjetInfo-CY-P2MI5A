@@ -16,6 +16,8 @@ typedef struct Station {
     uint8_t type; // STATION_HVB, STATION_HVA or STATION_LV
 } Station;
 
+typedef Station* pStation;
+
 typedef struct {
     pStation station;
     struct AVL *left;
@@ -24,7 +26,7 @@ typedef struct {
 } AVL;
 
 typedef AVL* pAVL;
-typedef Station* pStation;
+
 
 pAVL insertAVL(pAVL a, pStation s, int* h);
 pAVL createAVL(pStation s);
@@ -47,7 +49,5 @@ pAVL rotateDoubleRight(pAVL a);
 void cleanAVL(pAVL a)
 
 */
-
-
 
 #endif

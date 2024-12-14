@@ -1,7 +1,7 @@
 # C-WIRE
 This program processes data for an electricity distribution.
 
-**PREING-2 Computer Science Project**. **Developed by the MI-5 group A team**
+**PREING-2 Computer Science Project**. **Developed by the MI-5 group A group**
 
 ## Contributors
 
@@ -11,24 +11,24 @@ This program processes data for an electricity distribution.
 
 ## Prerequisites
 
-- You need `GnuPlot` to obtain graphs and `make` program to compile.
-- To install GnuPlot on Ubuntu/Debian distributions, type `sudo apt install gnuplot`.
-- To install GnuPlot on Ubuntu/Debian distributions, type `sudo apt install make`.
+- You need **GnuPlot** to obtain graphs and **make** program to compile.
+- To install `GnuPlot` on Ubuntu/Debian distributions, use `sudo apt install gnuplot`.
+- To install `make` on Ubuntu/Debian distributions, use `sudo apt install make`.
 
 ## Usage
 
 To run the program, use `./c-wire.sh <path_file.csv> <station_type> <consumer_type> [central_id]`.
 
-Usage example : `./c-wire.sh ./input/DATA_CWIRE.csv hva comp 2`.
+Usage example : `./c-wire.sh ./input/DATA_CWIRE.csv hva comp 3`.
 
-Use the `-h` parameter to get full help.
-- Note : you must place your input file in /input directory and name it **DATA_CWIRE.csv**.
+Use `-h` parameter to get full help.
+- Note : you must place your input file in `/input` directory and name it **DATA_CWIRE.csv**.
 
 ## Description
 
-This project analyzes energy station data to determine whether each station is experiencing overproduction or underproduction. It also evaluates the proportion of energy consumed by companies and individuals. The goal is to provide insights into station capacity and energy consumption efficiently, even with large datasets.
+To find out if each energy station is overproducing or underproducing, this project examines data from electricity stations. It also calculates the proportion of energy consumed by companies and individuals. The goal is to provide insights into station capacity and energy electricity efficiently, even with large datasets.
 
-The program consists of two main parts: a Shell script and a C program that work together to process input data and filter relevant information.
+The program is made of two parts: a Shell script and a C program.
 
 ### Shell Script (`c-wire.sh`)
 
@@ -42,27 +42,27 @@ The program consists of two main parts: a Shell script and a C program that work
 - The script has **optionnal** input arguments:
 
 4. An **identifier of a central station** can be provided to make the script focuses on the analysis of a single power plant.
-5. An optional `-h` flag provides detailed help and instructions on using the script.
+5. `-h` parameter provides detailed help and instructions on using the script.
 
 The script sends the sorted information to the executable program using a **pipe**, which is the fastest way to do it.
 
-It compiles the C program if it’s missing and calls it with the provided parameters.
+It compiles the C program and calls it with the provided parameters.
 
-The script will create graphs from the data files calculated by the C program, using `GnuPlot`.
+The script creates graphs from the data files calculated by the C program, using `GnuPlot`.
 
 ### C Program (`program_c`)
 
-The C program uses an **AVL tree data structure** to efficiently store and update station information in memory.
+The C program uses an **AVL tree structure** to efficiently store and update station information in memory.
 
 It calculates the energy consumption for HV-B, HV-A, and LV stations.
 
-The program processes the input data, updates station capacities and consumer sums, and generates CSV output files like `lv_all.csv`.
+The program processes the input data and generates CSV output files like `lv_all.csv` in `/output` directory.
 
 In the case of `lv all`, it creates `lv_all_minmax.csv` containing the 10 LV stations with the highest and lowest energy consumption.
 
 ## Content
 
-- The script `c-wire.sh` allows you to enter options to identify specific stations, checks the integrity of all files and sorts the data useful for station processing. It launches compilation using `make` and produces graphics using `GnuPlot`. It ensures the existence of required directories (`tmp`, `graphs`) or creates them as needed.
+- The script `c-wire.sh` allows you to enter options to identify specific stations, checks the integrity of all files and sorts the useful data for station processing. It launches compilation using `make` and produces graphics using `GnuPlot`. It ensures the existence of required directories (`tmp`, `graphs`, `output`) or creates them as needed.
 
 - The script `basics.c` contains all basic function such as security functions. The library `basics.h` contains all the libraries needed to run the program and the structure definitions.
 
