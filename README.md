@@ -11,9 +11,9 @@ This program processes data for an electricity distribution.
 
 ## Prerequisites
 
-- You need `GnuPlot` program to obtain graphs.
-- To install it on Ubuntu/Debian distributions, type `sudo apt install gnuplot`.
-- You also need `make` to compile the program, to install it type `sudo apt install make`.
+- You need `GnuPlot` to obtain graphs and `make` program to compile.
+- To install GnuPlot on Ubuntu/Debian distributions, type `sudo apt install gnuplot`.
+- To install GnuPlot on Ubuntu/Debian distributions, type `sudo apt install make`.
 
 ## Usage
 

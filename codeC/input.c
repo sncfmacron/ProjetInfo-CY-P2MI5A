@@ -24,8 +24,13 @@ void readData(int stationType) {
         int station_id = atoi(station_id_str);
         long capacity = atol(capacity_str);
 
+<<<<<<< HEAD
         if (power_plant_id && station_id && capacity) {
             pStation s = createStation(power_plant_id, station_id, capacity, stationType);
+=======
+        if (centrale_id && station_id && capacity) {
+            pStation s = createStation(centrale_id, station_id, capacity, stationType);
+>>>>>>> origin/Nathan
             printStation(s);
             //insertAVL(s);
 
@@ -49,9 +54,16 @@ void printStation(pStation s) {
         case 0:
             printf("Station type : LV\n");
             break;
+        default:
+            exit_with_message("ERROR: Printed station doesn't exist", 3);
+            break;
     }
 
+<<<<<<< HEAD
     printf("Central ID: %d\n", s->linked_power_plant);
+=======
+    printf("Central ID: %d\n", s->linked_central);
+>>>>>>> origin/Nathan
     printf("Station ID: %d\n", s->id);
     printf("Capacity: %ld kV\n", s->capacity);
     printf("----------------------\n");

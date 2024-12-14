@@ -148,7 +148,7 @@ sortingData () {
 
     case "$2" in
         hvb)
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $1, $2, $5, $7, $8 }' "$1" | ./codeC/program_c "hvb" "comp"
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $5, $7, $8 }' "$1" | ./codeC/program_c "hvb" "comp"
             #awk -F ';' 'NR > 2 && $2 != "-" && $3 == "-" { print $1, $2, $5, $7, $8 }' "$1" > test.txt
 
             ;;
