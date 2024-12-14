@@ -19,7 +19,9 @@
 #include "settings.h"
 #include "tree.h"
 
+
 // Structures
+
 
 // Functions declaration
 void exit_with_message(const char *message, int error_code);

@@ -19,7 +19,7 @@ void readData(int stationType) {
         char *capacity_str = strtok(NULL, " ");
         char *load_str = strtok(NULL, "\n");
 
-        //si capacity_str différent de "-" alors on étudie bien la capacité
+        // Si capacity_str différent de "-" alors on étudie bien la capacité
         if (strcmp(capacity_str, "-") != 0) {
 
             // Convertir les chaines récupérées en haut en entier ou long
@@ -30,12 +30,14 @@ void readData(int stationType) {
             printStation(s);
             //insertAVL(s);
 
+
+        // Sinon on étudie un consommateur
         } else if(strcmp(capacity_str, "-") == 0) {
             long load = atol(load_str);
-            printf("\n-> Conso détectée : %ld kV\n\n", load);
+            printf("\n-> Consumer : %ld kV\n\n", load);
             //calcul(...)
         } else {
-            exit_with_message("ERROR: invalid entry in readData() function.", 1);
+            exit_with_message("ERROR: invalid entry in readData() function.", ERROR_PIPE);
         }
     }
     printf("\nAffichage des données réussi");
@@ -56,7 +58,7 @@ void printStation(pStation s) {
             printf("Station type : LV\n");
             break;
         default:
-            exit_with_message("ERROR: printed station doesn't exist.", 3);
+            exit_with_message("ERROR: printed station doesn't exist.", ERROR_MEMORY);
             break;
     }
     printf("Station ID: %d\n", s->id);

@@ -19,7 +19,7 @@ This program processes data for an electricity distribution.
 
 To run the program, use `./c-wire.sh <path_file.csv> <station_type> <consumer_type> [central_id]`.
 
-Usage example : `./c-wire.sh ./input/DATA_CWIRE.csv hva comp 3`.
+Example : `./c-wire.sh ./input/DATA_CWIRE.csv hva comp 3`.
 
 Use `-h` parameter to get full help.
 - Note : you must place your input file in `/input` directory and name it **DATA_CWIRE.csv**.
@@ -41,7 +41,7 @@ The program is made of two parts: a Shell script and a C program.
 
 - The script has **optionnal** input arguments:
 
-4. An **identifier of a central station** can be provided to make the script focuses on the analysis of a single power plant.
+4. An **identifier of a central station** can be provided to make the script focuses on a single power plant.
 5. `-h` parameter provides detailed help and instructions on using the script.
 
 The script sends the sorted information to the executable program using a **pipe**, which is the fastest way to do it.

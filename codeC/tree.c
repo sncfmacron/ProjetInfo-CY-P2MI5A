@@ -7,14 +7,16 @@
 
 // Je te laisse compléter cette partie -/////////////////////////////////////////-
 
-/*pAVL createAVL(pStation s) {
+/*
+
+pAVL createAVL(pStation s) {
     if(s == NULL){
         exit_with_message("ERROR: NULL pointer", 3);
     }
     pAVL a = malloc(sizeof(AVL));
     if(a == NULL)
     {
-        exit_with_message("ERROR: AVL allocation failed.", 4);
+        exit_with_message("ERROR: AVL allocation failed.", ERROR_MEMORY);
     }
 
     a->station = s;
@@ -77,4 +79,6 @@ void cleanAVL(pAVL a) {
     free(a->right); // EDIT : faire une fonction recursive je pense free(a-left) -> cleanAVL(a->left)
 
     free(a);
-}*/
+}
+
+*/

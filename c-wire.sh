@@ -8,12 +8,12 @@
 display_help() {
     echo "CWIRE: this program processes data for an electricity distribution."
     echo ""
-    echo "Usage example:"
-    echo "      $0 input/DATA_CWIRE.csv lv comp 3"
-    echo ""
     echo "Usage:"
     echo "      $0 <path_file.csv> <station_type> <consumer_type> [power_plant_id]"
     echo "      Note : you must place your input file in '/input' directory and name it 'DATA_CWIRE.csv'."
+    echo ""
+    echo "Example:"
+    echo "      $0 input/DATA_CWIRE.csv lv comp 3"
     echo ""
     echo "Arguments:"
     echo "      <path_file.csv>  Specifies the location of the input .csv file (mandatory)."
@@ -93,7 +93,7 @@ verifyParameters() {
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
             echo "The fourth argument must be a valid power plant identifier."
-            exit 1
+            display_mini_help
         fi
     fi
 }
@@ -128,16 +128,8 @@ compilation () {
     # Checks that compilation has gone well
     if [ $? -ne 0 ]; then
         echo "ERROR : compilation error."
-        exit 1
+        exit 2
     fi
-}
-
-
-# Displays time
-displayTime () {
-    # configurer time ici pour pas faire une formule de 1000km dans sortingData()
-    # time
-    echo ""
 }
 
 
@@ -145,9 +137,8 @@ displayTime () {
 sortingData () {
 
     # We use the awk function to sort data. Usage : awk 'pattern { action }' file.
-    # Options : -F to indicate separating character, -v to indicate a variable.
     # We send the sorted data through a pipe (standard input) for fast data transmission.
-    # The condition using the “custom_id” variable allows information to be sorted for a single plant only.
+    # Options : -F to indicate separating character, -v to indicate a variable. “custom_id” variable allows information to be sorted for a single plant only.
 
     case "$2" in
         hvb)
@@ -177,6 +168,15 @@ sortingData () {
 }
 
 
+# Displays elapsed time for execution of a command
+#displayTime() {
+#    TIMEFORMAT=%R
+#    TIME_ELAPSED=time sortingData "$@"
+#    echo ""
+#    echo "Tri et transmission des données réussi en ${TIME_ELAPSED}."
+#}
+
+
 # Clean folders after execution
 clean () {
     rm -rf temp/*
@@ -185,18 +185,20 @@ clean () {
 
 
 #makeGraphs () {
-#
+#if ! command -v gnuplot 2>&1 /dev/null; then
+#   echo "Gnuplot is not installed. To install it, use 'sudo apt insall gnuplot'."
+#   exit 3
+#fi
 #}
 
 
-
-verifyParameters $@
+verifyParameters "$@"
 
 verifyFolders
 
-compilation $2 $3
+compilation "$2" "$3"
 
-sortingData $@
+sortingData "$@"
 
 clean
 

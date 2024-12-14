@@ -1,13 +1,15 @@
 /*
-    Contains constants for security
+    Contains constants for security and optimization
 */
 
 
 #ifndef SETTINGS_HEADER
 #define SETTINGS_HEADER
 
-#define MAX_BUFFER_SIZE 512
-#define MAX_STATION_TYPE 5
+#define ERROR_PIPE 1
+#define ERROR_MEMORY 2
+
+#define MAX_BUFFER_SIZE 256
 
 #define STATION_HVB 2
 #define STATION_HVA 1
