@@ -44,35 +44,12 @@ typedef struct {
 
 typedef AVL* pAVL;
 typedef Station* pStation;
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/Nathan
 
 // Functions declaration
 void exit_with_message(const char *message, int error_code);
 int getStationType(const char *station);
-<<<<<<< HEAD
-pStation createStation(int power_plant_id, int station_id, long capacity, int stationType);
-=======
-pStation createStation(int centrale_id, int station_id, long capacity, int stationType);
-
-pAVL createAVL(pStation s);
-// pAVL insertionAVL(pAVL a, Station s, int *h);
-/* A coder, Nathan :DDDDDDDD
-
-pAVL deleteAVL(pAVL a, int *h, int *pe);
-pAVL deleteMinAVL(pAVL a, int *h, int *pe);
-pAVL deleteAVL(pAVL a, Station s, int *h);
-pAVL equilibrateAVL(pAVL a);
-pAVL rotateLeft(pAVL a);
-pAVL rotateRight(pAVL a);
-pAVL rotateDoubleLeft(pAVL a);
-pAVL rotateDoubleRight(pAVL a);
-
-*/
-void cleanAVL(pAVL a);
->>>>>>> origin/Nathan
+pStation createStation(int station_id, long capacity, int stationType);
 
 int max(int a, int b);
 int max3(int a, int b, int c);

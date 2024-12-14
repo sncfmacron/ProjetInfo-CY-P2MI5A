@@ -25,29 +25,19 @@ int getStationType(const char *station) {
     }
     else {
        exit_with_message("ERROR: Unrecognised station", 1);
-<<<<<<< HEAD
-       return 1;
-=======
->>>>>>> origin/Nathan
+       return -1;
     }
 }
 
 
-<<<<<<< HEAD
-pStation createStation(int power_plant_id, int station_id, long capacity, int stationType) {
-=======
-pStation createStation(int centrale_id, int station_id, long capacity, int stationType) {
->>>>>>> origin/Nathan
+
+pStation createStation(int station_id, long capacity, int stationType) {
+
 
     pStation s = malloc(sizeof(Station));
     if(s == NULL){
         exit_with_message("ERROR: Sation allocation failed", 2);
     }
-<<<<<<< HEAD
-    s->linked_power_plant = power_plant_id;
-=======
-    s->linked_central = centrale_id;
->>>>>>> origin/Nathan
     s->id = station_id;
     s->capacity = capacity;
     s->type = stationType;
@@ -97,8 +87,6 @@ int min(int a, int b) {
     } else {
         return a;
     }
-<<<<<<< HEAD
-=======
 }
 
 pAVL createAVL(pStation s) {
@@ -145,7 +133,5 @@ void cleanAVL(pAVL a) {
 
     free(a->left);
     free(a->right);
-
     free(a);
->>>>>>> origin/Nathan
 }
