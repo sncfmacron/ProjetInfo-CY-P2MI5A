@@ -24,8 +24,8 @@ int getStationType(const char *station) {
         return STATION_LV;
     }
     else {
-       exit_with_message("ERROR: Unrecognised station", 1);
-       return -1;
+       exit_with_message("ERROR: Unrecognised station", ERROR_PIPE);
+       return 1;
     }
 }
 
@@ -34,11 +34,12 @@ pStation createStation(int station_id, long capacity, int stationType) {
 
     pStation s = malloc(sizeof(Station));
     if(s == NULL){
-        exit_with_message("ERROR: Sation allocation failed", 2);
+        exit_with_message("ERROR: Sation allocation failed", ERROR_ALLOC);
     }
     s->id = station_id;
     s->capacity = capacity;
     s->type = stationType;
+    s->consumption_sum = 0;
 
     return s;
 }

@@ -146,7 +146,7 @@ sortingData () {
             ;;
 
         hva)
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $2 == "-" { print $3, $7, $8 }' "$1" | ./codeC/program_c "hva" "comp"
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }' "$1" | ./codeC/program_c "hva" "comp"
             ;;
 
         lv)
