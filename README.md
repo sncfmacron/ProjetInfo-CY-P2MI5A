@@ -32,14 +32,14 @@ The program is made of two parts: a Shell script and a C program.
 
 ### Shell Script (`c-wire.sh`)
 
-- The script has **required** input arguments:
+- The script has **required** arguments:
 1. The path to the input CSV file.
 2. The station type to analyze (`hvb`, `hva`, or `lv`).
 3. The consumer type to analyze (`comp`, `indiv`, or `all`).
 
 **Warning** : The following combinations are forbidden: `hvb all`, `hvb indiv`, `hva all`, and `hva indiv`.
 
-- The script has **optionnal** input arguments:
+- The script has **optionnal** arguments:
 
 4. An **identifier of a central station** can be provided to make the script focuses on a single power plant.
 5. `-h` parameter provides detailed help and instructions on using the script.
