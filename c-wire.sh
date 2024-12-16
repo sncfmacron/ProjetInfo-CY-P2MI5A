@@ -37,7 +37,7 @@ display_help() {
 display_mini_help() {
     echo ""
     echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [power_plant_id]"
-    echo "Use the -h parameter to get full help."
+    echo "Use -h parameter to get full help."
     exit 1
 }
 
@@ -90,6 +90,7 @@ verifyParameters() {
     esac
 
     # Verifying fourth parameter (valid powerplant identifier)
+    # 'grep' checks if the id exists in 'DATA_CWIRE.csv'
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
             echo "The fourth argument must be a valid power plant identifier."

@@ -7,10 +7,12 @@
 
 
 int main(int argc, char* argv[]) {
+
     if(argc < 2) {
         exit_with_message("ERROR: invalid number of parameters.", ERROR_PIPE);
+    } else if(argv[1] == NULL || argv[2] == NULL) {
+        exit_with_message("ERROR: invalid parameters.", ERROR_PIPE);
     }
-
 
     // Récuperer le type de conso. et de station à traiter
     int stationType = getStationType(argv[1]);
