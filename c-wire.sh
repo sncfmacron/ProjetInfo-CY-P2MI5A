@@ -120,7 +120,7 @@ verifyFolders() {
     if [ ! -f "codeC/main.c" ]; then
         echo "ERROR: main.c is missing in '/codeC' directory."
         exit 1
-    elif [ -f codeC/program_c ]; then
+    elif [ -f "codeC/program_c" ]; then
         echo "ERROR: program_c already exists in '/codeC' directory."
         exit 1
     fi
@@ -131,7 +131,7 @@ verifyFolders() {
 compilation () {
     # An argument is used to avoid the 'make' program sending messages when browsing files.
     # We give arguments to 'make' so C program knows which type of station and consumer to process.
-    make --no-print-directory -C codeC TYPE=$1 CONSUMER=$2
+    make --no-print-directory -C codeC
 
     # Checks that compilation has gone well
     if [ $? -ne 0 ]; then
@@ -155,28 +155,28 @@ sortingData () {
     case "$2" in
         hvb)
             sort -t';' "$1" | \
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }' | ./codeC/program_c "$2" "comp"
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }' | ./codeC/program_c "$2" "comp" "$4"
             ;;
         hva)
             sort -t';' "$1" | \
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }' | ./codeC/program_c "$2" "comp"
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }' | ./codeC/program_c "$2" "comp" "$4"
             ;;
 
         lv)
             case "$3" in
                 all)
                     sort -t';' "$1" | \
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "all"
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "all" "$4"
                     ;;
 
                 comp)
                     sort -t';' "$1" | \
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "comp"
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "comp" "$4"
                     ;;
 
                 indiv)
                     sort -t';' "$1" | \
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "indiv"
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "indiv" "$4"
                     ;;
             esac
                 ;;
@@ -185,17 +185,22 @@ sortingData () {
     END_TIME=$(date +%s)
 
     echo ""
-    echo "Data sorted transmitted in $((END_TIME - START_TIME)) seconds."
+    echo "- Data sorted and transmitted successfully in $((END_TIME - START_TIME)) seconds. -"
 }
 
 
 # Function to make graphs using output files
-#makeGraphs () {
-#if ! command -v gnuplot 2>&1 /dev/null; then
-#   echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
-#   exit 3
-#fi
-#}
+makeGraphs () {
+
+    if [ -f "output/lv_all.csv" ]; then
+        if [ ! command -v gnuplot &> /dev/null ]; then
+            echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
+            exit 3
+        else 
+            echo "Gnuplot installed"
+        fi
+    fi
+}
 
 
 verifyParameters "$@"
@@ -208,6 +213,6 @@ sortingData "$@"
 
 cleanFolders
 
-#makeGraphs
+makeGraphs
 
 exit 0

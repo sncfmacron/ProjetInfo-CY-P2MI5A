@@ -44,11 +44,11 @@ void readData(int stationType) {
             exit_with_message("ERROR: invalid entry in readData() function.", ERROR_PIPE);
         }
     }
-    printf("\nAffichage des données réussi");
+    printf("\nAffichage des données réussi\n");
 }
 
 
-// Je mets ça ici pour test, on pourra l'enlever
+// Je mets ça ici pour test
 void printStation(pStation s) {
 
     switch (s->type) {

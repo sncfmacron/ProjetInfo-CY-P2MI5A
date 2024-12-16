@@ -6,41 +6,46 @@
 #include "output.h"
 
 
-void outputProcess(const char* stationType, const char* consumerType) {
+void outputProcess(const char* stationType, const char* consumerType, const char* stationID) {
 
-    createOutputFile(stationType, consumerType);
+    createOutputFile(stationType, consumerType, stationID);
 
 }
 
 
-void createPath(const char* stationType, const char* consumerType, char* path) {
+// Concatenate strings to get the right file name (ex: hva_comp_2)
+void createPath(const char* stationType, const char* consumerType, const char* stationID, char* path) {
 
-    // Concaténer les chaines de caractères pour avoir le bon nom de fichier
     strcat(path, DIR_OUTPUT);
     strcat(path, stationType);
     strcat(path, "_");
     strcat(path, consumerType);
-    strcat(path, ".csv");
 
+    if (strcmp(stationID, "\0") != 0) {
+        strcat(path, "_");
+        strcat(path, stationID);
+    }
+
+    strcat(path, ".csv");
 }
 
 
-void createOutputFile(const char* stationType, const char* consumerType) {
+void createOutputFile(const char* stationType, const char* consumerType, const char* stationID) {
 
     FILE* file = NULL;
 
     // Avoir le bon nom de fichier crée (ex : "hva_comp.csv")
-    char path[30];
+    char* path = malloc(sizeof(char)*30);
 
     if(path == NULL) {
         exit_with_message("ERROR: path string allocation failed.", ERROR_PTR_ALLOC);
     } else {
-        createPath(stationType, consumerType, path);
+        createPath(stationType, consumerType, stationID, path);
     }
 
     // fopen avec l'option "w" crée automatiquement le fichier
     file = fopen(path, "w");
-    fprintf(file, "Station %s:Capacity:Consumer %s", stationType, consumerType);
+    fprintf(file, "station %s:capacity:%s", stationType, consumerType);
 
     if(file == NULL) {
         exit_with_message("ERROR: output file allocation failed.", 3);

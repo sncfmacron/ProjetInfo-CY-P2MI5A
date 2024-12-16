@@ -26,7 +26,7 @@ int getStationType(const char *station) {
         return STATION_LV;
     }
     else {
-       exit_with_message("ERROR: unrecognised station.", ERROR_PIPE);
+       exit_with_message("ERROR: unrecognised station.", ERROR_INVALID_STATION_TYPE);
        return 1;
     }
 }
@@ -43,7 +43,7 @@ int getConsumerType(const char *consumer) {
         return CONSUMER_ALL;
     }
     else {
-       exit_with_message("ERROR: unrecognised consumer.", ERROR_PIPE);
+       exit_with_message("ERROR: unrecognised consumer.", ERROR_INVALID_CONSUMER_TYPE);
        return 1;
     }
 }
