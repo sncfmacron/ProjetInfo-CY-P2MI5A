@@ -58,6 +58,31 @@ pAVL rightRotation(pAVL a){
     return pivot;
 }
 
+pAVL balanceAVL(pAVL a){
+    if(a == NULL){
+        exit_with_message("ERROR: AVL sub-tree doesn't exist", 8);
+    }
+    if(a->balance >= 2){                // Left rotation
+        if(a->right->balance >= 0){     // Single left rotation
+            return leftRotation(a);
+        }
+        else{                           // Double left rotation
+            a->right = rightRotation(a->right);
+            return leftRotation(a);
+        }
+    }
+    if(a->balance <= -2){               // Right rotation
+        if(a->left->balance <= 0){      // Single right rotation
+            return rightRotation(a);
+        }
+        else{                           // Double left rotation
+            a->left = leftRotation(a->left);
+            return rightRotation(a); 
+        }
+    }
+    return a; // if the AVL is already balanced
+}
+
 pAVL insertAVL(pAVL a, pStation s, int* h){
     if(s == NULL){
         exit_with_message("ERROR: Station doesn't exist", 5);
@@ -69,11 +94,11 @@ pAVL insertAVL(pAVL a, pStation s, int* h){
     }
     else if(s->id < a->station->id){
         a->left = insertAVL(a->left, s, h);
-        *h = (*h) * (*h) * (-1); // make the height negative
+        *h = (*h) * (*h) * (-1);    // make the height negative
     }
     else if(s->id > a->station->id){
         a->right = insertAVL(a->right, s, h);
-        *h = (*h) * (*h); // make the height positive
+        *h = (*h) * (*h);           // make the height positive
     }
     else{
         *h = 0;
@@ -81,23 +106,14 @@ pAVL insertAVL(pAVL a, pStation s, int* h){
     }
 
     if(*h != 0){
-        switch (*h){
-        case -1:
-            a->balance += *h; // balances the node for a left child
-            break;
-        case 1:
-            a->balance += *h; // balances the node for a right child
-            break;
-        default:
-            exit_with_message("ERROR: InsertAVL balance error", 7);
-            break;
-        }
+        a->balance += *h;
 
         if((*h == -1 && a->balance >= 0) || (*h == 1 && a->balance <= 0)){ // if the node is balanced
             *h = 0;
         }
         else{
-            // rotation/balance function
+            a = balanceAVL(a);
+            *h = (a->balance == 0) ? 0 : 1;
         }
     }
     return a;

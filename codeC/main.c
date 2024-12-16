@@ -27,8 +27,6 @@ int main(int argc, char* argv[]) {
     // argv[1] = type de station
     // argv[2] = type de conso
     // argv[3] = id de centrale (si on l'a pas indiqué dans la commande alors chaine vide donc argv[3] = "\0")
-
-    printf("\nBoumiz\n");
   
     return 0;
 }

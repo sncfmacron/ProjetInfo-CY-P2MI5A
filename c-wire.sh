@@ -55,7 +55,7 @@ verifyParameters() {
 
     # Verifying number of parameters
     if [ $# -gt 5 ] || [ $# -lt 1 ]; then
-        echo "You must provide at least 3 arguments."
+        echo "You must provide at least the path to 'DATA_CWIRE.csv', the station type and the consumer type."
         display_mini_help
     fi
 
@@ -145,48 +145,48 @@ compilation () {
 # Sorting data function and transmission to C program
 sortingData () {
 
-    # We use 'awk' and 'sort' to sort through a pipe (standard input) for fast data transmission.
-    # Using these commands at the same time is fast because 'sort' handles large data. 'sort' uses disk space, not RAM.
+    # We use 'awk' to sort data through a pipe (standard input) and filters to send only relevant information.
     # Arguments in 'awk' line : -F to indicate separating character, -v to indicate a variable.
 
     # 'date' command gives the elapsed seconds since 01/01/1970.
 
     START_TIME=$(date +%s)
 
+    filePath="$1"
+    stationType="$2"
+    consumerType="$3"
+    powerPlantID="$4"
+
     case "$2" in
         hvb)
-            sort -t';' "$1" | \
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }' | ./codeC/program_c "$2" "comp" "$4"
+            # Très lent pour le fichier de 9 millions de lignes
+            # ~ 17 stations hva par secondes et pour le traitement hvb rien ne se passe
+            filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }'
             ;;
         hva)
-            sort -t';' "$1" | \
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }' | ./codeC/program_c "$2" "comp" "$4"
+            filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
             ;;
-
         lv)
             case "$3" in
                 all)
-                    sort -t';' "$1" | \
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "all" "$4"
+                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }'
                     ;;
-
                 comp)
-                    sort -t';' "$1" | \
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "comp" "$4"
+                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }'
                     ;;
-
                 indiv)
-                    sort -t';' "$1" | \
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "indiv" "$4"
+                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }'
                     ;;
             esac
                 ;;
     esac
 
+    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
+
     END_TIME=$(date +%s)
 
     echo ""
-    echo "- Data sorted and transmitted successfully in $((END_TIME - START_TIME)) seconds. -"
+    echo "--- The program was successfully completed in $((END_TIME - START_TIME)) seconds ---"
 }
 
 
@@ -198,7 +198,8 @@ makeGraphs () {
             echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
             exit 3
         else 
-            echo "Gnuplot installed"
+            echo "Gnuplot installed."
+            # Script pour créer des graphiques
         fi
     fi
 }

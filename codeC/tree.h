@@ -1,5 +1,5 @@
 /*
-    Library for tree management
+    Library for tree.h
 */
 
 
@@ -29,16 +29,15 @@ typedef Station* pStation;
 pAVL insertAVL(pAVL a, pStation s, int* h);
 pAVL createAVL(pStation s);
 void cleanAVL(pAVL a);
+pAVL leftRotation(pAVL a);
+pAVL rightRotation(pAVL a);
+pAVL balanceAVL(pAVL a);
 
 #endif
 
 /*
 pAVL deleteAVL(pAVL a, int *h, int *pe);
 pAVL deleteMinAVL(pAVL a, int *h, int *pe);
-pAVL deleteAVL(pAVL a, pStation s, int *h);
-pAVL equilibrateAVL(pAVL a);
-pAVL rotateLeft(pAVL a);
-pAVL rotateRight(pAVL a);
 pAVL rotateDoubleLeft(pAVL a);
 pAVL rotateDoubleRight(pAVL a);
 */

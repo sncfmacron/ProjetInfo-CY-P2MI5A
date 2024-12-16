@@ -13,6 +13,7 @@
 #include <time.h>
 #include <unistd.h>
 
+
 // Déclaration anticipée du type Station
 typedef struct Station_struct Station;
 typedef Station* pStation;
@@ -28,7 +29,11 @@ typedef Station* pStation;
 void exit_with_message(const char *message, int error_code);
 int getStationType(const char *station);
 int getConsumerType(const char *consumer);
+float getTime(clock_t start, clock_t end);
 pStation createStation(int station_id, long capacity, int stationType);
+
+int string_to_int(const char* string);
+long string_to_long(const char* string);
 
 int max3(int a, int b, int c);
 int min3(int a, int b, int c);

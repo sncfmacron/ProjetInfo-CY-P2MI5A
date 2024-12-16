@@ -13,6 +13,43 @@ void exit_with_message(const char *message, int error_code) {
 }
 
 
+// Transforms string to int
+int string_to_int(const char* string) {
+    if(string == 0) {
+        exit_with_message("ERROR: string to int conversion failed.", ERROR_INVALID_STRING);
+    }
+
+    return atoi(string);
+}
+
+
+// Transforms string to long
+long string_to_long(const char* string) {
+    char *endptr;
+    long value = strtol(string, &endptr, 10);
+
+    // An error has occurred if endptr does not point to '\0'.
+    if (*endptr != '\0') {
+        exit_with_message("ERROR: string to long conversion failed.", ERROR_INVALID_STRING);
+    }
+
+    return value;
+}
+
+
+// Gives time elapsed (using 'time.h')
+float getTime(clock_t start, clock_t end) {
+    float seconds = (float)(end - start) / CLOCKS_PER_SEC;
+
+    // Pour éviter d'afficher un nombre négatif quand traitement instant comme -00.00s
+    if(seconds < 0) {
+        return 0;
+    } else {
+        return seconds;
+    }
+}
+
+
 // Function to get the type of station
 // We use "const char *" to prevent modifying the string
 int getStationType(const char *station) {
@@ -30,6 +67,7 @@ int getStationType(const char *station) {
        return 1;
     }
 }
+
 
 // Function to get the type of consumer
 int getConsumerType(const char *consumer) {
@@ -65,44 +103,22 @@ pStation createStation(int station_id, long capacity, int stationType) {
 
 
 int max3(int a, int b, int c) {
-    int max = a;
-
-    if (b > max) {
-        max = b;
-    }
-    if (c > max) {
-        max = c;
-    }
-    return max;
+    int max = (a > b) ? a : b;
+    return (max > c) ? max : c;
 }
 
 
 int min3(int a, int b, int c) {
-    int min = a;
-
-    if (b < min) {
-        min = b;
-    }
-    if (c < min) {
-        min = c;
-    }
-    return min;
+    int min = (a < b) ? a : b;
+    return (min < c) ? min : c;
 }
 
 
 int max(int a, int b) {
-    if (a > b) {
-        return a;
-    } else {
-        return b;
-    }
+    return (a > b) ? a : b;
 }
 
 
 int min(int a, int b) {
-    if(a > b) {
-        return b;
-    } else {
-        return a;
-    }
+    return (a < b) ? a : b;
 }

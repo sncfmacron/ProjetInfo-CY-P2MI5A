@@ -18,6 +18,9 @@ void readData(int stationType) {
         Il faudra remplacer atol, aoi etc par strol c'est plus safe
     */
 
+    // On utilise clock de time_h pour mesurer le temps
+    clock_t start = clock();
+
     while (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL) {
         char *station_id_str = strtok(buffer, " ");
         char *capacity_str = strtok(NULL, " ");
@@ -27,7 +30,7 @@ void readData(int stationType) {
         if (strcmp(capacity_str, "-") != 0) {
 
             // Convertir les chaines récupérées en haut en entier ou long
-            int station_id = atoi(station_id_str);
+            int station_id = string_to_int(station_id_str);
             long capacity = atol(capacity_str);
 
             pStation s = createStation(station_id, capacity, stationType);
@@ -37,14 +40,19 @@ void readData(int stationType) {
 
         // Sinon on étudie un consommateur
         } else if(strcmp(capacity_str, "-") == 0) {
+            int station_id = string_to_int(station_id_str);
             long load = atol(load_str);
-            printf("\n-> Consumer : %ld kV\n\n", load);
+            printf("\n- Station %d consumer : %ld kV\n\n", station_id, load);
             //calcul(...)
         } else {
             exit_with_message("ERROR: invalid entry in readData() function.", ERROR_PIPE);
         }
     }
-    printf("\nAffichage des données réussi\n");
+
+    clock_t end = clock();
+    float seconds = getTime(end, start);
+
+    printf("\n--- Data transmitted successfully in %.2f seconds ---\n", seconds);
 }
 
 
