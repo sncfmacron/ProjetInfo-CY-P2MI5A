@@ -13,6 +13,8 @@ void exit_with_message(const char *message, int error_code) {
 }
 
 
+// Function to get the type of station
+// We use "const char *" to prevent modifying the string
 int getStationType(const char *station) {
     if(strcmp(station, "hvb") == 0) {
         return STATION_HVB;
@@ -24,7 +26,24 @@ int getStationType(const char *station) {
         return STATION_LV;
     }
     else {
-       exit_with_message("ERROR: Unrecognised station", ERROR_PIPE);
+       exit_with_message("ERROR: unrecognised station.", ERROR_PIPE);
+       return 1;
+    }
+}
+
+// Function to get the type of consumer
+int getConsumerType(const char *consumer) {
+    if(strcmp(consumer, "indiv") == 0) {
+        return CONSUMER_INDIV;
+    }
+    else if(strcmp(consumer, "comp") == 0) {
+        return CONSUMER_COMP;
+    }
+    else if(strcmp(consumer, "all") == 0) {
+        return CONSUMER_ALL;
+    }
+    else {
+       exit_with_message("ERROR: unrecognised consumer.", ERROR_PIPE);
        return 1;
     }
 }
@@ -34,7 +53,7 @@ pStation createStation(int station_id, long capacity, int stationType) {
 
     pStation s = malloc(sizeof(Station));
     if(s == NULL){
-        exit_with_message("ERROR: Sation allocation failed", ERROR_ALLOC);
+        exit_with_message("ERROR: station allocation failed.", ERROR_PTR_ALLOC);
     }
     s->id = station_id;
     s->capacity = capacity;

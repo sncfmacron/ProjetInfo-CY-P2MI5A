@@ -62,7 +62,7 @@ void printStation(pStation s) {
             printf("Station type : LV\n");
             break;
         default:
-            exit_with_message("ERROR: printed station doesn't exist.", ERROR_ALLOC);
+            exit_with_message("ERROR: printed station doesn't exist.", ERROR_PTR_ALLOC);
             break;
     }
     printf("Station ID: %d\n", s->id);

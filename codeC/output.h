@@ -8,6 +8,8 @@
 
 #include "basics.h"
 
-
+void outputProcess(const char* stationType, const char* consumerType);
+void createPath(const char* stationType, const char* consumerType, char* path);
+void createOutputFile(const char* stationType, const char* consumerType);
 
 #endif

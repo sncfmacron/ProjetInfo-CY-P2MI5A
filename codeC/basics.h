@@ -27,6 +27,7 @@ typedef Station* pStation;
 // Functions declaration
 void exit_with_message(const char *message, int error_code);
 int getStationType(const char *station);
+int getConsumerType(const char *consumer);
 pStation createStation(int station_id, long capacity, int stationType);
 
 int max3(int a, int b, int c);
