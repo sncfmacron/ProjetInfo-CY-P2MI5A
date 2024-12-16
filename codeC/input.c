@@ -14,6 +14,10 @@ void readData(int stationType) {
     // On passe pour une pipe pour transmettre les données du shell vers program_c
     // strok(str, delim) pour séparer l'entrée du shell en différentes chaines de caractères
 
+    /*
+        Il faudra remplacer atol, aoi etc par strol c'est plus safe
+    */
+
     while (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL) {
         char *station_id_str = strtok(buffer, " ");
         char *capacity_str = strtok(NULL, " ");

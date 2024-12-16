@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-# Shell script to run and sort data
+# Shell script to run programand sort data
 
 
 # Displays the program help manual
@@ -12,22 +12,22 @@ display_help() {
     echo "      $0 <path_file.csv> <station_type> <consumer_type> [power_plant_id]"
     echo "      Note : you must place your input file in '/input' directory and name it 'DATA_CWIRE.csv'."
     echo ""
-    echo "Example:"
-    echo "      $0 input/DATA_CWIRE.csv lv comp 3"
-    echo ""
     echo "Arguments:"
-    echo "      <path_file.csv>  Specifies the location of the input .csv file (mandatory)."
+    echo "      <path_file.csv>  Location of the input .csv file (mandatory)."
     echo "      <station_type>   Type of station to process: hva, hvb or lv (mandatory)."
     echo "      <consumer_type>  Type of consumer to process: all, comp or indiv (mandatory)."
-    echo "      [power_plant_id]     Filters the results for a specific power plant (optional)."
+    echo "      [power_plant_id] Filters the results for a specific power plant (optional)."
     echo ""
     echo "      -h               Displays program help manual (optional)."
     echo ""
-    echo "WARNING: The following options are forbidden:"
+    echo "WARNING: the following combinations are invalid:"
     echo "      * hvb all"
     echo "      * hvb indiv"
     echo "      * hva all"
     echo "      * hva indiv"
+    echo ""
+    echo "Example:"
+    echo "      $0 input/DATA_CWIRE.csv lv comp 3"
     echo ""
     exit 0
 }
@@ -35,6 +35,7 @@ display_help() {
 
 # Displays reduced program help
 display_mini_help() {
+    echo ""
     echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [power_plant_id]"
     echo "Use the -h parameter to get full help."
     exit 1
@@ -43,8 +44,7 @@ display_mini_help() {
 
 # Parameters verification
 verifyParameters() {
-    # Verify is "-h" is present
-    # OU utiliser getops mais je ne comprends pas comment ça fonctionnev :(
+    # Verifies if "-h" is present
     for option in "$@"; do
         case $option in
             -h) 
@@ -53,9 +53,9 @@ verifyParameters() {
         esac
     done
 
-    # Verify number of parameters
+    # Verifying number of parameters
     if [ $# -gt 5 ] || [ $# -lt 1 ]; then
-        echo "You must enter between 1 and 5 arguments"
+        echo "You must provide at least 3 arguments."
         display_mini_help
     fi
 
@@ -64,7 +64,7 @@ verifyParameters() {
         display_mini_help
     fi
 
-    # Check second parameter
+    # Verifying second parameter
     case "$2" in
         hva|hvb|lv)
             ;;
@@ -74,7 +74,7 @@ verifyParameters() {
             ;;
     esac
 
-    # Check third parameter
+    # Verifying third parameter
     case "$3" in
         comp|indiv|all)
             # Preventing invalid combinations
@@ -89,7 +89,7 @@ verifyParameters() {
             ;;
     esac
 
-    # Check fourth parameter (valid plant identifier)
+    # Verifying fourth parameter (valid powerplant identifier)
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
             echo "The fourth argument must be a valid power plant identifier."
@@ -99,31 +99,39 @@ verifyParameters() {
 }
 
 
-# Check the presence of temp and graph folders
+# Clean folders and unused file
+cleanFolders () {
+    rm -rf temp/*
+    rm -f codeC/program_c
+}
+
+
+# Checking the presence of temp and graph folders
 verifyFolders() {
-        rm -rf temp/*
+        cleanFolders
 
         mkdir -p graphs input temp output
 
     if [ ! -f "input/DATA_CWIRE.csv" ]; then
-        echo "You must place your input file in /input directory and name it 'DATA_CWIRE.csv'."
+        echo "You must place your input file in '/input' directory and name it 'DATA_CWIRE.csv'."
         display_mini_help
+    fi
+
+    if [ ! -f "codeC/main.c" ]; then
+        echo "ERROR: main.c is missing in '/codeC' directory."
+        exit 1
+    elif [ -f codeC/program_c ]; then
+        echo "ERROR: program_c already exists in '/codeC' directory."
         exit 1
     fi
 }
 
 
-# Start C program compilation
+# Starts C program compilation using 'make'
 compilation () {
-    if [ ! -f "codeC/main.c" ]; then
-        echo "ERROR: main.c is missing."
-        exit 1
-    elif [ -f codeC/program_c ]; then
-        echo "ERROR: program_c already exists."
-        exit 1
-    else
-        make --no-print-directory -C codeC TYPE=$1 CONSUMER=$2
-    fi
+    # An argument is used to avoid the 'make' program sending messages when browsing files.
+    # We give arguments to 'make' so C program knows which type of station and consumer to process.
+    make --no-print-directory -C codeC TYPE=$1 CONSUMER=$2
 
     # Checks that compilation has gone well
     if [ $? -ne 0 ]; then
@@ -133,60 +141,58 @@ compilation () {
 }
 
 
-# Sorting function
+# Sorting data function and transmission to C program
 sortingData () {
 
-    # We use the awk function to sort data. Usage : awk 'pattern { action }' file.
-    # We send the sorted data through a pipe (standard input) for fast data transmission.
-    # Options : -F to indicate separating character, -v to indicate a variable. “custom_id” variable allows information to be sorted for a single plant only.
+    # We use 'awk' and 'sort' to sort through a pipe (standard input) for fast data transmission.
+    # Using these commands at the same time is fast because 'sort' handles large data. 'sort' uses disk space, not RAM.
+    # Arguments in 'awk' line : -F to indicate separating character, -v to indicate a variable.
+
+    # 'date' command gives the elapsed seconds since 01/01/1970.
+
+    START_TIME=$(date +%s)
 
     case "$2" in
         hvb)
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }' "$1" | ./codeC/program_c "hvb" "comp"
+            sort -t';' "$1" | \
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }' | ./codeC/program_c "$2" "comp"
             ;;
-
         hva)
-            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }' "$1" | ./codeC/program_c "hva" "comp"
+            sort -t';' "$1" | \
+            awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }' | ./codeC/program_c "$2" "comp"
             ;;
 
         lv)
             case "$3" in
                 all)
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }' "$1" | ./codeC/program_c "lv" "all"
+                    sort -t';' "$1" | \
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "all"
                     ;;
 
                 comp)
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }' "$1" | ./codeC/program_c "lv" "comp"
+                    sort -t';' "$1" | \
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "comp"
                     ;;
 
                 indiv)
-                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }' "$1" | ./codeC/program_c "lv" "indiv"
+                    sort -t';' "$1" | \
+                    awk -F ';' -v custom_id="$4" 'NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }' | ./codeC/program_c "$2" "indiv"
                     ;;
             esac
                 ;;
     esac
+
+    END_TIME=$(date +%s)
+
+    echo ""
+    echo "Data sorted transmitted in $((END_TIME - START_TIME)) seconds."
 }
 
 
-# Displays elapsed time for execution of a command
-#displayTime() {
-#    TIMEFORMAT=%R
-#    TIME_ELAPSED=time sortingData "$@"
-#    echo ""
-#    echo "Tri et transmission des données réussi en ${TIME_ELAPSED}."
-#}
-
-
-# Clean folders after execution
-clean () {
-    rm -rf temp/*
-    rm codeC/program_c
-}
-
-
+# Function to make graphs using output files
 #makeGraphs () {
 #if ! command -v gnuplot 2>&1 /dev/null; then
-#   echo "Gnuplot is not installed. To install it, use 'sudo apt insall gnuplot'."
+#   echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
 #   exit 3
 #fi
 #}
@@ -200,7 +206,7 @@ compilation "$2" "$3"
 
 sortingData "$@"
 
-clean
+cleanFolders
 
 #makeGraphs
 
