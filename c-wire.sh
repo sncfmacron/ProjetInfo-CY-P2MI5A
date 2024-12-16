@@ -152,6 +152,7 @@ sortingData () {
 
     START_TIME=$(date +%s)
 
+
     filePath="$1"
     stationType="$2"
     consumerType="$3"
@@ -182,6 +183,7 @@ sortingData () {
     esac
 
     awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
+
 
     END_TIME=$(date +%s)
 
