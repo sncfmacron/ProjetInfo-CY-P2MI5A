@@ -8,7 +8,5 @@
 
 #include "basics.h"
 
-pStation updateSum(pStation s, long load);
-
 
 #endif

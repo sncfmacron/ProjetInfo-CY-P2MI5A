@@ -22,7 +22,7 @@ To run the program, use `./c-wire.sh <path_file.csv> <station_type> <consumer_ty
 Example : `./c-wire.sh ./input/DATA_CWIRE.csv hva comp 3`.
 
 Use `-h` parameter to get full help.
-- Note : you must place your input file in `/input` directory and name it **DATA_CWIRE.csv**.
+- Note : you must place a `.csv` input file in `/input` directory.
 
 ## Description
 

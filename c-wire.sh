@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-# Shell script to run programand sort data
+# Shell script to compile program_c and sort data
 
 
 # Displays the program help manual
@@ -9,18 +9,18 @@ display_help() {
     echo "CWIRE: this program processes data for an electricity distribution."
     echo ""
     echo "Usage:"
-    echo "      $0 <path_file.csv> <station_type> <consumer_type> [power_plant_id]"
-    echo "      Note : you must place your input file in '/input' directory and name it 'DATA_CWIRE.csv'."
+    echo "      $0 <file_path.csv> <station_type> <consumer_type> [power_plant_id]"
+    echo "      Note : you must place your '.csv' input file in './input' directory."
     echo ""
     echo "Arguments:"
-    echo "      <path_file.csv>  Location of the input .csv file (mandatory)."
+    echo "      <file_path.csv>  Location of the input file (mandatory)."
     echo "      <station_type>   Type of station to process: hva, hvb or lv (mandatory)."
     echo "      <consumer_type>  Type of consumer to process: all, comp or indiv (mandatory)."
     echo "      [power_plant_id] Filters the results for a specific power plant (optional)."
     echo ""
-    echo "      -h               Displays program help manual (optional)."
+    echo "      -h               Displays help manual (optional)."
     echo ""
-    echo "WARNING: the following combinations are invalid:"
+    echo "WARNING ! The following combinations are invalid:"
     echo "      * hvb all"
     echo "      * hvb indiv"
     echo "      * hva all"
@@ -55,12 +55,14 @@ verifyParameters() {
 
     # Verifying number of parameters
     if [ $# -gt 5 ] || [ $# -lt 1 ]; then
-        echo "You must provide at least the path to 'DATA_CWIRE.csv', the station type and the consumer type."
+        echo "You must provide at least the path to your input file, the station type and the consumer type."
         display_mini_help
     fi
 
-    if [ ! -f "$1" ]; then
-        echo "The first argument must indicate the path to a valid file."
+    # ---------- A REFAIRE ----------
+    # Verifying first parameter
+    if [[ ! "$1" == input/*.csv ]]; then
+        echo "The first argument must indicate a path to a valid '.csv' file located in './input' directory."
         display_mini_help
     fi
 
@@ -90,7 +92,7 @@ verifyParameters() {
     esac
 
     # Verifying fourth parameter (valid powerplant identifier)
-    # 'grep' checks if the id exists in 'DATA_CWIRE.csv'
+    # 'grep' checks if the id exists in input file
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
             echo "The fourth argument must be a valid power plant identifier."
@@ -103,54 +105,47 @@ verifyParameters() {
 # Clean folders and unused file
 cleanFolders () {
     rm -rf temp/*
-    rm -f codeC/program_c # CMT: il me semble que c'est pas demander. A voir plus tard
 }
 
 
-# Checking the presence of temp and graph folders
-verifyFolders() {
-        cleanFolders
-
-        mkdir -p graphs input temp output
-
-    if [ ! -f "input/DATA_CWIRE.csv" ]; then #CMT: le fichier peut s'appeler autre chose que data_cwire. A supprimer 
-        echo "You must place your input file in '/input' directory and name it 'DATA_CWIRE.csv'."   #CMT: ./input quand il y a /nom_repertoire au début d'un fichier ou d'un répertoire, ça définit un chemin absolue. Alors que ./nom_repertoire c'est relatif
-        display_mini_help                                                                           #CMT: 
-    fi
-    
-    if [ ! -f "codeC/main.c" ]; then #CMT:  A supprimer
-        echo "ERROR: main.c is missing in '/codeC' directory."
-        exit 1
-    elif [ -f "codeC/program_c" ]; then #CMT a suppr
-        echo "ERROR: program_c already exists in '/codeC' directory."
-        exit 1
-    fi
-}
-
-
-# Starts C program compilation using 'make'
+# Starts program_c compilation using 'make'
 compilation () {
-    # An argument is used to avoid the 'make' program sending messages when browsing files.
-    # We give arguments to 'make' so C program knows which type of station and consumer to process.
-    make --no-print-directory -C codeC
+    # If program_c doesn't exist we start the compilation
 
-    # Checks that compilation has gone well
-    if [ $? -ne 0 ]; then
-        echo "ERROR : compilation error."
-        exit 2
+    # --- VERIFIER POUR DISQUE DUR ---
+
+    if [ ! -f "codeC/program_c" ]; then
+        # An argument is used to avoid 'make' sending messages when browsing files.
+        # We give arguments to 'make' so program_c knows which type of station and consumer to process.
+        make --no-print-directory -C codeC
+
+        # Checks that compilation has gone well
+        if [ $? -ne 0 ]; then
+            echo "ERROR : compilation error."
+            exit 2
+        fi  
     fi
 }
 
 
-# Sorting data function and transmission to C program
+# Prepares directories for program execution
+processFolders() {
+    cleanFolders
+
+    # These folders are created if they don't exist. If they exist, nothing happens
+    mkdir -p graphs input temp output
+}
+
+
+# Sorting data function and transmission to program_c
 sortingData () {
 
-    # We use 'awk' to sort data through a pipe (standard input) and filters to send only relevant information.
+    # We use 'awk' to sort data through a pipe (standard input) and filters to send only relevant informations.
     # Arguments in 'awk' line : -F to indicate separating character, -v to indicate a variable.
 
     # 'date' command gives the elapsed seconds since 01/01/1970.
 
-    START_TIME=$(date +%s)
+    startTime=$(date +%s.%N)
 
 
     filePath="$1"
@@ -160,8 +155,6 @@ sortingData () {
 
     case "$2" in
         hvb)
-            # Très lent pour le fichier de 9 millions de lignes
-            # ~ 17 stations hva par secondes et pour le traitement hvb rien ne se passe
             filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }'
             ;;
         hva)
@@ -182,13 +175,13 @@ sortingData () {
                 ;;
     esac
 
-    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID" #CMT: le truc sur Discord
+    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
 
 
-    END_TIME=$(date +%s)
+    elapsedTime=$(printf "%.1f" $(echo "$(date +%s.%N) - $startTime" | bc))
 
     echo ""
-    echo "--- The program was successfully completed in $((END_TIME - START_TIME)) seconds ---"
+    echo "--- The program was successfully completed in $elapsedTime seconds ---"
 }
 
 
@@ -196,7 +189,7 @@ sortingData () {
 makeGraphs () {
 
     if [ -f "output/lv_all.csv" ]; then
-        if [ ! command -v gnuplot &> /dev/null ]; then
+        if ! command -v gnuplot &>/dev/null; then
             echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
             exit 3
         else 
@@ -209,7 +202,7 @@ makeGraphs () {
 
 verifyParameters "$@"
 
-verifyFolders
+processFolders
 
 compilation "$2" "$3"
 
@@ -218,5 +211,8 @@ sortingData "$@"
 cleanFolders
 
 makeGraphs
+
+# Pour faire des tests plus facilement, on l'enlevera
+rm codeC/program_c
 
 exit 0
