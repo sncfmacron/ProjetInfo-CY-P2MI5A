@@ -103,7 +103,7 @@ verifyParameters() {
 # Clean folders and unused file
 cleanFolders () {
     rm -rf temp/*
-    rm -f codeC/program_c
+    rm -f codeC/program_c # CMT: il me semble que c'est pas demander. A voir plus tard
 }
 
 
@@ -113,15 +113,15 @@ verifyFolders() {
 
         mkdir -p graphs input temp output
 
-    if [ ! -f "input/DATA_CWIRE.csv" ]; then
-        echo "You must place your input file in '/input' directory and name it 'DATA_CWIRE.csv'."
-        display_mini_help
+    if [ ! -f "input/DATA_CWIRE.csv" ]; then #CMT: le fichier peut s'appeler autre chose que data_cwire. A supprimer 
+        echo "You must place your input file in '/input' directory and name it 'DATA_CWIRE.csv'."   #CMT: ./input quand il y a /nom_repertoire au début d'un fichier ou d'un répertoire, ça définit un chemin absolue. Alors que ./nom_repertoire c'est relatif
+        display_mini_help                                                                           #CMT: 
     fi
-
-    if [ ! -f "codeC/main.c" ]; then
+    
+    if [ ! -f "codeC/main.c" ]; then #CMT:  A supprimer
         echo "ERROR: main.c is missing in '/codeC' directory."
         exit 1
-    elif [ -f "codeC/program_c" ]; then
+    elif [ -f "codeC/program_c" ]; then #CMT a suppr
         echo "ERROR: program_c already exists in '/codeC' directory."
         exit 1
     fi
@@ -182,7 +182,7 @@ sortingData () {
                 ;;
     esac
 
-    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
+    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID" #CMT: le truc sur Discord
 
 
     END_TIME=$(date +%s)
