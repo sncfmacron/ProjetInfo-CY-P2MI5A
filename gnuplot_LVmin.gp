@@ -13,7 +13,7 @@ set style data histogram
 set style histogram cluster gap 1
 
 #contour baton
-set style fill solid border -2
+set style fill solid
 
 #remplissage du baton par rapport a sa place
 set boxwidth 0.9
@@ -28,4 +28,4 @@ set title "10 max and 10 min"
 
 
 
-plot 'data_LVmax.txt' using 3:xtic(1) title 'LV min' linecolor rgb "#228b22",
+plot 'data_LV.txt' using 3:xtic(1) title 'LV min' linecolor rgb "#228b22",
