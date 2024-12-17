@@ -1,6 +1,6 @@
 
-#permet de définir le séparateur(;)
-set datafile separator ";"
+#permet de définir le séparateur(:)
+set datafile separator ":"
 
 # taille en pixel du graphique + nom du fichier graphique
 set terminal pngcairo size 1000,600
