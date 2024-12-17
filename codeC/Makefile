@@ -25,7 +25,7 @@ $(EXEC): $(OBJ)
 
 # Target to run the program with passed parameters
 run: $(EXEC)
-	@./$(EXEC) $(TYPE) $(CONSUMER)
+	@./$(EXEC)
 
 clean:
 	rm -f $(BUILD)/*.o $(EXEC) temp/*

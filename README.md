@@ -19,10 +19,10 @@ This program processes data for an electricity distribution.
 
 To run the program, use `./c-wire.sh <path_file.csv> <station_type> <consumer_type> [central_id]`.
 
-Example : `./c-wire.sh ./input/DATA_CWIRE.csv hva comp 3`.
+Example : `./c-wire.sh input/DATA_CWIRE.csv hva comp 3`.
 
 Use `-h` parameter to get full help.
-- Note : you must place your input file in `/input` directory and name it **DATA_CWIRE.csv**.
+- Note : you must place a `.csv` input file in `./input` directory.
 
 ## Description
 
@@ -32,17 +32,17 @@ The program is made of two parts: a Shell script and a C program.
 
 ### Shell Script (`c-wire.sh`)
 
-- The script has **required** input arguments:
+- The script has **mandatory** arguments:
 1. The path to the input CSV file.
 2. The station type to analyze (`hvb`, `hva`, or `lv`).
 3. The consumer type to analyze (`comp`, `indiv`, or `all`).
 
 **Warning** : The following combinations are forbidden: `hvb all`, `hvb indiv`, `hva all`, and `hva indiv`.
 
-- The script has **optionnal** input arguments:
+- The script has **optionnal** arguments:
 
 4. An **identifier of a central station** can be provided to make the script focuses on a single power plant.
-5. `-h` parameter provides detailed help and instructions on using the script.
+5. `-h` parameter provides detailed help on using the script.
 
 The script sends the sorted information to the executable program using a **pipe**, which is the fastest way to do it.
 
@@ -56,7 +56,7 @@ The C program uses an **AVL tree structure** to efficiently store and update sta
 
 It calculates the energy consumption for HV-B, HV-A, and LV stations.
 
-The program processes the input data and generates CSV output files like `lv_all.csv` in `/output` directory.
+The program processes the input data and generates CSV output files like `lv_all.csv` in `./output` directory.
 
 In the case of `lv all`, it creates `lv_all_minmax.csv` containing the 10 LV stations with the highest and lowest energy consumption.
 
