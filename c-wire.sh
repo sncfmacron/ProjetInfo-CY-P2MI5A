@@ -193,7 +193,8 @@ makeGraphs () {
             echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
             exit 3
         else 
-            echo "Gnuplot installed."
+            gnuplot gnuplot_LVmax.gp
+            gnuplot gnuplot_LVmin.gp
             # Script pour créer des graphiques
         fi
     fi
