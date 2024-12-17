@@ -8,7 +8,7 @@
 
 #include "basics.h"
 
-void readData(int stationType);
+void processData(int stationType);
 void printStation(pStation s);
 
 

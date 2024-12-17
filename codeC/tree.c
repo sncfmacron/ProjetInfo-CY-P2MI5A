@@ -7,12 +7,12 @@
 
 pAVL createAVL(pStation s) {
     if(s == NULL){
-        exit_with_message("ERROR: NULL pointer", 3);
+        exit_with_message("ERROR: station pointer is NULL.", ERROR_PTR_ALLOC);
     }
     pAVL a = malloc(sizeof(AVL));
     if(a == NULL)
     {
-        exit_with_message("ERROR: AVL allocation failed.", 4);
+        exit_with_message("ERROR: AVL allocation failed.", ERROR_AVL_ALLOC);
     }
 
     a->station = s;

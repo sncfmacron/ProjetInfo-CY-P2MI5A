@@ -7,7 +7,7 @@
 
 
 // Reading data from stdin with a pipe
-void readData(int stationType) {
+void processData(int stationType) {
     
     char buffer[MAX_BUFFER_SIZE];
 
@@ -20,6 +20,7 @@ void readData(int stationType) {
 
     // On utilise clock de time_h pour mesurer le temps
     clock_t start = clock();
+    
 
     while (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL) {
         char *station_id_str = strtok(buffer, " ");

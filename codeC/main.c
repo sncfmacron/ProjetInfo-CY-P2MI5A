@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
 
     // Lire les données triées par le shell dans input.c
-    readData(stationType);
+    processData(stationType);
 
 
     // Créer le fichier de sortie

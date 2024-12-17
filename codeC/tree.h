@@ -14,14 +14,14 @@ typedef struct Station_struct {
     long consumption_sum;
     long capacity;
     uint8_t type; // STATION_HVB, STATION_HVA or STATION_LV
-}Station;
+} Station;
 
 typedef struct AVL_struct {
     Station* station;
     struct AVL_struct *left;
     struct AVL_struct *right;
     int balance;
-}AVL;
+} AVL;
 
 typedef AVL* pAVL;
 typedef Station* pStation;
@@ -34,11 +34,3 @@ pAVL rightRotation(pAVL a);
 pAVL balanceAVL(pAVL a);
 
 #endif
-
-/*
-pAVL deleteAVL(pAVL a, int *h, int *pe);
-pAVL deleteMinAVL(pAVL a, int *h, int *pe);
-pAVL rotateDoubleLeft(pAVL a);
-pAVL rotateDoubleRight(pAVL a);
-*/
-
