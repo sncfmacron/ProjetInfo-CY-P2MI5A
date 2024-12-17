@@ -5,6 +5,7 @@
 
 #include "tree.h"
 
+
 pAVL createAVL(pStation s) {
     if(s == NULL){
         exit_with_message("ERROR: station pointer is NULL.", ERROR_PTR_ALLOC);

@@ -145,7 +145,7 @@ sortingData () {
 
     # 'date' command gives the elapsed seconds since 01/01/1970.
 
-    startTime=$(date +%s.%N)
+    START_TIME=$(date +%s%N)
 
 
     filePath="$1"
@@ -156,6 +156,7 @@ sortingData () {
     case "$2" in
         hvb)
             filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }'
+            sleep 2
             ;;
         hva)
             filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
@@ -175,13 +176,18 @@ sortingData () {
                 ;;
     esac
 
-    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
+    time(awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID")
 
+    END_TIME=$(date +%s%N)
 
-    elapsedTime=$(printf "%.1f" $(echo "$(date +%s.%N) - $startTime" | bc))
+    ELAPSED_TIME=$((END_TIME - START_TIME))
 
+    # Conversion to seconds and milliseconds
+    SECONDS=$((ELAPSED_TIME / 1000000000))
+    MILLISECONDS=$(((ELAPSED_TIME % 1000000000) / 1000000))
+    
     echo ""
-    echo "--- The program was successfully completed in $elapsedTime seconds ---"
+    echo "--- The program was successfully completed in ${SECONDS}.${MILLISECONDS} seconds ---"
 }
 
 

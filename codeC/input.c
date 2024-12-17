@@ -26,7 +26,7 @@ void processData(int stationType) {
         char *station_id_str = strtok(buffer, " ");
         char *capacity_str = strtok(NULL, " ");
         char *load_str = strtok(NULL, "\n");
-
+    
         // Si capacity_str différent de "-" alors on étudie bien la capacité
         if (strcmp(capacity_str, "-") != 0) {
 
