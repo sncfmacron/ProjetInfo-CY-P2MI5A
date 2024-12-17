@@ -38,7 +38,7 @@ void createOutputFile(const char* stationType, const char* consumerType, const c
     char* path = malloc(sizeof(char)*128);
 
     if(path == NULL) {
-        exit_with_message("ERROR: path string allocation failed.", ERROR_PTR_ALLOC);
+        exit_with_message("ERROR: path string allocation failed.", ERR_PTR_ALLOC);
     } else {
         createPath(stationType, consumerType, stationID, path);
     }
@@ -47,7 +47,7 @@ void createOutputFile(const char* stationType, const char* consumerType, const c
     file = fopen(path, "w");
 
     if(file == NULL) {
-        exit_with_message("ERROR: output file allocation failed.", ERROR_FILE_ALLOC);
+        exit_with_message("ERROR: output file allocation failed.", ERR_FILE_ALLOC);
     } else {
         fprintf(file, "station %s:capacity:%s", stationType, consumerType);
     }
@@ -55,7 +55,7 @@ void createOutputFile(const char* stationType, const char* consumerType, const c
     fclose(file);
 }
 
-void writeOutputFile(pStation s) {
+void writeOutputFile() {
     FILE* file = NULL;
 
 

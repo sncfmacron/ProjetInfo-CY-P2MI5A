@@ -7,7 +7,7 @@
 
 
 // Reading data from stdin with a pipe
-void processData(int stationType) {
+void processData() {
     
     char buffer[MAX_BUFFER_SIZE];
 
@@ -21,32 +21,36 @@ void processData(int stationType) {
     // On utilise clock de time_h pour mesurer le temps
     clock_t start = clock();
     
+    pAVL tree = NULL;
 
     while (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL) {
         char *station_id_str = strtok(buffer, " ");
         char *capacity_str = strtok(NULL, " ");
         char *load_str = strtok(NULL, "\n");
-    
+
+        int station_id = string_to_int(station_id_str);
+
         // Si capacity_str différent de "-" alors on étudie bien la capacité
         if (strcmp(capacity_str, "-") != 0) {
 
-            // Convertir les chaines récupérées en haut en entier ou long
-            int station_id = string_to_int(station_id_str);
-            long capacity = atol(capacity_str);
+            // processStation(int station_id, int capacity);
 
-            pStation s = createStation(station_id, capacity, stationType);
-            printStation(s);
-            //insertAVL(s);
+            // Convertir les chaines récupérées en haut en entier ou long
+            long capacity = string_to_long(capacity_str);
+
+            processStation(tree, station_id, capacity);
+
 
 
         // Sinon on étudie un consommateur
         } else if(strcmp(capacity_str, "-") == 0) {
-            int station_id = string_to_int(station_id_str);
-            long load = atol(load_str);
-            printf("\n- Station %d consumer : %ld kV\n\n", station_id, load);
-            //calcul(...)
+
+            long load = string_to_long(load_str);
+
+            processConsumer(tree, station_id, load);
+
         } else {
-            exit_with_message("ERROR: invalid entry in readData() function.", ERROR_PIPE);
+            exit_with_message("ERROR: invalid entry in readData() function.", ERR_PIPE);
         }
     }
 
@@ -57,23 +61,17 @@ void processData(int stationType) {
 }
 
 
-// Je mets ça ici pour test
-void printStation(pStation s) {
+void processStation(pAVL tree, int station_id, int capacity) {
 
-    switch (s->type) {
-        case 2:
-            printf("Station type : HVB\n");
-            break;
-        case 1:
-            printf("Station type : HVA\n");
-            break;
-        case 0:
-            printf("Station type : LV\n");
-            break;
-        default:
-            exit_with_message("ERROR: printed station doesn't exist.", ERROR_PTR_ALLOC);
-            break;
-    }
-    printf("Station ID: %d\n", s->id);
-    printf("Capacity: %ld kV\n", s->capacity);
+    pStation s = createStation(station_id, capacity);
+
+    int height = 0;
+    tree = insertAVL(tree, s, &height);
+
+    // ajouterListe(s);
+}
+
+void processConsumer(pAVL tree, int station_id, int load) {
+
+    // updateSum(tree, station_id, load);
 }

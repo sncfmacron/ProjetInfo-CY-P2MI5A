@@ -13,7 +13,6 @@ typedef struct Station_struct {
     uint32_t id;
     long consumption_sum;
     long capacity;
-    uint8_t type; // STATION_HVB, STATION_HVA or STATION_LV
 } Station;
 
 typedef struct AVL_struct {

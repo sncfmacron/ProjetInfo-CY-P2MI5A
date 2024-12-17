@@ -15,25 +15,28 @@ void exit_with_message(const char *message, int error_code) {
 
 // Transforms string to int
 int string_to_int(const char* string) {
-    if(string == 0) {
-        exit_with_message("ERROR: string to int conversion failed.", ERROR_INVALID_STRING);
+    if(string == NULL) {
+        // If station id is not given, 0 is returned by default because the string is null
+        return 0;
+    } else {
+        return atoi(string);
     }
-
-    return atoi(string);
 }
 
 
 // Transforms string to long
-long string_to_long(const char* string) {
-    char *endptr;
-    long value = strtol(string, &endptr, 10);
-
-    // An error has occurred if endptr does not point to '\0'.
-    if (*endptr != '\0') {
-        exit_with_message("ERROR: string to long conversion failed.", ERROR_INVALID_STRING);
+long string_to_long(const char *string) {
+    if (string == NULL) {
+        exit_with_message("ERROR: string to long conversion failed.", ERR_INVALID_STRING);
     }
 
-    return value;
+    char *endptr;
+    long result = strtol(string, &endptr, 10);
+
+    if (*endptr != '\0') {
+        exit_with_message("ERROR: string to long conversion failed.", ERR_INVALID_STRING);
+    }
+    return result;
 }
 
 
@@ -50,8 +53,10 @@ float getTime(clock_t start, clock_t end) {
 }
 
 
-// Function to get the type of station
+// Function to get the type of station to process
 // We use "const char *" to prevent modifying the string
+
+// --- A PEUT ETRE SUPPRIMER ---
 int getStationType(const char *station) {
     if(strcmp(station, "hvb") == 0) {
         return STATION_HVB;
@@ -63,39 +68,40 @@ int getStationType(const char *station) {
         return STATION_LV;
     }
     else {
-       exit_with_message("ERROR: unrecognised station.", ERROR_INVALID_STATION_TYPE);
+       exit_with_message("ERROR: unrecognised station.", ERR_INVALID_STATION_TYPE);
        return 1;
     }
 }
 
 
-// Function to get the type of consumer
+// --- A PEUT ETRE SUPPRIMER ---
+// Function to get the type of consumer to process
 int getConsumerType(const char *consumer) {
-    if(strcmp(consumer, "indiv") == 0) {
-        return CONSUMER_INDIV;
-    }
-    else if(strcmp(consumer, "comp") == 0) {
+    if(strcmp(consumer, "comp") == 0) {
         return CONSUMER_COMP;
+    }
+    else if(strcmp(consumer, "indiv") == 0) {
+        return CONSUMER_INDIV;
     }
     else if(strcmp(consumer, "all") == 0) {
         return CONSUMER_ALL;
     }
     else {
-       exit_with_message("ERROR: unrecognised consumer.", ERROR_INVALID_CONSUMER_TYPE);
+       exit_with_message("ERROR: unrecognised consumer.", ERR_INVALID_CONSUMER_TYPE);
        return 1;
     }
 }
 
 
-pStation createStation(int station_id, long capacity, int stationType) {
+// Function to create a station
+pStation createStation(int station_id, long capacity) {
 
     pStation s = malloc(sizeof(Station));
     if(s == NULL){
-        exit_with_message("ERROR: station allocation failed.", ERROR_PTR_ALLOC);
+        exit_with_message("ERROR: station allocation failed.", ERR_PTR_ALLOC);
     }
     s->id = station_id;
     s->capacity = capacity;
-    s->type = stationType;
     s->consumption_sum = 0;
 
     return s;

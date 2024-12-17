@@ -6,7 +6,7 @@
 
 # Displays the program help manual
 display_help() {
-    # We use 'tput' to set the text in bold
+    # We use 'tput' to set the text in bold to make the text more aesthetic
     bold=$(tput bold)
     normal=$(tput sgr0)
 
@@ -17,7 +17,7 @@ display_help() {
     echo "      This program processes data for an electricity distribution."
     echo ""
     echo "${bold} SYNOPSIS ${normal}"
-    echo "      $0 [file_path.csv] [station_type] [consumer_type] [power_plant_id]"
+    echo "      ./c-wire.sh [file_path.csv] [station_type] [consumer_type] [power_plant_id]"
     echo ""
     echo "${bold} OPTIONS ${normal}"
     echo "     ${bold} [file_path.csv] ${normal}  Location of the input file (required)"
@@ -35,7 +35,7 @@ display_help() {
     echo "      * hva indiv"
     echo ""
     echo "${bold} EXAMPLE ${normal}"
-    echo "      $0 input/DATA_CWIRE.csv lv comp 3"
+    echo "      ./c-wire.sh input/DATA_CWIRE.csv lv comp 3"
     echo ""
     exit 0
 }
@@ -46,7 +46,7 @@ display_mini_help() {
     bold=$(tput bold)
     normal=$(tput sgr0)
     echo ""
-    echo "${bold}Usage${normal}: $0 [path_file.csv] [station_type] [consumer_type] [power_plant_id]"
+    echo "${bold}Usage${normal}: ./c-wire.sh [path_file.csv] [station_type] [consumer_type] [power_plant_id]"
     echo "Use -h parameter to get full help."
     exit 1
 }
@@ -64,7 +64,7 @@ verifyParameters() {
     done
 
     # Verifying number of parameters
-    if [ $# -gt 5 ] || [ $# -lt 1 ]; then
+    if [[ $# -gt 5 ]] || [[ $# -lt 1 ]]; then
         echo "You must provide at least the path to your input file, the station type and the consumer type."
         display_mini_help
     fi
@@ -121,18 +121,19 @@ cleanFolders () {
 compilation () {
     # If program_c doesn't exist we start the compilation
 
-    if [ ! -f codeC/program_c ]; then
+    if [[ ! -f codeC/program_c ]]; then
         # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
         make --no-print-directory -C codeC
 
         # Checks that compilation has gone well
-        if [ $? -ne 0 ]; then
+        if [[ $? -ne 0 ]]; then
             echo "ERROR : compilation error."
             exit 2
         fi  
     else
         echo "INFO: 'program_c' is already present, compilation is not executed."
         echo ""
+        exit 3
     fi
 }
 
@@ -147,22 +148,18 @@ processFolders () {
 
 
 # Displays the execution time of a function
-displayTime () {
-    # We use 'tput' to set the text in bold
-    bold=$(tput bold)
-    normal=$(tput sgr0)
+displayTime() {
+    local startTime="$1"
+    local endTime="$2"
 
-    START_TIME="$1"
-    END_TIME="$2"
+    local elapsedTime=$((endTime - startTime))
 
-    ELAPSED_TIME=$((END_TIME - START_TIME))
+    local seconds=$((elapsedTime / 1000000000))
+    local milliseconds=$(((elapsedTime % 1000000000) / 1000000))
 
-    # Conversion to seconds and milliseconds
-    SECONDS=$((ELAPSED_TIME / 1000000000))
-    MILLISECONDS=$(((ELAPSED_TIME % 1000000000) / 1000000))
-    
     echo ""
-    echo "--- The program was successfully completed in $bold${SECONDS}.${MILLISECONDS}$normal seconds ---"
+    echo "--- The program was successfully completed in $seconds.${milliseconds} seconds ---"
+    echo ""
 }
 
 
@@ -174,13 +171,13 @@ sortingData () {
 
     # 'date' command gives the elapsed seconds since 01/01/1970.
 
-    START_TIME=$(date +%s%N)
+    startTime=$(date +%s%N)
 
 
-    filePath="$1"
-    stationType="$2"
-    consumerType="$3"
-    powerPlantID="$4"
+    local filePath="$1"
+    local stationType="$2"
+    local consumerType="$3"
+    local powerPlantID="$4"
 
     case "$2" in
         hvb)
@@ -205,19 +202,20 @@ sortingData () {
     esac
 
     # We send data through a pipe with arguments like 'stationType' so the program process the right type of station
-    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
+    # sort -t ';' -k7nr "$filePath" | awk -F ';' -v custom_id="$powerPlantID" "$filter" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
+    sort -t ';' -k7nr "$filePath" | awk -F ';' -v custom_id="$powerPlantID" "$filter" > test.txt
 
 
-    END_TIME=$(date +%s%N)
+    local endTime=$(date +%s%N)
 
-    displayTime "$START_TIME" "$END_TIME"
+    displayTime "$startTime" "$endTime"
 }
 
 
 # Function to make graphs using output files
 makeGraphs () {
 
-    if [ -f "output/lv_all.csv" ]; then
+    if [[ -f "output/lv_all.csv" ]]; then
         if ! command -v gnuplot &>/dev/null; then
             echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
             exit 3
@@ -229,20 +227,25 @@ makeGraphs () {
 }
 
 
-# Function calls
-verifyParameters "$@"
+# Functions calls
+runProgram () {
 
-processFolders
+    verifyParameters "$@"
 
-compilation "$2" "$3"
+    processFolders
 
-sortingData "$@"
+    compilation "$2" "$3"
 
-cleanFolders
+    sortingData "$@"
 
-makeGraphs
+    cleanFolders
 
-# Je mets ça pour pouvoir test plus facilement
-rm codeC/program_c
+    makeGraphs
 
-exit 0
+    # Je mets ça pour pouvoir test plus facilement
+    rm codeC/program_c
+
+    exit 0
+}
+
+runProgram "$@"

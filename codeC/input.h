@@ -8,8 +8,8 @@
 
 #include "basics.h"
 
-void processData(int stationType);
-void printStation(pStation s);
-
+void processData();
+void processStation(pAVL tree, int station_id, int capacity);
+void processConsumer(pAVL tree, int station_id, int load);
 
 #endif
