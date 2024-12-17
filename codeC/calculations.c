@@ -7,17 +7,16 @@
 
 
 // Updates station consumption sum
-/*void updateSum(pAVL a, int stationID, long load) {
+void updateSum(pAVL a, int stationID, long load) {
     if(a == NULL) {
-        return;
+        exit_with_message("ERROR: station doesn't exist.", ERROR_INVALID_STATION);
     }
 
     if(a->station->id == stationID) {
         a->station->consumption_sum += load;
-    }
-    if(a->station->id < stationID) {
-        updateSum(a->left, s, load);
+    } else if(a->station->id > stationID) {
+        updateSum(a->left, stationID, load);
     } else {
-        updateSum(a->right, s, load);
+        updateSum(a->right, stationID, load);
     }
-}*/
+}

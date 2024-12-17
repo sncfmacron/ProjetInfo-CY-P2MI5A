@@ -14,9 +14,10 @@
 #include <unistd.h>
 
 
-// Déclaration anticipée du type Station
+// Early declaration of the Station type for use across the program
 typedef struct Station_struct Station;
 typedef Station* pStation;
+
 
 #include "calculations.h"
 #include "input.h"

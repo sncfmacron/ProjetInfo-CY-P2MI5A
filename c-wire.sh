@@ -6,27 +6,35 @@
 
 # Displays the program help manual
 display_help() {
-    echo "CWIRE: this program processes data for an electricity distribution."
+    # We use 'tput' to set the text in bold
+    bold=$(tput bold)
+    normal=$(tput sgr0)
+
+    echo "${bold} NAME ${normal}"
+    echo "      c-wire - data managing"
     echo ""
-    echo "Usage:"
-    echo "      $0 <file_path.csv> <station_type> <consumer_type> [power_plant_id]"
-    echo "      Note : you must place your '.csv' input file in './input' directory."
+    echo "${bold} DESCRIPTION ${normal}"
+    echo "      This program processes data for an electricity distribution."
     echo ""
-    echo "Arguments:"
-    echo "      <file_path.csv>  Location of the input file (mandatory)."
-    echo "      <station_type>   Type of station to process: hva, hvb or lv (mandatory)."
-    echo "      <consumer_type>  Type of consumer to process: all, comp or indiv (mandatory)."
-    echo "      [power_plant_id] Filters the results for a specific power plant (optional)."
+    echo "${bold} SYNOPSIS ${normal}"
+    echo "      $0 [file_path.csv] [station_type] [consumer_type] [power_plant_id]"
     echo ""
-    echo "      -h               Displays help manual (optional)."
+    echo "${bold} OPTIONS ${normal}"
+    echo "     ${bold} [file_path.csv] ${normal}  Location of the input file (required)"
+    echo "     ${bold} [station_type] ${normal}   Type of station to process: 'hva', 'hvb' or 'lv' (required)"
+    echo "     ${bold} [consumer_type] ${normal}  Type of consumer to process: 'all', 'comp' or 'indiv' (required)"
+    echo "     ${bold} [power_plant_id] ${normal} Filters the results for a specific power plant ID (optional)"
     echo ""
-    echo "WARNING ! The following combinations are invalid:"
+    echo "     ${bold} -h ${normal}               Displays help manual"
+    echo ""
+    echo "${bold} WARNING ${normal}"
+    echo "      The following combinations are forbidden:"
     echo "      * hvb all"
     echo "      * hvb indiv"
     echo "      * hva all"
     echo "      * hva indiv"
     echo ""
-    echo "Example:"
+    echo "${bold} EXAMPLE ${normal}"
     echo "      $0 input/DATA_CWIRE.csv lv comp 3"
     echo ""
     exit 0
@@ -35,8 +43,10 @@ display_help() {
 
 # Displays reduced program help
 display_mini_help() {
+    bold=$(tput bold)
+    normal=$(tput sgr0)
     echo ""
-    echo "Usage: $0 <path_file.csv> <station_type> <consumer_type> [power_plant_id]"
+    echo "${bold}Usage${normal}: $0 [path_file.csv] [station_type] [consumer_type] [power_plant_id]"
     echo "Use -h parameter to get full help."
     exit 1
 }
@@ -59,10 +69,9 @@ verifyParameters() {
         display_mini_help
     fi
 
-    # ---------- A REFAIRE ----------
     # Verifying first parameter
-    if [[ ! "$1" == input/*.csv ]]; then
-        echo "The first argument must indicate a path to a valid '.csv' file located in './input' directory."
+    if [[ ! -f "$1" ]]; then
+        echo "The first option must indicate a path to a valid '.csv' file."
         display_mini_help
     fi
 
@@ -71,7 +80,7 @@ verifyParameters() {
         hva|hvb|lv)
             ;;
         *)
-            echo "Second argument must be 'hva', 'hvb', or 'lv'."
+            echo "Second option must be 'hva', 'hvb', or 'lv'."
             display_mini_help
             ;;
     esac
@@ -86,7 +95,7 @@ verifyParameters() {
             fi
             ;;
         *)
-            echo "The third argument must be 'comp', 'indiv', or 'all'."
+            echo "The third option must be 'comp', 'indiv', or 'all'."
             display_mini_help
             ;;
     esac
@@ -95,7 +104,7 @@ verifyParameters() {
     # 'grep' checks if the id exists in input file
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
-            echo "The fourth argument must be a valid power plant identifier."
+            echo "The fourth option must be a valid power plant identifier."
             display_mini_help
         fi
     fi
@@ -112,11 +121,8 @@ cleanFolders () {
 compilation () {
     # If program_c doesn't exist we start the compilation
 
-    # --- VERIFIER POUR DISQUE DUR ---
-
-    if [ ! -f "codeC/program_c" ]; then
-        # An argument is used to avoid 'make' sending messages when browsing files.
-        # We give arguments to 'make' so program_c knows which type of station and consumer to process.
+    if [ ! -f codeC/program_c ]; then
+        # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
         make --no-print-directory -C codeC
 
         # Checks that compilation has gone well
@@ -124,12 +130,15 @@ compilation () {
             echo "ERROR : compilation error."
             exit 2
         fi  
+    else
+        echo "INFO: 'program_c' is already present, compilation is not executed."
+        echo ""
     fi
 }
 
 
 # Prepares directories for program execution
-processFolders() {
+processFolders () {
     cleanFolders
 
     # These folders are created if they don't exist. If they exist, nothing happens
@@ -137,11 +146,31 @@ processFolders() {
 }
 
 
+# Displays the execution time of a function
+displayTime () {
+    # We use 'tput' to set the text in bold
+    bold=$(tput bold)
+    normal=$(tput sgr0)
+
+    START_TIME="$1"
+    END_TIME="$2"
+
+    ELAPSED_TIME=$((END_TIME - START_TIME))
+
+    # Conversion to seconds and milliseconds
+    SECONDS=$((ELAPSED_TIME / 1000000000))
+    MILLISECONDS=$(((ELAPSED_TIME % 1000000000) / 1000000))
+    
+    echo ""
+    echo "--- The program was successfully completed in $bold${SECONDS}.${MILLISECONDS}$normal seconds ---"
+}
+
+
 # Sorting data function and transmission to program_c
 sortingData () {
 
     # We use 'awk' to sort data through a pipe (standard input) and filters to send only relevant informations.
-    # Arguments in 'awk' line : -F to indicate separating character, -v to indicate a variable.
+    # Options in 'awk' line : -F to indicate separating character, -v to indicate a variable.
 
     # 'date' command gives the elapsed seconds since 01/01/1970.
 
@@ -176,18 +205,13 @@ sortingData () {
                 ;;
     esac
 
-    time(awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID")
+    # We send data through a pipe with arguments like 'stationType' so the program process the right type of station
+    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
+
 
     END_TIME=$(date +%s%N)
 
-    ELAPSED_TIME=$((END_TIME - START_TIME))
-
-    # Conversion to seconds and milliseconds
-    SECONDS=$((ELAPSED_TIME / 1000000000))
-    MILLISECONDS=$(((ELAPSED_TIME % 1000000000) / 1000000))
-    
-    echo ""
-    echo "--- The program was successfully completed in ${SECONDS}.${MILLISECONDS} seconds ---"
+    displayTime "$START_TIME" "$END_TIME"
 }
 
 
@@ -199,13 +223,14 @@ makeGraphs () {
             echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
             exit 3
         else 
-            echo "Gnuplot installed."
-            # Script pour créer des graphiques
+            echo "Gnuplot is installed."
+            # Script pour créer des graphiques (voir branche Guirec)
         fi
     fi
 }
 
 
+# Function calls
 verifyParameters "$@"
 
 processFolders
@@ -218,7 +243,7 @@ cleanFolders
 
 makeGraphs
 
-# Pour faire des tests plus facilement, on l'enlevera
+# Je mets ça pour pouvoir test plus facilement
 rm codeC/program_c
 
 exit 0
