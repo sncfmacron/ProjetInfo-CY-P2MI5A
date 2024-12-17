@@ -184,22 +184,21 @@ sortingData () {
 
     case "$2" in
         hvb)
-            filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }'
-            sleep 2
+            filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }'
             ;;
         hva)
-            filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
+            filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
             ;;
         lv)
             case "$3" in
                 all)
-                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }'
+                    filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }'
                     ;;
                 comp)
-                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }'
+                    filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }'
                     ;;
                 indiv)
-                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }'
+                    filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }'
                     ;;
             esac
                 ;;
