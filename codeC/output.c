@@ -59,6 +59,4 @@ void writeOutputFile(pAVL tree, FILE* file) {
 
 
 
-
-
 }
