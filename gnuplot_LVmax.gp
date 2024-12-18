@@ -21,15 +21,18 @@ set boxwidth 0.9
 # permet d'avoir une grille pour mieux se reperer  
 set grid ytics
 
+#pour avoir une graduation de 1 en 1 POUR l'axe x
 set xtics 1
+
+#si tu veux chager la range de y c'est juste en dessoussi tu, tu peux meme l'enlever parce que elle sert pas trop 
 set yrange [0:40]
 set xrange [0:11]
-set format y "%g"
 
 # nom x/y/graphique
 set xlabel "LV max/min"
 set ylabel "capacity(kwh)"
 set title "10 LV max"
 
+#column(0)+1 remplace la colonne du fichier de l'axe des x
 
 plot 'data_LV.txt' using 2:xtic(column(0)+1) title 'LV max' linecolor rgb "#e34234",
