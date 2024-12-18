@@ -7,16 +7,16 @@
 
 
 // Reading sorted station data from './temp' directory
-pAVL processStation(const char *filePath, pAVL tree) {
+pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
     FILE *file = fopen(filePath, "r");
     if (file == NULL) {
         exit_with_message("ERROR : sorted station file not found.", ERR_MISSING_FILE);
     }
 
-    char line[128];  // Buffer for each line of the file
+    char line[128];     // Buffer for each line of the file
     int id;
     long capacity;
-
+    uint32_t i = 0;         // Incremental value for the stations
     while (fgets(line, sizeof(line), file)) {
         // Read the current line with 'sscanf'
         if (sscanf(line, "%d %ld", &id, &capacity) == 2) {
@@ -24,9 +24,9 @@ pAVL processStation(const char *filePath, pAVL tree) {
             //printf("DEBUG : Lues depuis le fichier - ID: %d, Capacité: %ld", id, capacity);
 
             int height = 0;
-            pStation station = createStation(id, capacity);
-            tree = insertAVL(tree, station, &height);
-
+            stations[i] = createStation(id, capacity);
+            tree = insertAVL(tree, stations[i], &height);
+            i++;
             //printf("DEBUG : Station ID %d insérée dans l'arbre.\n", id);
 
         } else {
@@ -54,11 +54,14 @@ pAVL processConsumer(const char *filePath, pAVL tree)
 
     while (fgets(line, sizeof(line), file)) {
         if (sscanf(line, "%d %ld", &id, &load) == 2) {
+            //printf("DEBUG : Lues depuis le fichier - ID: %d, Charge: %ld\n", id, load);
             if (load > 0) {
                 updateSum(tree, id, load);
+                //printf("DEBUG : MAJ de la conso. pour la station %d avec +%ldkV.\n", id, load);
             }
         }  else {
             exit_with_message("ERROR: invalid sorted input file format.", ERR_INPUT_FORMAT);
+            printf("DEBUG : Ligne incorrecte : %s", line);
         }
     }
 

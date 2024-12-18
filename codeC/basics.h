@@ -39,5 +39,8 @@ int min3(int a, int b, int c);
 int max(int a, int b);
 int min(int a, int b);
 
+void merge(pStation* stations, uint32_t start, uint32_t middle, uint32_t end);
+void mergeSortRecursive(pStation* stations, uint32_t start, uint32_t end);
+void mergeSort(pStation* stations, uint32_t nb_stations);
 
 #endif

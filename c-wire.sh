@@ -138,9 +138,10 @@ compilation () {
 
     local stationType="$1"
     local consumerType="$2"
-    local stationID="$3"
+    local powerPlantID="$3"
+
     # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
-    make --no-print-directory -C codeC run ARGS="$stationType $consumerType $stationID $stationNumber"
+    make --no-print-directory -C codeC run ARGS="$stationType $consumerType $stationNumber $powerPlantID"
 
     # Checks that compilation has gone well
     if [[ $? -ne 0 ]]; then
@@ -256,9 +257,6 @@ runProgram () {
     startTime=$(date +%s%N)
 
     sortingData "$@"
-
-    echo "Station number: $stationNumber"
-
 
     compilation "$2" "$3" "$4" "$stationNumber"
 
