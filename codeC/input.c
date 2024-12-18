@@ -54,14 +54,11 @@ pAVL processConsumer(const char *filePath, pAVL tree)
 
     while (fgets(line, sizeof(line), file)) {
         if (sscanf(line, "%d %ld", &id, &load) == 2) {
-            //printf("DEBUG : Lues depuis le fichier - ID: %d, Charge: %ld\n", id, load);
             if (load > 0) {
                 updateSum(tree, id, load);
-                //printf("DEBUG : MAJ de la conso. pour la station %d avec +%ldkV.\n", id, load);
             }
         }  else {
             exit_with_message("ERROR: invalid sorted input file format.", ERR_INPUT_FORMAT);
-            printf("DEBUG : Ligne incorrecte : %s", line);
         }
     }
 

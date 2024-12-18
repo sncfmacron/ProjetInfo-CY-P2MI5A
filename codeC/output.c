@@ -32,7 +32,7 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
         exit_with_message("ERROR: stationType or consumerType is NULL.", ERR_INVALID_ARGS);
     }
 
-    char path[128];
+    char path[64];
     // Create the right file name (e.g. “hva_comp_2.csv”)
     int sizePath = sizeof(path);
     createPath(stationType, consumerType, powerPlantID, path, sizePath);
@@ -56,7 +56,6 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 // Writing calculated data in the output file
 void writeOutputFile(pAVL tree, FILE* file) {
 
-
-    // QSORT
+    
 
 }

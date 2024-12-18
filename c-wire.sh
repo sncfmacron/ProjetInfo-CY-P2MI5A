@@ -140,7 +140,7 @@ compilation () {
     local consumerType="$2"
     local stationID="$3"
     # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
-    make --no-print-directory -C codeC run ARGS="$stationType $consumerType $stationID"
+    make --no-print-directory -C codeC run ARGS="$stationType $consumerType $stationID $stationNumber"
 
     # Checks that compilation has gone well
     if [[ $? -ne 0 ]]; then
@@ -221,6 +221,8 @@ sortingData () {
 
     awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath">/dev/null
 
+    stationNumber=$(wc -l < temp/station_sorted.csv)
+
     local endTime=$(date +%s%N)
     local timeMsg="$filePath sorted"
     displayTime "$timeMsg" "$startTime" "$endTime"
@@ -255,7 +257,10 @@ runProgram () {
 
     sortingData "$@"
 
-    compilation "$2" "$3" "$4"
+    echo "Station number: $stationNumber"
+
+
+    compilation "$2" "$3" "$4" "$stationNumber"
 
     # Faciliter les test
     rm -f codeC/program_c
@@ -270,5 +275,6 @@ runProgram () {
 
     exit 0
 }
+
 
 runProgram "$@"
