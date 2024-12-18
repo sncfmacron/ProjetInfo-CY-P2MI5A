@@ -187,7 +187,12 @@ sortingData () {
             filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }'
             ;;
         hva)
-            filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
+            # filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
+            filter='
+            
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $7 != "-" { print $3, $7 > "temp/hva_station.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $8 != "-" { print $3, $8 > "temp/hva_comp.csv" }
+            '
             ;;
         lv)
             # Ne fonctionne pas bien pour lv all
@@ -205,7 +210,9 @@ sortingData () {
                 ;;
     esac
 
-    sort -t ';' -k7nr "$filePath" | awk -F ';' -v custom_id="$powerPlantID" "$filter" > ./temp/station_sorted.csv >/dev/null
+    # sort -t ';' -k7nr "$filePath" | awk -F ';' -v custom_id="$powerPlantID" "$filter" > ./temp/station_sorted.csv >/dev/null
+    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath"> ./temp/station_sorted.csv >/dev/null
+    # pistes de test : tester sort uniquement sur le fichier de sortie hva_station.csv ou faire le trie en C (je vais le faire pour voir la diff)
 
     local endTime=$(date +%s%N)
     local timeMsg="$filePath sorted"
