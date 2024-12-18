@@ -19,7 +19,7 @@ void outputProcess(const char* stationType, const char* consumerType, const char
 }
 
 void createPath(const char* stationType, const char* consumerType, const char* powerPlantID, char* path, int sizePath) {
-    if(powerPlantID != NULL && strcmp(powerPlantID, "") !=  0) {
+    if(powerPlantID != NULL && strcmp(powerPlantID, "EMPTY") !=  0) {
         snprintf(path, sizePath, "%s%s_%s_%s.csv", DIR_OUTPUT, stationType, consumerType, powerPlantID);
     } else {
         snprintf(path, sizePath, "%s%s_%s.csv", DIR_OUTPUT, stationType, consumerType);
