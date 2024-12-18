@@ -184,28 +184,42 @@ sortingData () {
 
     case "$2" in
         hvb)
-            filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }'
+            filter='
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $7 != "-" { print $2, $7 > "temp/station_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $8 != "-" { print $2, $8 > "temp/consumer_sorted.csv" }
+            '
             ;;
         hva)
-            filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
+            filter='
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $7 != "-" { print $3, $7 > "temp/station_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $8 != "-" { print $3, $8 > "temp/consumer_sorted.csv" }
+            '
             ;;
         lv)
-            # Ne fonctionne pas bien pour lv all
             case "$3" in
                 all)
-                    filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }'
+                    filter='
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" && $4 != "LV Station" { print $4, $7 > "temp/station_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $8 != "-" && $4 != "LV Station" { print $4, $8 > "temp/consumer_sorted.csv" }
+                    '
                     ;;
                 comp)
-                    filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }'
+                    filter='
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 == "-" { print $4, $7 }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" && $8 != "-" { print $4, $8 }
+                    '
                     ;;
                 indiv)
-                    filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }'
+                    filter='
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 == "-" { print $4, $7 > "temp/station_sorted.csv"}
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" && $8 != "-" { print $4, $8 > "temp/consumer_sorted.csv"}
+                    '
                     ;;
             esac
                 ;;
     esac
 
-    sort -t ';' -k7nr "$filePath" | awk -F ';' -v custom_id="$powerPlantID" "$filter" > ./temp/station_sorted.csv
+    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath">/dev/null
 
     local endTime=$(date +%s%N)
     local timeMsg="$filePath sorted"
@@ -230,7 +244,9 @@ makeGraphs () {
 
 # Functions calls
 runProgram () {
-
+    # Suppr au cas où il y a eu une erreur avant pour test
+    rm -f codeC/program_c
+    
     verifyParameters "$@"
 
     processFolders
@@ -241,12 +257,12 @@ runProgram () {
 
     compilation "$2" "$3" "$4"
 
+    # Faciliter les test
+    rm -f codeC/program_c
+
     # cleanFolders
 
     makeGraphs
-
-    # Je mets ça pour pouvoir test plus facilement
-    rm codeC/program_c
 
     local endTime=$(date +%s%N)
     local timeMsg="Program completed successfully"

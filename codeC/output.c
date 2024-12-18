@@ -13,6 +13,8 @@ void outputProcess(const char* stationType, const char* consumerType, const char
     if (file != NULL) {
         //writeOutputFile(tree, file);
         fclose(file);
+    } else {
+        ("ERROR: output file writing failed.", ERR_FILE_CREATION);
     }
 }
 
@@ -24,7 +26,7 @@ void createPath(const char* stationType, const char* consumerType, const char* p
     }
 }
 
-// Initializes a file: generates its name and header
+// Initializes a file, generates its name and header
 FILE* initOutputFile(const char* stationType, const char* consumerType, const char* powerPlantID) {
     if (stationType == NULL || consumerType == NULL) {
         exit_with_message("ERROR: stationType or consumerType is NULL.", ERR_INVALID_ARGS);
@@ -35,15 +37,13 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
     int sizePath = sizeof(path);
     createPath(stationType, consumerType, powerPlantID, path, sizePath);
         
-        
-
     FILE* file = NULL;
     
     // 'fopen' with “w” option automatically creates the file
     file = fopen(path, "w");
 
     if(file == NULL) {
-        exit_with_message("ERROR: output file creation failed.", ERR_INVALID_FILE);
+        exit_with_message("ERROR: output file creation failed.", ERR_FILE_CREATION);
         return NULL;
     } else {
         fprintf(file, "station %s:capacity:%s\n", stationType, consumerType);
@@ -55,9 +55,7 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 
 // Writing calculated data in the output file
 void writeOutputFile(pAVL tree, FILE* file) {
-    if(file == NULL) {
-        exit_with_message("ERROR: output file writing failed.", ERR_INVALID_FILE);
-    }
+
 
 
 

@@ -22,13 +22,13 @@ int main(int argc, char* argv[]) {
     }
 
     pAVL tree = NULL;
-    tree = processFile("../temp/station_sorted.csv", tree);
 
+    tree = processStation(DIR_STATION_SORTED, tree);
+    tree = processConsumer(DIR_CONSUMER_SORTED, tree);
 
     printf("\n");
     printAVL(tree);
 
-  
     outputProcess(argv[1], argv[2], argv[3], tree);
 
     printf("\nMain : exec réussie\n");
