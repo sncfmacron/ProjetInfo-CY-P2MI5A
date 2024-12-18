@@ -1,77 +1,61 @@
 /*
-    Functions to get data from c-wire.sh
+    input.c : functions to get data from c-wire.sh
 */
 
 
 #include "input.h"
 
 
-// Reading data from stdin with a pipe
-void processData() {
-    
-    char buffer[MAX_BUFFER_SIZE];
+// Reading data
+pAVL processFile(const char *filePath, pAVL tree) {
+    FILE *file = fopen(filePath, "r");
+    if (file == NULL) {
+        exit_with_message("ERROR : './temp/station_sorted.csv' not found.", ERR_INVALID_FILE);
+    }
 
-    // On passe pour une pipe pour transmettre les données du shell vers program_c
-    // strok(str, delim) pour séparer l'entrée du shell en différentes chaines de caractères
+    char line[128];  // Buffer for each line of the file
+    int id;
+    long capacity;
+    long load;
 
-    /*
-        Il faudra remplacer atol, aoi etc par strol c'est plus safe
-    */
+    while (fgets(line, sizeof(line), file)) {
+        // // Replace the '-' character with '0
+        char *p = line;
+        while (*p) {
+            if (*p == '-') {
+                *p = '0';
+            }
+            p++;
+        }
 
-    // On utilise clock de time_h pour mesurer le temps
-    clock_t start = clock();
-    
-    pAVL tree = NULL;
+        // Read the current line with 'sscanf'
+        if (sscanf(line, "%d %ld %ld", &id, &capacity, &load) == 3) {
+            printf("DEBUG : Lues depuis le fichier - ID: %d, Capacité: %ld, Charge: %ld\n", id, capacity, load);
 
-    while (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL) {
-        char *station_id_str = strtok(buffer, " ");
-        char *capacity_str = strtok(NULL, " ");
-        char *load_str = strtok(NULL, "\n");
-
-        int station_id = string_to_int(station_id_str);
-
-        // Si capacity_str différent de "-" alors on étudie bien la capacité
-        if (strcmp(capacity_str, "-") != 0) {
-
-            // processStation(int station_id, int capacity);
-
-            // Convertir les chaines récupérées en haut en entier ou long
-            long capacity = string_to_long(capacity_str);
-
-            processStation(tree, station_id, capacity);
-
-
-
-        // Sinon on étudie un consommateur
-        } else if(strcmp(capacity_str, "-") == 0) {
-
-            long load = string_to_long(load_str);
-
-            processConsumer(tree, station_id, load);
-
+            if (capacity > 0) {
+                int height = 0;
+                pStation station = createStation(id, capacity);
+                tree = insertAVL(tree, station, &height);
+                printf("DEBUG : Station ID %d insérée dans l'arbre.\n", id);
+            } else if (load > 0) {
+                updateSum(tree, id, load);
+                printf("DEBUG : MAJ de la conso. pour la station %d avec +%ldkV.\n", id, load);
+            }
         } else {
-            exit_with_message("ERROR: invalid entry in readData() function.", ERR_PIPE);
+            printf("DEBUG : Ligne incorrecte : %s", line);
         }
     }
 
+    fclose(file);
+    return tree;
+}
+    
+    
+    
+/*clock_t start = clock();
+    
+ 
     clock_t end = clock();
     float seconds = getTime(end, start);
 
-    printf("\n--- Data transmitted successfully in %.2f seconds ---\n", seconds);
-}
-
-
-void processStation(pAVL tree, int station_id, int capacity) {
-
-    pStation s = createStation(station_id, capacity);
-
-    int height = 0;
-    tree = insertAVL(tree, s, &height);
-
-    // ajouterListe(s);
-}
-
-void processConsumer(pAVL tree, int station_id, int load) {
-
-    // updateSum(tree, station_id, load);
-}
+printf("\n--- Data transmitted successfully in %.2f seconds ---\n", seconds);*/

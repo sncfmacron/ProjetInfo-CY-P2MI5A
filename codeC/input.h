@@ -1,15 +1,16 @@
 /*
-    Library for input.c
+    input.h : ibrary for input.c
 */
 
 
 #ifndef INPUT_HEADER
 #define INPUT_HEADER
 
+typedef struct AVL_struct AVL;
+typedef AVL* pAVL;
+
 #include "basics.h"
 
-void processData();
-void processStation(pAVL tree, int station_id, int capacity);
-void processConsumer(pAVL tree, int station_id, int load);
+pAVL processFile(const char* filename, pAVL tree);
 
 #endif

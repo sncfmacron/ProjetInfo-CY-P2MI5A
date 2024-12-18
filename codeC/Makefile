@@ -1,4 +1,4 @@
-# Compiler and flags
+# Compiler and flag
 CC = gcc
 CFLAGS = -Wall
 
@@ -23,9 +23,10 @@ $(BUILD)/%.o: $(DIR)/%.c $(HEADERS) | $(BUILD)
 $(EXEC): $(OBJ)
 	@$(CC) $(CFLAGS) $(OBJ) -o $(EXEC)
 
-# Target to run the program with passed parameters
+# Run the program with passed parameters
 run: $(EXEC)
-	@./$(EXEC)
+	@./$(EXEC) $(ARGS)
 
+# Clean after execution
 clean:
 	rm -f $(BUILD)/*.o $(EXEC) temp/*

@@ -1,5 +1,5 @@
 /*
-    Basic functions
+    basic.c : basic functions
 */
 
 
@@ -7,6 +7,7 @@
 
 
 // Exit program with an error message
+// We use 'const char *' to prevent modifying the string
 void exit_with_message(const char *message, int error_code) {
     printf("%s\n", message);
     exit(error_code);
@@ -53,47 +54,7 @@ float getTime(clock_t start, clock_t end) {
 }
 
 
-// Function to get the type of station to process
-// We use "const char *" to prevent modifying the string
-
-// --- A PEUT ETRE SUPPRIMER ---
-int getStationType(const char *station) {
-    if(strcmp(station, "hvb") == 0) {
-        return STATION_HVB;
-    }
-    else if(strcmp(station, "hva") == 0) {
-        return STATION_HVA;
-    }
-    else if(strcmp(station, "lv") == 0) {
-        return STATION_LV;
-    }
-    else {
-       exit_with_message("ERROR: unrecognised station.", ERR_INVALID_STATION_TYPE);
-       return 1;
-    }
-}
-
-
-// --- A PEUT ETRE SUPPRIMER ---
-// Function to get the type of consumer to process
-int getConsumerType(const char *consumer) {
-    if(strcmp(consumer, "comp") == 0) {
-        return CONSUMER_COMP;
-    }
-    else if(strcmp(consumer, "indiv") == 0) {
-        return CONSUMER_INDIV;
-    }
-    else if(strcmp(consumer, "all") == 0) {
-        return CONSUMER_ALL;
-    }
-    else {
-       exit_with_message("ERROR: unrecognised consumer.", ERR_INVALID_CONSUMER_TYPE);
-       return 1;
-    }
-}
-
-
-// Function to create a station
+// Creates a station pointer
 pStation createStation(int station_id, long capacity) {
 
     pStation s = malloc(sizeof(Station));
@@ -108,6 +69,7 @@ pStation createStation(int station_id, long capacity) {
 }
 
 
+// These functions are used to retrieve the maximum of variables
 int max3(int a, int b, int c) {
     int max = (a > b) ? a : b;
     return (max > c) ? max : c;

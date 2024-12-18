@@ -117,20 +117,14 @@ cleanFolders () {
 }
 
 
-# Starts program_c compilation using 'make'
-compilation () {
-    # If program_c doesn't exist we start the compilation
+# Prepares directories for program execution
+processFolders () {
+    cleanFolders
 
-    if [[ ! -f codeC/program_c ]]; then
-        # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
-        make --no-print-directory -C codeC
+    # These folders are created if they don't exist. If they exist, nothing happens
+    mkdir -p graphs input temp output
 
-        # Checks that compilation has gone well
-        if [[ $? -ne 0 ]]; then
-            echo "ERROR : compilation error."
-            exit 2
-        fi  
-    else
+    if [[ -f codeC/program_c ]]; then
         echo "INFO: 'program_c' is already present, compilation is not executed."
         echo ""
         exit 3
@@ -138,19 +132,29 @@ compilation () {
 }
 
 
-# Prepares directories for program execution
-processFolders () {
-    cleanFolders
+# Starts program_c compilation using 'make'
+compilation () {
+    # At this stage, program_c doesn't exist because we've verified it in 'processFolders'
 
-    # These folders are created if they don't exist. If they exist, nothing happens
-    mkdir -p graphs input temp output
+    local stationType="$1"
+    local consumerType="$2"
+    local stationID="$3"
+    # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
+    make --no-print-directory -C codeC run ARGS="$stationType $consumerType $stationID"
+
+    # Checks that compilation has gone well
+    if [[ $? -ne 0 ]]; then
+        echo "ERROR : compilation error."
+        exit 2
+    fi  
 }
 
 
 # Displays the execution time of a function
 displayTime() {
-    local startTime="$1"
-    local endTime="$2"
+    local timeMsg="$1"
+    local startTime="$2"
+    local endTime="$3"
 
     local elapsedTime=$((endTime - startTime))
 
@@ -158,21 +162,20 @@ displayTime() {
     local milliseconds=$(((elapsedTime % 1000000000) / 1000000))
 
     echo ""
-    echo "--- The program was successfully completed in $seconds.${milliseconds} seconds ---"
+    echo "---- ${timeMsg} in $seconds.${milliseconds} seconds ----"
     echo ""
 }
 
 
-# Sorting data function and transmission to program_c
+# Sorting data function
 sortingData () {
 
-    # We use 'awk' to sort data through a pipe (standard input) and filters to send only relevant informations.
+    # We use 'awk' to sort data in temporary '.csv' files, read by program_c and filters only relevant informations.
     # Options in 'awk' line : -F to indicate separating character, -v to indicate a variable.
 
     # 'date' command gives the elapsed seconds since 01/01/1970.
 
     startTime=$(date +%s%N)
-
 
     local filePath="$1"
     local stationType="$2"
@@ -187,6 +190,7 @@ sortingData () {
             filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
             ;;
         lv)
+            # Ne fonctionne pas bien pour lv all
             case "$3" in
                 all)
                     filter='NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }'
@@ -201,14 +205,11 @@ sortingData () {
                 ;;
     esac
 
-    # We send data through a pipe with arguments like 'stationType' so the program process the right type of station
-    # sort -t ';' -k7nr "$filePath" | awk -F ';' -v custom_id="$powerPlantID" "$filter" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
-    sort -t ';' -k7nr "$filePath" | awk -F ';' -v custom_id="$powerPlantID" "$filter" > test.txt
-
+    sort -t ';' -k7nr "$filePath" | awk -F ';' -v custom_id="$powerPlantID" "$filter" > ./temp/station_sorted.csv
 
     local endTime=$(date +%s%N)
-
-    displayTime "$startTime" "$endTime"
+    local timeMsg="$filePath sorted"
+    displayTime "$timeMsg" "$startTime" "$endTime"
 }
 
 
@@ -234,16 +235,22 @@ runProgram () {
 
     processFolders
 
-    compilation "$2" "$3"
+    startTime=$(date +%s%N)
 
     sortingData "$@"
 
-    cleanFolders
+    compilation "$2" "$3" "$4"
+
+    # cleanFolders
 
     makeGraphs
 
     # Je mets ça pour pouvoir test plus facilement
     rm codeC/program_c
+
+    local endTime=$(date +%s%N)
+    local timeMsg="Program completed successfully"
+    displayTime "$timeMsg" "$startTime" "$endTime"
 
     exit 0
 }

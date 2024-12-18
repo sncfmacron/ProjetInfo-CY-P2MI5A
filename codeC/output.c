@@ -1,63 +1,66 @@
 /*
-    Contains functions for creating output files
+    output.c : contains functions for creating output files
 */
 
 
 #include "output.h"
 
 
-void outputProcess(const char* stationType, const char* consumerType, const char* stationID) {
-
-    createOutputFile(stationType, consumerType, stationID);
-
+// Calls output fonctions
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pAVL tree) {
+    FILE* file = NULL;
+    file = initOutputFile(stationType, consumerType, powerPlantID);
+    if (file != NULL) {
+        //writeOutputFile(tree, file);
+        fclose(file);
+    }
 }
 
+void createPath(const char* stationType, const char* consumerType, const char* powerPlantID, char* path, int sizePath) {
+    if(powerPlantID != NULL && strcmp(powerPlantID, "") !=  0) {
+        snprintf(path, sizePath, "%s%s_%s_%s.csv", DIR_OUTPUT, stationType, consumerType, powerPlantID);
+    } else {
+        snprintf(path, sizePath, "%s%s_%s.csv", DIR_OUTPUT, stationType, consumerType);
+    }
+}
 
-// Concatenates strings to get the right file name (ex: hva_comp_2)
-void createPath(const char* stationType, const char* consumerType, const char* stationID, char* path) {
-
-    strcat(path, DIR_OUTPUT);
-    strcat(path, stationType);
-    strcat(path, "_");
-    strcat(path, consumerType);
-
-    if (strcmp(stationID, "\0") != 0) {
-        strcat(path, "_");
-        strcat(path, stationID);
+// Initializes a file: generates its name and header
+FILE* initOutputFile(const char* stationType, const char* consumerType, const char* powerPlantID) {
+    if (stationType == NULL || consumerType == NULL) {
+        exit_with_message("ERROR: stationType or consumerType is NULL.", ERR_INVALID_ARGS);
     }
 
-    strcat(path, ".csv");
-}
-
-
-void createOutputFile(const char* stationType, const char* consumerType, const char* stationID) {
+    char path[128];
+    // Create the right file name (e.g. “hva_comp_2.csv”)
+    int sizePath = sizeof(path);
+    createPath(stationType, consumerType, powerPlantID, path, sizePath);
+        
+        
 
     FILE* file = NULL;
-
-    // Avoir le bon nom de fichier crée (ex : "hva_comp.csv")
-    char* path = malloc(sizeof(char)*128);
-
-    if(path == NULL) {
-        exit_with_message("ERROR: path string allocation failed.", ERR_PTR_ALLOC);
-    } else {
-        createPath(stationType, consumerType, stationID, path);
-    }
-
-    // fopen avec l'option "w" crée automatiquement le fichier
+    
+    // 'fopen' with “w” option automatically creates the file
     file = fopen(path, "w");
 
     if(file == NULL) {
-        exit_with_message("ERROR: output file allocation failed.", ERR_FILE_ALLOC);
+        exit_with_message("ERROR: output file creation failed.", ERR_INVALID_FILE);
+        return NULL;
     } else {
-        fprintf(file, "station %s:capacity:%s", stationType, consumerType);
+        fprintf(file, "station %s:capacity:%s\n", stationType, consumerType);
     }
 
-    fclose(file);
+    return file;
 }
 
-void writeOutputFile() {
-    FILE* file = NULL;
+
+// Writing calculated data in the output file
+void writeOutputFile(pAVL tree, FILE* file) {
+    if(file == NULL) {
+        exit_with_message("ERROR: output file writing failed.", ERR_INVALID_FILE);
+    }
 
 
-    fclose(file);
+
+
+
 }

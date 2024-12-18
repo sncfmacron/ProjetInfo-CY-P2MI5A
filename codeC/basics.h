@@ -1,5 +1,5 @@
 /*
-    Contains the basic structures and libraries
+    basics.h : contains the basic structures and libraries
 */
 
 
@@ -19,7 +19,6 @@ typedef struct Station_struct Station;
 typedef Station* pStation;
 
 
-#include "calculations.h"
 #include "input.h"
 #include "output.h"
 #include "settings.h"

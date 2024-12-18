@@ -1,6 +1,5 @@
-
 /*
-    Main program library
+    main.h : main program library
 */
 
 
@@ -8,6 +7,5 @@
 #define MAIN_HEADER
 
 #include "basics.h"
-
 
 #endif

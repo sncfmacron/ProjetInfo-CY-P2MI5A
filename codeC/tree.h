@@ -1,5 +1,5 @@
 /*
-    Library for tree.h
+    tree.h : library for tree.h
 */
 
 
@@ -25,11 +25,12 @@ typedef struct AVL_struct {
 typedef AVL* pAVL;
 typedef Station* pStation;
 
+void updateSum(pAVL a, int stationID, long load);
 pAVL insertAVL(pAVL a, pStation s, int* h);
 pAVL createAVL(pStation s);
-void cleanAVL(pAVL a);
 pAVL leftRotation(pAVL a);
 pAVL rightRotation(pAVL a);
 pAVL balanceAVL(pAVL a);
+void cleanAVL(pAVL a);
 
 #endif
