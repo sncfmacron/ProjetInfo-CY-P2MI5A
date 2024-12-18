@@ -90,3 +90,46 @@ int max(int a, int b) {
 int min(int a, int b) {
     return (a < b) ? a : b;
 }
+
+void merge(pStation* stations, uint32_t start, uint32_t middle, uint32_t end){
+    pStation* temp = malloc((end+1 - start) * sizeof(pStation));
+    if(temp == NULL){
+        exit_with_message("ERROR: Temporary station array allocation failed", 666);
+    }
+    uint32_t i, indexA = start, indexB = end;   // init of i, indexA and indexB
+    
+    for(i = start; i < middle+1; i++){
+        temp[i] = stations[i];                  // copy the array
+    }
+    for(i = middle+1; i < end+1; i++){
+        temp[i] = stations[end-i + middle+1];   // inverted copy of the array
+    }
+
+    for(i = start; i < end+1; i++){
+        if(temp[indexA]->capacity <= temp[indexB]->capacity){
+            stations[i] = temp[indexA];
+            indexA++;
+        } else{
+            stations[i] = temp[indexB];
+            indexB--;
+        }
+    }
+    free(temp);
+}
+
+void mergeSortRecursive(pStation* stations, uint32_t start, uint32_t end){
+    if(stations == NULL){
+        exit_with_message("ERROR: Stations array is NULL", 9999);
+    }
+    uint32_t middle;
+    if(start < end){
+        middle = (start + end) / 2;
+        mergeSortRecursive(stations, start, middle);
+        mergeSortRecursive(stations, middle+1, end);
+        merge(stations, start, middle, end);
+    }
+}
+
+void mergeSort(pStation* stations, uint32_t nb_stations){
+    mergeSortRecursive(stations, 0, nb_stations-1);
+}
