@@ -11,8 +11,7 @@ int main(int argc, char* argv[]) {
     if (argc < 3) {
         exit_with_message("ERROR: Not enough parameters provided.", ERR_COMPILATION);
     }
-    uint32_t nb_stations = string_to_int(argv[4]);
-    pStation* stations = malloc(nb_stations * sizeof(pStation));
+    
     pAVL tree = NULL;
 
     uint32_t nbStations = string_to_int(argv[3]);

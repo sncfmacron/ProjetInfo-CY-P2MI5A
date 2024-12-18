@@ -25,7 +25,7 @@ typedef struct AVL_struct {
 typedef AVL* pAVL;
 typedef Station* pStation;
 
-void updateSum(pAVL a, int stationID, long load);
+void updateSum(pAVL a, uint32_t stationID, long load);
 pAVL insertAVL(pAVL a, pStation s, int* h);
 pAVL createAVL(pStation s);
 pAVL leftRotation(pAVL a);
