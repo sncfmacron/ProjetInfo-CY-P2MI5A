@@ -14,7 +14,7 @@ void outputProcess(const char* stationType, const char* consumerType, const char
         //writeOutputFile(tree, file);
         fclose(file);
     } else {
-        ("ERROR: output file writing failed.", ERR_FILE_CREATION);
+        exit_with_message("ERROR: output file writing failed.", ERR_FILE_CREATION);
     }
 }
 
@@ -57,6 +57,6 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 void writeOutputFile(pAVL tree, FILE* file) {
 
 
-
+    // QSORT
 
 }

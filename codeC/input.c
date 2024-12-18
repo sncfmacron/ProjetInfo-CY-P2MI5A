@@ -39,6 +39,7 @@ pAVL processStation(const char *filePath, pAVL tree) {
     return tree;
 }
 
+
 // Reading sorted consumer data from './temp' directory
 pAVL processConsumer(const char *filePath, pAVL tree)
 {
