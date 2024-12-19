@@ -11,10 +11,10 @@ int main(int argc, char* argv[]) {
     if (argc < 3) {
         exit_with_message("ERROR: Not enough parameters provided.", ERR_COMPILATION);
     }
-    
+
     pAVL tree = NULL;
 
-    uint32_t nbStations = string_to_int(argv[3]);
+    uint32_t nb_stations = string_to_int(argv[3]);
     char* stationType = argv[1];
     char* consumerType = argv[2];
 
@@ -23,18 +23,20 @@ int main(int argc, char* argv[]) {
     char* powerPlantID = argv[4];
 
 
-    pStation* stations = malloc(nbStations * sizeof(pStation));
+    pStation* stations = malloc(nb_stations * sizeof(pStation));
 
     tree = processStation(DIR_STATION_SORTED, tree, stations);
 
-    mergeSort(stations, nbStations);
+    mergeSort(stations, nb_stations);
 
 
-    //tree = processConsumer(DIR_CONSUMER_SORTED, tree);
+    processConsumer(DIR_CONSUMER_SORTED, tree);
 
 
-    outputProcess(consumerType, stationType, powerPlantID, tree);
-
+    outputProcess(stationType, consumerType, powerPlantID, stations, nb_stations);
+    // for(int y=0; y<118; y++){
+    //     printf("ID : %d | Capacity : %ld | Somme : %ld\n", stations[y]->id, stations[y]->capacity, stations[y]->consumption_sum);
+    // }
     printf("\nMain : exec réussie\n");
   
     return 0;

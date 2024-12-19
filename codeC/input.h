@@ -14,6 +14,6 @@ typedef AVL* pAVL;
 #include "basics.h"
 
 pAVL processStation(const char *filePath, pAVL tree, pStation* stations);
-pAVL processConsumer(const char *filePath, pAVL tree);
+void processConsumer(const char *filePath, pAVL tree);
 
 #endif
