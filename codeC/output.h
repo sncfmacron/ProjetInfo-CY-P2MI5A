@@ -13,7 +13,8 @@ typedef AVL* pAVL;
 
 void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nb_stations);
 void createPath(const char* stationType, const char* consumerType, const char* powerPlantID, char* path, int sizePath);
-FILE* initOutputFile(const char* stationType, const char* consumerType, const char* powerPlantID);
 void writeOutputFile(pStation* stations, FILE* file, uint32_t nb_stations);
+FILE* initOutputFile(const char* stationType, const char* consumerType, const char* powerPlantID);
+FILE* initLvMinMax(FILE* file);
 
 #endif

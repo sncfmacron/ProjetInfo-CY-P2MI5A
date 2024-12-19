@@ -34,14 +34,26 @@ const char* typeToPrint(const char* type){
 
 
 // Calls output fonctions
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nb_stations) {
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations) {
     FILE* file = NULL;
     file = initOutputFile(stationType, consumerType, powerPlantID);
     if (file != NULL) {
-        writeOutputFile(stations, file, nb_stations);
+        writeOutputFile(stations, file, nbStations);
         fclose(file);
     } else {
         exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
+    }
+
+    // lv_min_max process
+    if(strcmp(consumerType, "all") == 0) {
+        FILE* lvMinMax = NULL;
+        //lvMinMax = initLvMinMax(lvMinMax);
+        if (file == NULL) {
+            // fonction pour remplir le fichier
+            fclose(lvMinMax);
+        } else {
+
+        }
     }
 }
 
@@ -80,15 +92,24 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 
 
 // Writing calculated data in the output file
-void writeOutputFile(pStation* stations, FILE* file, uint32_t nb_stations){
+void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
     printf("Writing output data...\n\n");
     clock_t start = clock();
     
  
-    for(int i=0; i<nb_stations; i++){
+    for(int i=0; i<nbStations; i++){
         fprintf(file, "%d:%ld:%ld\n", stations[i]->id, stations[i]->capacity, stations[i]->consumption_sum);
     }
 
+    sleep(2);
     clock_t end = clock();
-    displayTime(end, start, "Writing the output data completed successfully");
+    displayTime(start, end, "Writing the output data completed successfully");
 }
+
+
+/*FILE* initLvMinMax(FILE* file) {
+    
+    fprintf(file, "Station LV:Capacity:Unusued capacity\n");
+
+    return file;
+}*/

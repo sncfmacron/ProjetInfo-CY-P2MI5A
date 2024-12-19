@@ -3,6 +3,5 @@
 temp/
 test/
 output/
-input/GROS.csv
-input/DATA_CWIRE.csv
+input/*.csv
 graphs/

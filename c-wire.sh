@@ -17,6 +17,7 @@ PROGRAM_ABORTED=105
 bold=$(tput bold)
 normal=$(tput sgr0)
 
+
 # Displays the program help manual
 display_help() {
     # We use 'tput' to set the text in bold to make the text more aesthetic
@@ -271,15 +272,22 @@ stationCount () {
 
 # Function to make graphs using output files
 makeGraphs () {
-    dir="output/lv_all.csv"
-    if [[ -f "$dir" ]]; then
+    local stationType="$1"
+    local consumerType="$2"
+
+    if [[ "$1" == "lv" && "$2" == "all" ]]; then
        if ! command -v gnuplot &>/dev/null; then
             echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
             exit 1
-        else 
-        echo ""
-            echo "Making graphs in "$dir"..."
-            
+        else
+            verifyFilePresence "gnuplot_LVminmax.gp"
+            echo ""
+            echo "Making graphs..."
+
+            gnuplot gnuplot_LVminmax.gp 2>&1 | tee gnuplot_error.log
+
+            echo ""
+            echo "[INFO] The graph has been successfully created in './output'."
         fi
     fi
 }
@@ -287,6 +295,7 @@ makeGraphs () {
 
 # Functions calls
 runProgram () {
+    rm -f codeC/program_c
     verifyParameters "$@"
 
     processFolders
@@ -303,7 +312,7 @@ runProgram () {
 
     cleanFolders
 
-    makeGraphs
+    makeGraphs "$2" "$3"
 
     local endTime=$(date +%s%N)
     local timeMsg="Program completed successfully"
