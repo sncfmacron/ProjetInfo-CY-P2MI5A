@@ -1,5 +1,7 @@
 .vscode/
 .git/
+temp/
 test/
 output/
 input/GROS.csv
+graphs/

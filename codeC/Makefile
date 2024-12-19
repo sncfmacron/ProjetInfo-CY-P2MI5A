@@ -3,13 +3,11 @@
 CC = gcc
 CFLAGS = -Wall
 
-
 # Directory containing source files
 
 DIR = .
 BUILD = ../temp
 EXEC = program_c
-
 
 # Source and header files
 
@@ -17,7 +15,7 @@ SRC = $(wildcard $(DIR)/*.c)
 HEADERS = $(wildcard $(DIR)/*.h)
 OBJ = $(patsubst $(DIR)/%.c,$(BUILD)/%.o,$(SRC))
 
-#Targets
+# Targets
 
 all: $(EXEC)
 

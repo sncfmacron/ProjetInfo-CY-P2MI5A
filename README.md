@@ -25,21 +25,9 @@ Use `-h` parameter to get full help.
 
 ## Description
 
-To find out if each energy station is overproducing or underproducing, this project examines data from electricity stations. It also calculates the proportion of energy consumed by companies and individuals. The goal is to provide insights into station capacity and energy electricity efficiently, even with large datasets.
 
 ## Options
 
-- The script has **required** options:
-1. The path to the input CSV file.
-2. The station type to analyze (`hvb`, `hva`, or `lv`).
-3. The consumer type to analyze (`comp`, `indiv`, or `all`).
-
-**Warning** : The following combinations are forbidden: `hvb all`, `hvb indiv`, `hva all`, and `hva indiv`.
-
-- The script has **optional** options:
-
-4. An **identifier of a central station** can be provided to make the script focuses on a single power plant.
-5. `-h` option provides help on using the script.
 
 ## Content (/!\ expliquer plus en détail /!\)
 

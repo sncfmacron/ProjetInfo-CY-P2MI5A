@@ -11,9 +11,9 @@ typedef AVL* pAVL;
 
 #include "basics.h"
 
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pAVL tree);
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nb_stations);
 void createPath(const char* stationType, const char* consumerType, const char* powerPlantID, char* path, int sizePath);
 FILE* initOutputFile(const char* stationType, const char* consumerType, const char* powerPlantID);
-void writeOutputFile(pAVL tree, FILE* file);
+void writeOutputFile(pStation* stations, FILE* file, uint32_t nb_stations);
 
 #endif

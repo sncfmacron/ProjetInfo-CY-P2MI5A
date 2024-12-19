@@ -10,7 +10,7 @@
 pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
     FILE *file = fopen(filePath, "r");
     if (file == NULL) {
-        exit_with_message("ERROR : sorted station file not found.", ERR_MISSING_FILE);
+        exit_with_message("ERROR : Sorted station file not found.", ERR_MISSING_FILE);
     }
 
     char line[128];     // Buffer for each line of the file
@@ -21,17 +21,13 @@ pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
         // Read the current line with 'sscanf'
         if (sscanf(line, "%d %ld", &id, &capacity) == 2) {
 
-            //printf("DEBUG : Lues depuis le fichier - ID: %d, Capacité: %ld", id, capacity);
-
             int height = 0;
             stations[i] = createStation(id, capacity);
             tree = insertAVL(tree, stations[i], &height);
             i++;
-            //printf("DEBUG : Station ID %d insérée dans l'arbre.\n", id);
 
         } else {
-            exit_with_message("ERROR: invalid sorted input file format", ERR_INPUT_FORMAT);
-            printf("DEBUG : Ligne incorrecte : %s", line);
+            exit_with_message("ERROR: Invalid sorted input file format", ERR_INPUT_FORMAT);
         }
     }
 
@@ -41,11 +37,11 @@ pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
 
 
 // Reading sorted consumer data from './temp' directory
-pAVL processConsumer(const char *filePath, pAVL tree)
+void processConsumer(const char *filePath, pAVL tree)
 {
     FILE *file = fopen(filePath, "r");
     if (file == NULL) {
-        exit_with_message("ERROR : sorted consumer file not found.", ERR_MISSING_FILE);
+        exit_with_message("ERROR : Sorted consumer file not found.", ERR_MISSING_FILE);
     }
 
     char line[128];
@@ -54,26 +50,13 @@ pAVL processConsumer(const char *filePath, pAVL tree)
 
     while (fgets(line, sizeof(line), file)) {
         if (sscanf(line, "%d %ld", &id, &load) == 2) {
-            //printf("DEBUG : Lues depuis le fichier - ID: %d, Charge: %ld\n", id, load);
             if (load > 0) {
                 updateSum(tree, id, load);
-                //printf("DEBUG : MAJ de la conso. pour la station %d avec +%ldkV.\n", id, load);
             }
         }  else {
-            exit_with_message("ERROR: invalid sorted input file format.", ERR_INPUT_FORMAT);
-            printf("DEBUG : Ligne incorrecte : %s", line);
+            exit_with_message("ERROR: Invalid sorted input file format.", ERR_INPUT_FORMAT);
         }
     }
 
     fclose(file);
-    return tree;
 }
-    
-    
-/*clock_t start = clock();
-    
- 
-    clock_t end = clock();
-    float seconds = getTime(end, start);
-
-printf("\n--- Data transmitted successfully in %.2f seconds ---\n", seconds);*/

@@ -28,15 +28,9 @@
 
 #define ERR_INVALID_ARGS 13
 
+
 #define MAX_BUFFER_SIZE 8192  // (8 Ko)
 
-#define STATION_HVB 2
-#define STATION_HVA 1
-#define STATION_LV 0
-
-#define CONSUMER_INDIV 0
-#define CONSUMER_COMP 1
-#define CONSUMER_ALL 2
 
 #define DIR_OUTPUT "../output/"
 #define DIR_STATION_SORTED "../temp/station_sorted.csv"
