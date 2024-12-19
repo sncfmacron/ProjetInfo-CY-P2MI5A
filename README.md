@@ -1,7 +1,8 @@
 # C-WIRE
 This program processes data for an electricity distribution.
 
-**PREING-2 INFORMATIQUE III PROJECT**. **Developed by MI-5 group A**
+**PREING-2 INFORMATIQUE III PROJECT**.
+**Developed by MI-5 group A**
 
 ## Contributors
 
