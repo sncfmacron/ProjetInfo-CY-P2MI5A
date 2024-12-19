@@ -148,11 +148,6 @@ processFolders () {
 
 # Starts program_c compilation using 'make'
 compilation () {
-    # At this stage, program_c doesn't exist because we've verified it in 'processFolders'
-
-    local stationType="$1"
-    local consumerType="$2"
-    local powerPlantID="$3"
     # Compile if the program is absent
     if [[ ! -f codeC/program_c ]]; then
         echo "[INFO] 'program_c' is absent, compilation is executed."
@@ -166,7 +161,6 @@ compilation () {
             exit "$ERR_COMPILATION"
         fi
     fi
-    
 }
 
 
@@ -174,23 +168,22 @@ compilation () {
 displayTime() {
     local timeMsg="$1"
     local startTime="$2"
-    local endTime="$3"
+    local endTime=$(date +%s%N)
 
     local elapsedTime=$((endTime - startTime))
 
     local seconds=$((elapsedTime / 1000000000))
     local milliseconds=$(((elapsedTime % 1000000000) / 1000000))
 
-    echo ""
+    echo
     echo "[INFO] ${timeMsg} in $seconds.${milliseconds:1:3} seconds."
-    echo ""
 }
 
 
 # Produces the data filter corresponding to the request
 awkFilter () {
     case "$2" in
-        hvb)
+        hvb) 
             filter='
             NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $7 != "-" { print $2, $7 > "tmp/station_sorted.csv" }
             NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $8 != "-" { print $2, $8 > "tmp/consumer_sorted.csv" }
@@ -231,7 +224,12 @@ awkFilter () {
         exit "$ERR_INVALID_FILTER"
     fi
 }
-
+# CHANGER SORTED EN EXTRACTED par exemple et mettre en variable (en define (comme en C))
+# Count the number of lines in the sorted file
+stationCount () {
+    verifyFilePresence "tmp/station_sorted.csv"
+    stationNumber=$(wc -l < tmp/station_sorted.csv)
+}
 
 # Sorting data function
 sortingData () {
@@ -257,18 +255,12 @@ sortingData () {
 
     verifyFilePresence "tmp/consumer_sorted.csv"
 
-    local endTime=$(date +%s%N)
-    local timeMsg="$inputFilePath sorted"
-    displayTime "$timeMsg" "$startTime" "$endTime"
+    displayTime "$inputFilePath sorted" "$startTime"
+
+    stationCount
+
+    codeC/program_c $stationType $consumerType $stationNumber $powerPlantID
 }
-
-
-# Count the number of lines in the sorted file
-stationCount () {
-    verifyFilePresence "tmp/station_sorted.csv"
-    stationNumber=$(wc -l < tmp/station_sorted.csv)
-}
-
 
 # Function to make graphs using output files
 makeGraphs () {
@@ -295,29 +287,25 @@ makeGraphs () {
 
 # Functions calls
 runProgram () {
+    echo
     verifyParameters "$@"
 
     processFolders
 
-    compilation "$2" "$3" "$4" "$stationNumber"
+    compilation
 
     # Start processing
     startTime=$(date +%s%N)
 
     sortingData "$@"
-
-    stationCount
-
-    local endTime=$(date +%s%N)
-    local timeMsg="Program completed successfully"
-    displayTime "$timeMsg" "$startTime" "$endTime"
     
+    displayTime "Program completed successfully" "$startTime" # modifier les messages plus tard (j'ai une présentation, on verra plus tard)
+    
+    # makeGraphs "$2" "$3"
 
-    makeGraphs "$2" "$3"
+    displayTime "Program completed successfully with Graphs" "$startTime"
+    echo
 
-    local endTime=$(date +%s%N)
-    local timeMsg="Program completed successfully with Graphs"
-    displayTime "$timeMsg" "$startTime" "$endTime"
     exit 0
 }
 

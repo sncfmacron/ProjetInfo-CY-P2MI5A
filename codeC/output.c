@@ -81,13 +81,13 @@ void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
 }
 
 
-FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
-    // verif stationArray
-    fprintf(file, "Station LV:Capacity:Used capacity\n");
-    // 
+// FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
+//     // verif stationArray
+//     fprintf(file, "Station LV:Capacity:Used capacity\n");
+//     // 
 
-    return file;
-}
+//     return file;
+// }
 
 // Calls output fonctions
 void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations) {
@@ -103,7 +103,7 @@ void outputProcess(const char* stationType, const char* consumerType, const char
     // lv_min_max process
     if(strcmp(consumerType, "all") == 0) {
         FILE* lvMinMax = NULL;
-        lvMinMax = initLvMinMax(lvMinMax, stations, nbStations);
+        // lvMinMax = initLvMinMax(lvMinMax, stations, nbStations);
         if (file == NULL) {
             // fonction pour remplir le fichier
             fclose(lvMinMax);
