@@ -284,10 +284,10 @@ makeGraphs () {
             echo ""
             echo "Making graphs..."
 
-            gnuplot gnuplot_LVminmax.gp 2>&1 | tee gnuplot_error.log
+            gnuplot gnuplot_LVminmax.gp
 
             echo ""
-            echo "[INFO] The graph has been successfully created in './output'."
+            echo "[INFO] The graph has been successfully created in './graphs'."
         fi
     fi
 }
@@ -295,7 +295,6 @@ makeGraphs () {
 
 # Functions calls
 runProgram () {
-    rm -f codeC/program_c
     verifyParameters "$@"
 
     processFolders
@@ -307,8 +306,6 @@ runProgram () {
     stationCount
 
     compilation "$2" "$3" "$4" "$stationNumber"
-
-    rm -f codeC/program_c
 
     cleanFolders
 

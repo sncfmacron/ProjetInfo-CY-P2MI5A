@@ -109,7 +109,7 @@ void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
 
 /*FILE* initLvMinMax(FILE* file) {
     
-    fprintf(file, "Station LV:Capacity:Unusued capacity\n");
+    fprintf(file, "Station LV:Capacity:Used capacity\n");
 
     return file;
 }*/

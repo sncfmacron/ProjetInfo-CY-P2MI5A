@@ -32,10 +32,10 @@ set xrange [0:21]
 
 # nom x/y/graphique
 set xlabel "Station LV"
-set ylabel "Capacity / Unused capacity (kWh)"
-set title "20 Stations sorted by unused capacity"
+set ylabel "Capacity / Used capacity (kWh)"
+set title "20 Stations sorted by used capacity"
 
 # column(1) remplace la colonne du fichier de l'axe des x
 
 plot 'lv_minmax_temp.csv' using 2:xtic(1) title 'Capacity' linecolor rgb "#669900", \
-    '' using 3 title 'Unused capacity' linecolor rgb "#ff0000"
+    '' using 3 title 'Used capacity' linecolor rgb "#ff0000"
