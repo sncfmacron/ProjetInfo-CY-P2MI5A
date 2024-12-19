@@ -113,7 +113,7 @@ pAVL balanceAVL(pAVL a){
 
 pAVL insertAVL(pAVL a, pStation s, int* h){
     if(s == NULL){
-        exit_with_message("ERROR: station doesn't exist.", ERR_INVALID_STATION);
+        exit_with_message("ERROR: Station doesn't exist.", ERR_INVALID_STATION);
     }
 
     if(a == NULL){

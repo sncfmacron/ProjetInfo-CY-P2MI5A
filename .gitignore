@@ -1,7 +1,10 @@
 .vscode/
 .git/
+temp/
 test/
 output/
 input/GROS.csv
 temp/*
 program_c
+input/*.csv
+graphs/

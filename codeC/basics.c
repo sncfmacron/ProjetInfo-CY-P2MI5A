@@ -14,6 +14,30 @@ void exit_with_message(const char *message, int error_code) {
 }
 
 
+void verifyArguments(int argc, char* stationType, char* consumerType, char* powerPlantID, uint32_t nbStations) {
+    if (argc < 3) {
+        exit_with_message("ERROR: Not enough parameters provided.", ERR_INVALID_ARGS);
+    }
+
+    if(nbStations < 0) {
+        exit_with_message("ERROR: Number of stations is invalid.", ERR_INVALID_ARGS);
+    }
+
+    if(stationType == NULL) {
+        exit_with_message("ERROR: Invalid station type.", ERR_INVALID_ARGS);
+    }
+
+    if(consumerType == NULL) {
+        exit_with_message("ERROR: Invalid consumer type.", ERR_INVALID_ARGS);
+    }
+
+    if(powerPlantID == NULL) {
+        exit_with_message("ERROR: Invalid power plant ID.", ERR_INVALID_ARGS);
+    }
+    return ;
+}
+
+
 // Transforms string to int
 int string_to_int(const char* string) {
     if(string == NULL) {
@@ -24,33 +48,16 @@ int string_to_int(const char* string) {
     }
 }
 
-
-// Transforms string to long
-long string_to_long(const char *string) {
-    if (string == NULL) {
-        exit_with_message("ERROR: string to long conversion failed.", ERR_INVALID_STRING);
-    }
-
-    char *endptr;
-    long result = strtol(string, &endptr, 10);
-
-    if (*endptr != '\0') {
-        exit_with_message("ERROR: string to long conversion failed.", ERR_INVALID_STRING);
-    }
-    return result;
-}
-
-
-// Gives time elapsed (using 'time.h')
-float getTime(clock_t start, clock_t end) {
+// Displays execution time of a function
+void displayTime(clock_t start, clock_t end, char* message) {
     float seconds = (float)(end - start) / CLOCKS_PER_SEC;
 
-    // Pour éviter d'afficher un nombre négatif quand traitement instant comme -00.00s
+    // To avoid displaying a negative number when processing too fast
     if(seconds < 0) {
-        return 0;
-    } else {
-        return seconds;
+        seconds = 0;
     }
+
+    printf("[INFO] %s in %.3fs.\n", message, seconds);
 }
 
 
@@ -59,7 +66,7 @@ pStation createStation(int station_id, long capacity) {
 
     pStation s = malloc(sizeof(Station));
     if(s == NULL){
-        exit_with_message("ERROR: station allocation failed.", ERR_PTR_ALLOC);
+        exit_with_message("ERROR: Station allocation failed.", ERR_PTR_ALLOC);
     }
     s->id = station_id;
     s->capacity = capacity;
@@ -140,6 +147,7 @@ void merge(pStation* stations, uint32_t start, uint32_t middle, uint32_t end){
     free(temp);
 }
 
+
 void mergeSortRecursive(pStation* stations, uint32_t start, uint32_t end){
     if(stations == NULL){
         exit_with_message("ERROR: Stations array is NULL", 9999);
@@ -152,6 +160,7 @@ void mergeSortRecursive(pStation* stations, uint32_t start, uint32_t end){
         merge(stations, start, middle, end);
     }
 }
+
 
 void mergeSort(pStation* stations, uint32_t nb_stations){
     if(stations == NULL){

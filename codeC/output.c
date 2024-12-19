@@ -30,15 +30,29 @@ const char* typeToPrint(const char* type){
 
     return NULL;
 }
+
+
 // Calls output fonctions
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nb_stations) {
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations) {
     FILE* file = NULL;
     file = initOutputFile(stationType, consumerType, powerPlantID);
     if (file != NULL) {
-        writeOutputFile(stations, file, nb_stations);
+        writeOutputFile(stations, file, nbStations);
         fclose(file);
     } else {
-        exit_with_message("ERROR: output file writing failed.", ERR_FILE_CREATION);
+        exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
+    }
+
+    // lv_min_max process
+    if(strcmp(consumerType, "all") == 0) {
+        FILE* lvMinMax = NULL;
+        //lvMinMax = initLvMinMax(lvMinMax);
+        if (file == NULL) {
+            // fonction pour remplir le fichier
+            fclose(lvMinMax);
+        } else {
+
+        }
     }
 }
 
@@ -50,12 +64,9 @@ void createPath(const char* stationType, const char* consumerType, const char* p
     }
 }
 
+
 // Initializes a file, generates its name and header
 FILE* initOutputFile(const char* stationType, const char* consumerType, const char* powerPlantID) {
-    if (stationType == NULL || consumerType == NULL) {
-        exit_with_message("ERROR: stationType or consumerType is NULL.", ERR_INVALID_ARGS);
-    }
-
     char path[64];
     // Create the right file name (e.g. “hva_comp_2.csv”)
     int sizePath = sizeof(path);
@@ -68,7 +79,7 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
     const char* consumerTypeToPrint = typeToPrint(consumerType);
     const char* stationTypeToPrint = typeToPrint(stationType);
     if(file == NULL) {
-        exit_with_message("ERROR: output file creation failed.", ERR_FILE_CREATION);
+        exit_with_message("ERROR: Output file creation failed.", ERR_FILE_CREATION);
         return NULL;
     } else {
         fprintf(file, "Station %s:Capacity:%s\n", stationTypeToPrint, consumerTypeToPrint);
@@ -80,8 +91,24 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 
 
 // Writing calculated data in the output file
-void writeOutputFile(pStation* stations, FILE* file, uint32_t nb_stations){
-    for(int i=0; i<nb_stations; i++){
+void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
+    printf("Writing output data...\n\n");
+    clock_t start = clock();
+    
+ 
+    for(int i=0; i<nbStations; i++){
         fprintf(file, "%d:%ld:%ld\n", stations[i]->id, stations[i]->capacity, stations[i]->consumption_sum);
     }
+
+    sleep(2);
+    clock_t end = clock();
+    displayTime(start, end, "Writing the output data completed successfully");
 }
+
+
+/*FILE* initLvMinMax(FILE* file) {
+    
+    fprintf(file, "Station LV:Capacity:Used capacity\n");
+
+    return file;
+}*/
