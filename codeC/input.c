@@ -6,7 +6,7 @@
 #include "input.h"
 
 
-// Reading sorted station data from './temp' directory
+// Reading sorted station data from './tmp' directory
 pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
     FILE *file = fopen(filePath, "r");
     if (file == NULL) {
@@ -36,7 +36,7 @@ pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
 }
 
 
-// Reading sorted consumer data from './temp' directory
+// Reading sorted consumer data from './tmp' directory
 void processConsumer(const char *filePath, pAVL tree)
 {
     FILE *file = fopen(filePath, "r");

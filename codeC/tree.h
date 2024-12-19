@@ -11,8 +11,8 @@
 // Structures
 typedef struct Station_struct {
     uint32_t id;
-    long consumption_sum;
     long capacity;
+    long consumption_sum;
 } Station;
 
 typedef struct AVL_struct {

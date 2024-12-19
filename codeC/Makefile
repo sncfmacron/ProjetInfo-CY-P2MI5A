@@ -6,7 +6,7 @@ CFLAGS = -Wall
 # Directory containing source files
 
 DIR = .
-BUILD = ../temp
+BUILD = ../tmp
 EXEC = program_c
 
 # Source and header files
@@ -25,12 +25,5 @@ $(BUILD)/%.o: $(DIR)/%.c $(HEADERS) | $(BUILD)
 $(EXEC): $(OBJ)
 	@$(CC) $(CFLAGS) $(OBJ) -o $(EXEC)
 
-# Run the program with passed parameters
-
-run: $(EXEC)
-	@./$(EXEC) $(ARGS)
-
-# Clean after execution
-
 clean:
-	rm -f $(BUILD)/*.o $(EXEC) temp/*
+	rm -f $(BUILD)/*.o $(EXEC) tmp/*

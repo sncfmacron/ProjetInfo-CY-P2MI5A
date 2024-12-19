@@ -31,31 +31,6 @@ const char* typeToPrint(const char* type){
     return NULL;
 }
 
-
-// Calls output fonctions
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations) {
-    FILE* file = NULL;
-    file = initOutputFile(stationType, consumerType, powerPlantID);
-    if (file != NULL) {
-        writeOutputFile(stations, file, nbStations);
-        fclose(file);
-    } else {
-        exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
-    }
-
-    // lv_min_max process
-    if(strcmp(consumerType, "all") == 0) {
-        FILE* lvMinMax = NULL;
-        //lvMinMax = initLvMinMax(lvMinMax);
-        if (file == NULL) {
-            // fonction pour remplir le fichier
-            fclose(lvMinMax);
-        } else {
-
-        }
-    }
-}
-
 void createPath(const char* stationType, const char* consumerType, const char* powerPlantID, char* path, int sizePath) {
     if(powerPlantID != NULL && strcmp(powerPlantID, "EMPTY") !=  0) {
         snprintf(path, sizePath, "%s%s_%s_%s.csv", DIR_OUTPUT, stationType, consumerType, powerPlantID);
@@ -106,9 +81,34 @@ void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
 }
 
 
-/*FILE* initLvMinMax(FILE* file) {
-    
+FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
+    // verif stationArray
     fprintf(file, "Station LV:Capacity:Used capacity\n");
+    // 
 
     return file;
-}*/
+}
+
+// Calls output fonctions
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations) {
+    FILE* file = NULL;
+    file = initOutputFile(stationType, consumerType, powerPlantID);
+    if (file != NULL) {
+        writeOutputFile(stations, file, nbStations);
+        fclose(file);
+    } else {
+        exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
+    }
+
+    // lv_min_max process
+    if(strcmp(consumerType, "all") == 0) {
+        FILE* lvMinMax = NULL;
+        lvMinMax = initLvMinMax(lvMinMax, stations, nbStations);
+        if (file == NULL) {
+            // fonction pour remplir le fichier
+            fclose(lvMinMax);
+        } else {
+
+        }
+    }
+}

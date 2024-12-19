@@ -133,7 +133,7 @@ verifyParameters() {
 
 # Clean folders and unused file
 cleanFolders () {
-    rm -rf temp/*
+    rm -rf tmp/*
 }
 
 
@@ -142,12 +142,7 @@ processFolders () {
     cleanFolders
 
     # These folders are created if they don't exist. If they exist, nothing happens
-    mkdir -p graphs input temp output
-
-    if [[ -f codeC/program_c ]]; then
-        echo "[INFO] 'program_c' is already present, compilation is not executed."
-        exit "$PROGRAM_ABORTED"
-    fi
+    mkdir -p graphs input tmp output
 }
 
 
@@ -158,15 +153,20 @@ compilation () {
     local stationType="$1"
     local consumerType="$2"
     local powerPlantID="$3"
-
-    # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
-    make --no-print-directory -C codeC run ARGS="$stationType $consumerType $stationNumber $powerPlantID"
-
-    # Checks that compilation has gone well
-    if [[ $? -ne 0 ]]; then
-        echo "ERROR : Compilation error."
-        exit "$ERR_COMPILATION"
-    fi 
+    # Compile if the program is absent
+    if [[ ! -f codeC/program_c ]]; then
+        echo "[INFO] 'program_c' is absent, compilation is executed."
+        
+        # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
+        make  --no-print-directory -C codeC
+        
+        # Checks that compilation has gone well
+        if [[ $? -ne 0 ]]; then
+            echo "ERROR : Compilation error."
+            exit "$ERR_COMPILATION"
+        fi
+    fi
+    
 }
 
 
@@ -182,7 +182,7 @@ displayTime() {
     local milliseconds=$(((elapsedTime % 1000000000) / 1000000))
 
     echo ""
-    echo "[INFO] ${timeMsg} in $seconds.${milliseconds} seconds."
+    echo "[INFO] ${timeMsg} in $seconds.${milliseconds:1:3} seconds."
     echo ""
 }
 
@@ -192,34 +192,34 @@ awkFilter () {
     case "$2" in
         hvb)
             filter='
-            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $7 != "-" { print $2, $7 > "temp/station_sorted.csv" }
-            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $8 != "-" { print $2, $8 > "temp/consumer_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $7 != "-" { print $2, $7 > "tmp/station_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $8 != "-" { print $2, $8 > "tmp/consumer_sorted.csv" }
             '
             ;;
         hva)
             filter='
-            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $7 != "-" { print $3, $7 > "temp/station_sorted.csv" }
-            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $8 != "-" { print $3, $8 > "temp/consumer_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $7 != "-" { print $3, $7 > "tmp/station_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $8 != "-" { print $3, $8 > "tmp/consumer_sorted.csv" }
             '
             ;;
         lv)
             case "$3" in
                 all)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "temp/station_sorted.csv" }
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $8 != "-" { print $4, $8 > "temp/consumer_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv" }
                     '
                     ;;
                 comp)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "temp/station_sorted.csv" }
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" && $8 != "-" { print $4, $8 > "temp/consumer_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv" }
                     '
                     ;;
                 indiv)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "temp/station_sorted.csv"}
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" && $8 != "-" { print $4, $8 > "temp/consumer_sorted.csv"}
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv"}
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv"}
                     '
                     ;;
             esac
@@ -253,9 +253,9 @@ sortingData () {
 
     awk -F ';' -v custom_id="$powerPlantID" "$filter" "$inputFilePath" > /dev/null
 
-    verifyFilePresence "temp/station_sorted.csv"
+    verifyFilePresence "tmp/station_sorted.csv"
 
-    verifyFilePresence "temp/consumer_sorted.csv"
+    verifyFilePresence "tmp/consumer_sorted.csv"
 
     local endTime=$(date +%s%N)
     local timeMsg="$inputFilePath sorted"
@@ -265,8 +265,8 @@ sortingData () {
 
 # Count the number of lines in the sorted file
 stationCount () {
-    verifyFilePresence "temp/station_sorted.csv"
-    stationNumber=$(wc -l < temp/station_sorted.csv)
+    verifyFilePresence "tmp/station_sorted.csv"
+    stationNumber=$(wc -l < tmp/station_sorted.csv)
 }
 
 
@@ -299,22 +299,25 @@ runProgram () {
 
     processFolders
 
+    compilation "$2" "$3" "$4" "$stationNumber"
+
+    # Start processing
     startTime=$(date +%s%N)
 
     sortingData "$@"
 
     stationCount
 
-    compilation "$2" "$3" "$4" "$stationNumber"
-
-    cleanFolders
+    local endTime=$(date +%s%N)
+    local timeMsg="Program completed successfully"
+    displayTime "$timeMsg" "$startTime" "$endTime"
+    
 
     makeGraphs "$2" "$3"
 
     local endTime=$(date +%s%N)
-    local timeMsg="Program completed successfully"
+    local timeMsg="Program completed successfully with Graphs"
     displayTime "$timeMsg" "$startTime" "$endTime"
-
     exit 0
 }
 

@@ -32,8 +32,8 @@
 #define MAX_BUFFER_SIZE 8192  // (8 Ko)
 
 
-#define DIR_STATION_SORTED "../temp/station_sorted.csv"
-#define DIR_CONSUMER_SORTED "../temp/consumer_sorted.csv"
+#define DIR_STATION_SORTED "../tmp/station_sorted.csv"
+#define DIR_CONSUMER_SORTED "../tmp/consumer_sorted.csv"
 #define DIR_OUTPUT "../output/"
 #define DIR_LV_MINMAX "../output/lv_all_minmax.csv"
 

@@ -15,6 +15,6 @@ void outputProcess(const char* stationType, const char* consumerType, const char
 void createPath(const char* stationType, const char* consumerType, const char* powerPlantID, char* path, int sizePath);
 void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations);
 FILE* initOutputFile(const char* stationType, const char* consumerType, const char* powerPlantID);
-// FILE* initLvMinMax(FILE* file);
+FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations);
 
 #endif
