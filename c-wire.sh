@@ -200,19 +200,19 @@ sortingData () {
             case "$3" in
                 all)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" && $4 != "LV Station" { print $4, $7 > "temp/station_sorted.csv" }
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $8 != "-" && $4 != "LV Station" { print $4, $8 > "temp/consumer_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "temp/station_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $8 != "-" { print $4, $8 > "temp/consumer_sorted.csv" }
                     '
                     ;;
                 comp)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 == "-" { print $4, $7 }
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" && $8 != "-" { print $4, $8 }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "temp/station_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" && $8 != "-" { print $4, $8 > "temp/consumer_sorted.csv" }
                     '
                     ;;
                 indiv)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 == "-" { print $4, $7 > "temp/station_sorted.csv"}
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "temp/station_sorted.csv"}
                     NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" && $8 != "-" { print $4, $8 > "temp/consumer_sorted.csv"}
                     '
                     ;;
