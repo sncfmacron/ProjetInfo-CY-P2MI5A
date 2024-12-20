@@ -81,8 +81,8 @@ void writeOutputFile(pStation* stationArray, FILE* file, uint32_t nbStations){
 
 
 FILE* initLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, uint32_t nbStations) {
-    if(mmArray == NULL){
-        exit_with_message("ERROR: Station min max array is NULL", 31418);
+    if(mmArray == NULL || stationArray == NULL){
+        exit_with_message("ERROR: Station array is NULL", 31418);
     }
     fprintf(file, "Min and Max 'capacity-load' extreme nodes\n");
     fprintf(file, "Station LV:Capacity:Load(all)\n");
