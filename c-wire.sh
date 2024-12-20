@@ -284,10 +284,11 @@ makeGraphs () {
     fi
 }
 
-
 # Functions calls
 runProgram () {
+    
     echo
+
     verifyParameters "$@"
 
     processFolders
@@ -301,13 +302,12 @@ runProgram () {
     
     displayTime "Program completed successfully" "$startTime" # modifier les messages plus tard (j'ai une présentation, on verra plus tard)
     
-    # makeGraphs "$2" "$3"
+    makeGraphs "$2" "$3"
 
     displayTime "Program completed successfully with Graphs" "$startTime"
     echo
 
     exit 0
 }
-
 
 runProgram "$@"
