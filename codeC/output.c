@@ -25,7 +25,7 @@ const char* typeToPrint(const char* type){
         return "LV";
     }
     else {
-        exit_with_message("consumerType or stationType is invalid.", ERR_INVALID_ARGS);
+        exit_with_message("ERROR: 'consumerType' or 'stationType' is invalid.", ERR_INVALID_ARGS);
     }
 
     return NULL;
@@ -66,12 +66,11 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 
 // Writing calculated data in the output file
 void writeOutputFile(pStation* stationArray, FILE* file, uint32_t nbStations){
-    printf("Writing output data...\n\n");
     clock_t start = clock();
     
  
     for(int i=0; i<nbStations; i++){
-        fprintf(file, "%d:%ld:%ld\n", stationArray[i]->id, stationArray[i]->capacity, stationArray[i]->consumption_sum);
+        fprintf(file, "%d:%ld:%ld\n", stationArray[i]->id, stationArray[i]->capacity, stationArray[i]->load_sum);
     }
 
     sleep(2);
@@ -79,6 +78,14 @@ void writeOutputFile(pStation* stationArray, FILE* file, uint32_t nbStations){
     displayTime(start, end, "Writing the output data completed successfully");
 }
 
+//
+FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
+    // Verif stationArray
+    file = fopen("output/lv_all_minmax.csv", "w");
+    // vérif les droits d'écriture
+    fprintf(file, "Station LV:Capacity:Used capacity\n");
+    return file;
+}
 
 FILE* initLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, uint32_t nbStations) {
     if(mmArray == NULL || stationArray == NULL){
@@ -99,10 +106,17 @@ FILE* initLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, uint32
         }
     }
     for(i = 0; i < 20; i++){ // somme de 10 + 10 (define)
-        fprintf(file, "%d:%ld:%ld\n", stationArray[index[i]]->id, stationArray[index[i]]->capacity, stationArray[index[i]]->consumption_sum);
+        fprintf(file, "%d:%ld:%ld\n", stationArray[index[i]]->id, stationArray[index[i]]->capacity, stationArray[index[i]]->load_sum);
     }
 
     return file;
+}
+
+void writeOutputLvMinMax(FILE* file, pStation* stations, pStation* mmArray) {
+    for(int i=0; i<NB_MINMAX_STATIONS; i++){
+        fprintf(file, "%d:%ld\n", mmArray[i]->id, mmArray[i]->capacity);
+    }
+
 }
 
 // Calls output fonctions
@@ -116,15 +130,15 @@ void outputProcess(const char* stationType, const char* consumerType, const char
         exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
     }
 
-    // // lv_min_max process
-    // if((strcmp(stationType, "lv") == 0) && (strcmp(consumerType, "all") == 0)){
-    //     FILE* lvMinMax = NULL;
-    //     lvMinMax = initLvMinMax(lvMinMax, stationArray, mmArray, nbStations);
-    //     if (lvMinMax != NULL) { // CMT: j'ai mit !=, c'est ça normalement non ? It's late so my brain isn't braining anymore
-    //         // fonction pour remplir le fichier
-    //         fclose(lvMinMax);
-    //     } else {
-    //         exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
-    //     }
-    // }
+    // lv_min_max process
+    if(strcmp(consumerType, "all") == 0){
+        FILE* lvMinMax = NULL;
+        lvMinMax = initLvMinMax(lvMinMax, stationArray, nbStations);
+        if (lvMinMax != NULL) { // CMT: j'ai mit !=, c'est ça normalement non ? It's late so my brain isn't braining anymore
+            writeOutputLvMinMax(lvMinMax, stationArray, mmArray);
+            fclose(lvMinMax);
+        } else {
+            exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
+        }
+    }
 }

@@ -5,6 +5,7 @@
 
 
 # Error code declaration
+
 ERR_INVALID_PARAMETER=100
 ERR_INVALID_FILTER=101
 ERR_FILE_MISSING=102
@@ -12,8 +13,15 @@ ERR_FILE_CREATION=103
 ERR_COMPILATION=104
 PROGRAM_ABORTED=105
 
+# Directories declaration
+
+DIR_EXTRACTED_STATION="tmp/extracted_station.csv"
+DIR_EXTRACTED_CONSUMER="tmp/extracted_consumer.csv"
+DIR_GNUPLOT_PROGRAM="gnuplot_LVminmax.gp"
+
 
 # Variable declaration to set the text in bold using 'tput'
+
 bold=$(tput bold)
 normal=$(tput sgr0)
 
@@ -24,43 +32,41 @@ display_help() {
 
     echo "${bold} NAME ${normal}"
     echo "      c-wire - data managing"
-    echo ""
+    echo
     echo "${bold} DESCRIPTION ${normal}"
     echo "      This program processes data for an electricity distribution."
-    echo ""
+    echo
     echo "${bold} SYNOPSIS ${normal}"
-    echo "      ./c-wire.sh [file_path.csv] [station_type] [consumer_type] [power_plant_id]"
-    echo ""
+    echo "      $0 [file_path.csv] [station_type] [consumer_type] [power_plant_id]"
+    echo
     echo "${bold} OPTIONS ${normal}"
     echo "     ${bold} [file_path.csv] ${normal}  Location of the input file (required)"
     echo "     ${bold} [station_type] ${normal}   Type of station to process: 'hva', 'hvb' or 'lv' (required)"
     echo "     ${bold} [consumer_type] ${normal}  Type of consumer to process: 'all', 'comp' or 'indiv' (required)"
     echo "     ${bold} [power_plant_id] ${normal} Filters the results for a specific power plant ID (optional)"
-    echo ""
+    echo
     echo "     ${bold} -h ${normal}               Displays help manual"
-    echo ""
+    echo "     ${bold} --version ${normal}        Displays program version"
+    echo
     echo "${bold} WARNING ${normal}"
     echo "      The following combinations are forbidden:"
     echo "      * hvb all"
     echo "      * hvb indiv"
     echo "      * hva all"
     echo "      * hva indiv"
-    echo ""
+    echo
     echo "${bold} EXAMPLE ${normal}"
-    echo "      ./c-wire.sh input/DATA_CWIRE.csv lv comp 3"
-    echo ""
+    echo "      $0 input/DATA_CWIRE.csv lv comp 3"
+    echo
     exit 0
 }
 
-
 # Displays reduced program help
 display_mini_help() {
-    echo ""
-    echo "Usage: ./c-wire.sh [path_file.csv] [station_type] [consumer_type] [power_plant_id]"
-    echo "Use ${bold}-h${normal} parameter to get full help."
+    echo "Usage: $0 [path_file.csv] [station_type] [consumer_type] [power_plant_id]"
+    echo "Use -h parameter to get full help."
     exit "$ERR_INVALID_PARAMETER"
 }
-
 
 # Verifies the presence of a file
 verifyFilePresence () {
@@ -71,6 +77,12 @@ verifyFilePresence () {
     fi
 }
 
+# Displays the program version
+displayVersion () {
+    echo "c-wire v1.5.0"
+    echo "Written by Nathan Choupin, Romain Michaut-Joyeux and Guirec Vetier." 
+    exit 0
+}
 
 # Parameters verification
 verifyParameters() {
@@ -79,6 +91,15 @@ verifyParameters() {
         case $option in
             -h) 
                 display_help
+            ;;
+        esac
+    done
+
+    # Verifies if "-v" is present
+    for option in "$@"; do
+        case $option in
+            --version) 
+                displayVersion
             ;;
         esac
     done
@@ -130,12 +151,10 @@ verifyParameters() {
     fi
 }
 
-
 # Clean folders and unused file
 cleanFolders () {
     rm -rf tmp/*
 }
-
 
 # Prepares directories for program execution
 processFolders () {
@@ -144,7 +163,6 @@ processFolders () {
     # These folders are created if they don't exist. If they exist, nothing happens
     mkdir -p graphs input tmp output
 }
-
 
 # Starts program_c compilation using 'make'
 compilation () {
@@ -163,7 +181,6 @@ compilation () {
     fi
 }
 
-
 # Displays the execution time of a function
 displayTime() {
     local timeMsg="$1"
@@ -179,40 +196,39 @@ displayTime() {
     echo "[INFO] ${timeMsg} in $seconds.${milliseconds:1:3} seconds."
 }
 
-
 # Produces the data filter corresponding to the request
 awkFilter () {
     case "$2" in
         hvb) 
             filter='
-            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $7 != "-" { print $2, $7 > "tmp/station_sorted.csv" }
-            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $8 != "-" { print $2, $8 > "tmp/consumer_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $7 != "-" { print $2, $7 > stationFile }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $8 != "-" { print $2, $8 > consumerFile }
             '
             ;;
         hva)
             filter='
-            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $7 != "-" { print $3, $7 > "tmp/station_sorted.csv" }
-            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $8 != "-" { print $3, $8 > "tmp/consumer_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $7 != "-" { print $3, $7 > stationFile }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $8 != "-" { print $3, $8 > consumerFile }
             '
             ;;
         lv)
             case "$3" in
                 all)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv" }
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > stationFile }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $8 != "-" { print $4, $8 > consumerFile }
                     '
                     ;;
                 comp)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv" }
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > stationFile }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" && $8 != "-" { print $4, $8 > consumerFile }
                     '
                     ;;
                 indiv)
                     filter='
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv"}
-                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv"}
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > stationFile }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" && $8 != "-" { print $4, $8 > consumerFile }
                     '
                     ;;
             esac
@@ -224,11 +240,11 @@ awkFilter () {
         exit "$ERR_INVALID_FILTER"
     fi
 }
-# CHANGER SORTED EN EXTRACTED par exemple et mettre en variable (en define (comme en C))
+
 # Count the number of lines in the sorted file
 stationCount () {
-    verifyFilePresence "tmp/station_sorted.csv"
-    stationNumber=$(wc -l < tmp/station_sorted.csv)
+    verifyFilePresence "$DIR_EXTRACTED_STATION"
+    stationNumber=$(wc -l < "$DIR_EXTRACTED_STATION")
 }
 
 # Sorting data function
@@ -245,15 +261,16 @@ sortingData () {
     consumerType="$3"
     powerPlantID="$4"
 
+    echo
     echo "Starting data processing for station type '$stationType' and consumer type '$consumerType'..."
 
     awkFilter "$@"
 
-    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$inputFilePath" > /dev/null
+    awk -F ';' -v custom_id="$powerPlantID" -v stationFile="$DIR_EXTRACTED_STATION" -v consumerFile="$DIR_EXTRACTED_CONSUMER" "$filter" "$inputFilePath" > /dev/null
 
-    verifyFilePresence "tmp/station_sorted.csv"
+    verifyFilePresence "$DIR_EXTRACTED_STATION"
 
-    verifyFilePresence "tmp/consumer_sorted.csv"
+    verifyFilePresence "$DIR_EXTRACTED_STATION"
 
     displayTime "$inputFilePath sorted" "$startTime"
 
@@ -272,13 +289,13 @@ makeGraphs () {
             echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
             exit 1
         else
-            verifyFilePresence "gnuplot_LVminmax.gp"
-            echo ""
-            echo "Making graphs..."
+            verifyFilePresence "$DIR_GNUPLOT_PROGRAM"
+            echo
+            echo "[INFO] Making graphs..."
 
             gnuplot gnuplot_LVminmax.gp
 
-            echo ""
+            echo
             echo "[INFO] The graph has been successfully created in './graphs'."
         fi
     fi
@@ -306,6 +323,9 @@ runProgram () {
 
     displayTime "Program completed successfully with Graphs" "$startTime"
     echo
+
+    # cleanFolders
+    rm -f codeC/program_c
 
     exit 0
 }

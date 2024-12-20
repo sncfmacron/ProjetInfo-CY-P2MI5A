@@ -51,7 +51,7 @@ void sortMinMax(char* consumerType){
             exit_with_message("ERROR: Station min max array is NULL", 123);
         }
         for(uint32_t i = 0; i < nbStations; i++){
-            mmArray[i]->capacity = mmArray[i]->capacity - mmArray[i]->consumption_sum;
+            mmArray[i]->capacity = mmArray[i]->capacity - mmArray[i]->load_sum;
         }
         mergeSort(mmArray, nbStations);
     }
@@ -70,6 +70,9 @@ int main(int argc, char* argv[]) {
     // Managing the case where no power plant id is given
     argv[4] = (argv[4] != NULL) ? argv[4] : "EMPTY";
     char* powerPlantID = argv[4];
+    // if(strcmp(stationType, "lv") == 0){
+        
+    // }
 
     verifyArguments(argc, stationType, consumerType, powerPlantID, nbStations);
 
@@ -86,6 +89,12 @@ int main(int argc, char* argv[]) {
     globalTree = processStation(DIR_STATION_SORTED, globalTree, stationArray, mmArray, consumerType);
     
     mergeSort(stationArray, nbStations);
+    
+    processConsumer(DIR_CONSUMER_SORTED, globalTree);
+    
+    if((strcmp(stationType, "lv") == 0) && (strcmp(consumerType, "all") == 0)){
+        sortMinMax(consumerType);
+    }
 
     if(strcmp(consumerType, "all") == 0){
             allocMinMax(consumerType);

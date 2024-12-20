@@ -13,7 +13,7 @@ void updateSum(pAVL a, uint32_t stationID, long load) {
     }
 
     if(a->station->id == stationID) {
-        a->station->consumption_sum += load;
+        a->station->load_sum += load;
     } else if(a->station->id > stationID) {
         updateSum(a->left, stationID, load);
     } else {

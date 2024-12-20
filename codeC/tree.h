@@ -12,7 +12,7 @@
 typedef struct Station_struct {
     uint32_t id;
     long capacity;
-    long consumption_sum; // remplacer par load_sum je penses
+    long load_sum;
 } Station;
 
 typedef struct AVL_struct {
