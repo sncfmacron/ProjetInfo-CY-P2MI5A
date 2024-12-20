@@ -7,12 +7,12 @@
 
 
 // Reading sorted station data from './tmp' directory
-pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
+pAVL processStation(const char *filePath, pAVL tree, pStation* stationArray, pStation* mmArray, char* consumerType) {
     FILE *file = fopen(filePath, "r");
     if (file == NULL) {
         exit_with_message("ERROR : Sorted station file not found.", ERR_MISSING_FILE);
     }
-
+    
     char line[128];     // Buffer for each line of the file
     int id;
     long capacity;
@@ -22,8 +22,11 @@ pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
         if (sscanf(line, "%d %ld", &id, &capacity) == 2) {
 
             int height = 0;
-            stations[i] = createStation(id, capacity);
-            tree = insertAVL(tree, stations[i], &height);
+            stationArray[i] = createStation(id, capacity);
+            tree = insertAVL(tree, stationArray[i], &height);
+            if(strcmp(consumerType, "all") == 0){
+                mmArray[i] = createStation(id, capacity);
+            }
             i++;
 
         } else {

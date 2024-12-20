@@ -89,7 +89,7 @@ verifyFilePresence () {
 
 # Displays the program version
 displayVersion () {
-    echo "c-wire ${bold}v1.5.0${normal}"
+    echo "c-wire ${bold}v1.6.0${normal}"
     echo "Written by Nathan Choupin, Romain Michaut-Joyeux and Guirec Vetier." 
     exit 0
 }
@@ -290,20 +290,26 @@ sortingData () {
     codeC/program_c $stationType $consumerType $stationNumber $powerPlantID
 }
 
+
+getMaxLoad () {
+    maxLoad=$(tail -n 1 "$DIR_LVMINMAX" | awk -F ':' '{print $3}')
+}
+
 # Function to make graphs using output files
 makeGraphs () {
-    local stationType="$1"
-    local consumerType="$2"
+    local filePath="$1"
+    local stationType="$2"
+    local consumerType="$3"
     local startTime=$(date +%s%N)
 
-    if [[ "$1" == "lv" && "$2" == "all" ]]; then
+    if [[ "$stationType" == "lv" && "$consumerType" == "all" ]]; then
         if ! command -v gnuplot &>/dev/null; then
             echo
             echo -e "[${darkred}WARNING${normal}] Gnuplot is not installed. Type ${yellow}sudo apt install gnuplot${normal} to install it."
 
         elif [[ ! -f "$DIR_LVMINMAX" ]]; then
             echo
-            echo -e "[${darkred}WARNING${normal}] File $DIR_LVMINMAX not found. Skipping graph creation."
+            echo -e "[${darkred}WARNING${normal}] File $DIR_LVMINMAX not found : skipping graph creation..."
             exit "$PROGRAM_NOT_FOUND"
 
         else
@@ -311,9 +317,16 @@ makeGraphs () {
             echo
             echo "Making graphs..."
 
-            gnuplot gnuplot_LVminmax.gp
+            getMaxLoad
 
-            displayTime "...3. The graph has been created in ./graphs" "$startTime"
+            gnuplot -e "maxLoad=${maxLoad}" gnuplot_LVminmax.gp
+
+            # Checks that gnuplot program has gone well
+            if [[ $? -ne 0 ]]; then
+                echo "${bold}[ERROR]${normal} Gnuplot error."
+            else
+                displayTime "...3. The graph has been created in ${blue}./graphs${normal}" "$startTime"
+            fi
         fi
     fi
 }
@@ -334,7 +347,7 @@ runProgram () {
 
     sortingData "$@"
     
-    makeGraphs "$2" "$3"
+    makeGraphs "$1" "$2" "$3"
 
     cleanFolders
 

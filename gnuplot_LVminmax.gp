@@ -1,41 +1,46 @@
-
 # gnuplot_LVminmax
 
-# permet de définir le séparateur (:)
+
+red = "#ff0000"
+green = "#669900"
+
+# Define the separator
+
 set datafile separator ":"
 
-# taille en pixel du graphique + nom du fichier graphique
-set terminal pngcairo size 1000,600
+# Set graphic size in pixels and graphic file name
+
+set terminal pngcairo size 1920,1080
 set output 'graphs/graphLV_minmax.png'
 
-# baton
+# Setup bar graph
+
 set style data histogram
-
-# largeur baton
 set style histogram cluster gap 1
-
-# contour baton
 set style fill solid
 
-# remplissage du baton par rapport a sa place
 set boxwidth 0.9
-
-# permet d'avoir une grille pour mieux se reperer  
 set grid ytics
 
-# pour avoir une graduation de 1 en 1 POUR l'axe x
 set xtics 1
 
-# si tu veux chager la range de y c'est juste en dessous, tu peux meme l'enlever parce que elle sert pas trop 
-set yrange [0:80]
-set xrange [0:21]
-
-# nom x/y/graphique
 set xlabel "Station LV"
 set ylabel "Capacity / Used capacity (kWh)"
 set title "20 Stations sorted by used capacity"
 
-# column(1) remplace la colonne du fichier de l'axe des x
+set xlabel "Station LV" offset -90,0
 
-plot 'lv_minmax_temp.csv' using 2:xtic(1) title 'Capacity' linecolor rgb "#669900", \
-    '' using 3 title 'Used capacity' linecolor rgb "#ff0000"
+# Define abscissa and ordinate ranges
+
+set yrange [0:12*maxLoad]
+set xrange [0:21]
+
+# Offset x-axis labels to manage long LV IDs
+
+set xtics rotate by 45
+set xtics offset -2,-2.3
+
+# Setup the caption
+
+plot 'output/lv_all_minmax.csv' using 2:xtic(1) title 'Underproduction' linecolor rgb green, \
+    'output/lv_all_minmax.csv' using 3 title 'Overproduction' linecolor rgb red

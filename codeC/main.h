@@ -17,6 +17,7 @@ extern pStation* stationArray;
 extern uint32_t nbStations;
 
 void cleanup(void);
-void sortMinMax(char* stationType, char* consumerType);
+void allocMinMax(char* consumerType);
+void sortMinMax(char* consumerType);
 
 #endif

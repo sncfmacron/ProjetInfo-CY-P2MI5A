@@ -12,11 +12,11 @@ const char* typeToPrint(const char* type){
     }
 
     if(strcmp(type, "all") == 0){
-        return "All";
+        return "all";
     } else if(strcmp(type, "comp") == 0){
-        return "Company";
+        return "company";
     } else if(strcmp(type, "indiv") == 0){
-        return "Individual";
+        return "individual";
     } else if(strcmp(type, "hvb") == 0){
         return "HV-B";
     } else if(strcmp(type, "hva") == 0){
@@ -57,8 +57,7 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
         exit_with_message("ERROR: Output file creation failed.", ERR_FILE_CREATION);
         return NULL;
     } else {
-        fprintf(file, "Station %s:Capacity:%s\n", stationTypeToPrint, consumerTypeToPrint);
-        
+        fprintf(file, "Station %s:Capacity:Load(%s)\n", stationTypeToPrint, consumerTypeToPrint);
     }
 
     return file;
@@ -66,48 +65,65 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 
 
 // Writing calculated data in the output file
-void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
+void writeOutputFile(pStation* stationArray, FILE* file, uint32_t nbStations){
+    clock_t start = clock();
+    
+ 
     for(int i=0; i<nbStations; i++){
-        fprintf(file, "%d:%ld:%ld\n", stations[i]->id, stations[i]->capacity, stations[i]->load_sum);
+        fprintf(file, "%d:%ld:%ld\n", stationArray[i]->id, stationArray[i]->capacity, stationArray[i]->load_sum);
     }
+
+    clock_t end = clock();
+    displayTime(start, end, "Writing the output data completed successfully");
 }
 
 //
-FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
+FILE* initLvMinMax(FILE* file){
     // Verif stationArray
     file = fopen(DIR_LV_MINMAX, "w");
     // vérif les droits d'écriture
-    fprintf(file, "Station LV:Capacity:Used capacity\n");
     return file;
 }
 
-void writeOutputLvMinMax(FILE* file, pStation* stations, pStation* mmArray) {
-    for(int i=0; i<NB_MINMAX_STATIONS; i++){
-        fprintf(file, "%d:%ld\n", mmArray[i]->id, mmArray[i]->capacity);
+void writeOutputLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, uint32_t nbStations){
+    if(mmArray == NULL || stationArray == NULL){
+        exit_with_message("ERROR: Station array is NULL", 31418);
     }
-
+    fprintf(file, "Station LV:Capacity:Load(all)\n");
+    uint32_t i = 0, y = 0;
+    uint32_t index[NB_MINMAX_STATIONS];
+    for(i = 0; i < nbStations; i++){
+        for(y = 0; y < 10; y++){ // 10 = NB_MINMAX_STATIONS/2, for safety reason we put 10 because 'y' is an int 
+            if(mmArray[y]->id == stationArray[i]->id){
+                index[y] = i;
+            }
+            if(mmArray[nbStations-1-y]->id == stationArray[i]->id){
+                index[NB_MINMAX_STATIONS-1-y] = i;
+            }
+        }
+    }
+    for(i = 0; i < NB_MINMAX_STATIONS; i++){
+        fprintf(file, "%d:%ld:%ld\n", stationArray[index[i]]->id, stationArray[index[i]]->capacity, stationArray[index[i]]->load_sum);
+    }
 }
 
 // Calls output fonctions
-
-// CMT : remplacer stations par stationsArray ?
-
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations, pStation* mmArray) {
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stationArray, uint32_t nbStations, pStation* mmArray) {
     FILE* file = NULL;
     file = initOutputFile(stationType, consumerType, powerPlantID);
     if (file != NULL) {
-        writeOutputFile(stations, file, nbStations);
+        writeOutputFile(stationArray, file, nbStations);
         fclose(file);
     } else {
         exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
     }
 
     // lv_min_max process
-    if(strcmp(consumerType, "all") == 0) {
+    if(strcmp(consumerType, "all") == 0){
         FILE* lvMinMax = NULL;
-        lvMinMax = initLvMinMax(lvMinMax, stations, nbStations);
-        if (file != NULL) {
-            writeOutputLvMinMax(lvMinMax, stations, mmArray);
+        lvMinMax = initLvMinMax(lvMinMax);
+        if (lvMinMax != NULL) { // CMT: j'ai mit !=, c'est ça normalement non ? It's late so my brain isn't braining anymore
+            writeOutputLvMinMax(lvMinMax, stationArray, mmArray, nbStations);
             fclose(lvMinMax);
         } else {
             exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
