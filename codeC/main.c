@@ -48,6 +48,9 @@ void sortMinMax(char* stationType, char* consumerType){
 }
 
 int main(int argc, char* argv[]) {
+
+    clock_t start = clock();
+
     if (atexit(cleanup) != 0) {
         fprintf(stderr, "Cannot register cleanup function\n");
         return 1;
@@ -83,6 +86,9 @@ int main(int argc, char* argv[]) {
     }
 
     outputProcess(stationType, consumerType, powerPlantID, stationArray, nbStations, mmArray);
+
+    clock_t end = clock();
+    displayTime(start, end, "...2. Processing data completed");
 
     return 0;
 }

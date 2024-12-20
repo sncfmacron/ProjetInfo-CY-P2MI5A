@@ -67,22 +67,15 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 
 // Writing calculated data in the output file
 void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
-    clock_t start = clock();
-    
- 
     for(int i=0; i<nbStations; i++){
         fprintf(file, "%d:%ld:%ld\n", stations[i]->id, stations[i]->capacity, stations[i]->load_sum);
     }
-
-    sleep(2);
-    clock_t end = clock();
-    displayTime(start, end, "Writing the output data completed successfully");
 }
 
 //
 FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
     // Verif stationArray
-    file = fopen("output/lv_all_minmax.csv", "w");
+    file = fopen(DIR_LV_MINMAX, "w");
     // vérif les droits d'écriture
     fprintf(file, "Station LV:Capacity:Used capacity\n");
     return file;

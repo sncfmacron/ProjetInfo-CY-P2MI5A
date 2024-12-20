@@ -12,18 +12,24 @@ ERR_FILE_MISSING=102
 ERR_FILE_CREATION=103
 ERR_COMPILATION=104
 PROGRAM_ABORTED=105
+PROGRAM_NOT_FOUND=106
 
 # Directories declaration
 
 DIR_EXTRACTED_STATION="tmp/extracted_station.csv"
 DIR_EXTRACTED_CONSUMER="tmp/extracted_consumer.csv"
 DIR_GNUPLOT_PROGRAM="gnuplot_LVminmax.gp"
+DIR_LVMINMAX="output/lv_all_minmax.csv"
 
-
-# Variable declaration to set the text in bold using 'tput'
+# Variable declaration to set the text in bold or in red using 'tput'
 
 bold=$(tput bold)
 normal=$(tput sgr0)
+yellow='\033[1;33m'
+red='\033[1;31m'
+darkred='\033[0;31m'
+blue='\033[1;36m'
+normalColor='\033[0m'
 
 
 # Displays the program help manual
@@ -37,15 +43,19 @@ display_help() {
     echo "      This program processes data for an electricity distribution."
     echo
     echo "${bold} SYNOPSIS ${normal}"
-    echo "      $0 [file_path.csv] [station_type] [consumer_type] [power_plant_id]"
+    echo "      $0 [FILE_PATH.csv] [STATION_TYPE] [CONSUMER_TYPE] [POWER_PLANT_ID] ..."
     echo
     echo "${bold} OPTIONS ${normal}"
-    echo "     ${bold} [file_path.csv] ${normal}  Location of the input file (required)"
-    echo "     ${bold} [station_type] ${normal}   Type of station to process: 'hva', 'hvb' or 'lv' (required)"
-    echo "     ${bold} [consumer_type] ${normal}  Type of consumer to process: 'all', 'comp' or 'indiv' (required)"
-    echo "     ${bold} [power_plant_id] ${normal} Filters the results for a specific power plant ID (optional)"
+    echo "     ${bold} [FILE_PATH.csv] ${normal}  Location of the input file (required)"
+    echo
+    echo "     ${bold} [STATION_TYPE] ${normal}   Type of station to process: 'hva', 'hvb' or 'lv' (required)"
+    echo
+    echo "     ${bold} [CONSUMER_TYPE] ${normal}  Type of consumer to process: 'all', 'comp' or 'indiv' (required)"
+    echo
+    echo "     ${bold} [POWER_PLANT_ID] ${normal} Filters the results for a specific power plant ID (optional)"
     echo
     echo "     ${bold} -h ${normal}               Displays help manual"
+    echo
     echo "     ${bold} --version ${normal}        Displays program version"
     echo
     echo "${bold} WARNING ${normal}"
@@ -72,14 +82,14 @@ display_mini_help() {
 verifyFilePresence () {
     filePath="$1"
     if [[ ! -f "$filePath" ]]; then
-        echo "ERROR: File $filePath is missing."
+        echo "${bold}[ERROR]${normal} File $filePath is missing."
         exit "$ERR_FILE_MISSING"
     fi
 }
 
 # Displays the program version
 displayVersion () {
-    echo "c-wire v1.5.0"
+    echo "c-wire ${bold}v1.5.0${normal}"
     echo "Written by Nathan Choupin, Romain Michaut-Joyeux and Guirec Vetier." 
     exit 0
 }
@@ -95,7 +105,7 @@ verifyParameters() {
         esac
     done
 
-    # Verifies if "-v" is present
+    # Verifies if "--version" is present
     for option in "$@"; do
         case $option in
             --version) 
@@ -106,13 +116,13 @@ verifyParameters() {
 
     # Verifying number of parameters
     if [[ $# -gt 5 ]] || [[ $# -lt 1 ]]; then
-        echo "You must provide at least the path to your input file, the station type and the consumer type."
+        echo -e "[${darkred}WARNING${normal}] You must provide at least the path to your input file, the station type and the consumer type."
         display_mini_help
     fi
 
     # Verifying first parameter
     if [[ ! -f "$1" ]]; then
-        echo "The first option must indicate a path to a valid '.csv' file."
+        echo -e "[${darkred}WARNING${normal}] The first option must indicate a path to a valid '.csv' file."
         display_mini_help
     fi
 
@@ -121,7 +131,7 @@ verifyParameters() {
         hva|hvb|lv)
             ;;
         *)
-            echo "Second option must be 'hva', 'hvb', or 'lv'."
+            echo -e "[${darkred}WARNING${normal}] Second option must be ${red}hva${normal}, ${red}hvb${normal}, or ${red}lv${normal}."
             display_mini_help
             ;;
     esac
@@ -131,12 +141,12 @@ verifyParameters() {
         comp|indiv|all)
             # Preventing invalid combinations
             if [[ "$2" == "hvb" && "$3" == "all" ]] || [[ "$2" == "hvb" && "$3" == "indiv" ]] || [[ "$2" == "hva" && "$3" == "all" ]] || [[ "$2" == "hva" && "$3" == "indiv" ]]; then
-                echo "The following combinations are forbidden: 'hvb all', 'hvb indiv', 'hva all', and 'hva indiv'."
+                echo -e "[${darkred}WARNING${normal}] The following combinations are forbidden: ${red}hvb all${normal}, ${red}hvb indiv${normal}, ${red}hva all${normal}, and ${red}hva indiv${normal}."
                 display_mini_help
             fi
             ;;
         *)
-            echo "The third option must be 'comp', 'indiv', or 'all'."
+            echo -e "[${darkred}WARNING${normal}] The third option must be ${red}comp${normal}, ${red}indiv${normal}, or ${red}all${normal}."
             display_mini_help
             ;;
     esac
@@ -145,7 +155,7 @@ verifyParameters() {
     # 'grep' checks if the id exists in input file
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
-            echo "The fourth option must be a valid power plant identifier."
+            echo -e "[${darkred}WARNING${normal}] The fourth option must be a valid power plant identifier."
             display_mini_help
         fi
     fi
@@ -168,14 +178,15 @@ processFolders () {
 compilation () {
     # Compile if the program is absent
     if [[ ! -f codeC/program_c ]]; then
-        echo "[INFO] 'program_c' is absent, compilation is executed."
+        echo -e "${bold}[INFO]${normal} ${yellow}program_c${normal} is absent, compilation is executed."
+        echo
         
         # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
         make  --no-print-directory -C codeC
         
         # Checks that compilation has gone well
         if [[ $? -ne 0 ]]; then
-            echo "ERROR : Compilation error."
+            echo "${bold}[ERROR]${normal} Compilation error."
             exit "$ERR_COMPILATION"
         fi
     fi
@@ -193,7 +204,7 @@ displayTime() {
     local milliseconds=$(((elapsedTime % 1000000000) / 1000000))
 
     echo
-    echo "[INFO] ${timeMsg} in $seconds.${milliseconds:1:3} seconds."
+    echo -e "${timeMsg} in $seconds.${milliseconds:1:3}s."
 }
 
 # Produces the data filter corresponding to the request
@@ -236,7 +247,7 @@ awkFilter () {
     esac
 
     if [[ "$filter" == "" ]]; then
-        echo "ERROR: Data filter creation failed."
+        echo "${bold}[ERROR]${normal} Data filter creation failed."
         exit "$ERR_INVALID_FILTER"
     fi
 }
@@ -262,7 +273,7 @@ sortingData () {
     powerPlantID="$4"
 
     echo
-    echo "Starting data processing for station type '$stationType' and consumer type '$consumerType'..."
+    echo -e "Starting data processing for station type ${red}$stationType${normalColor} and consumer type ${red}$consumerType${normalColor}..."
 
     awkFilter "$@"
 
@@ -272,7 +283,7 @@ sortingData () {
 
     verifyFilePresence "$DIR_EXTRACTED_STATION"
 
-    displayTime "$inputFilePath sorted" "$startTime"
+    displayTime "...1. ${blue}"$1"${normal} extracted" "$startTime"
 
     stationCount
 
@@ -283,27 +294,33 @@ sortingData () {
 makeGraphs () {
     local stationType="$1"
     local consumerType="$2"
+    local startTime=$(date +%s%N)
 
     if [[ "$1" == "lv" && "$2" == "all" ]]; then
-       if ! command -v gnuplot &>/dev/null; then
-            echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
-            exit 1
+        if ! command -v gnuplot &>/dev/null; then
+            echo
+            echo -e "[${darkred}WARNING${normal}] Gnuplot is not installed. Type ${yellow}sudo apt install gnuplot${normal} to install it."
+
+        elif [[ ! -f "$DIR_LVMINMAX" ]]; then
+            echo
+            echo -e "[${darkred}WARNING${normal}] File $DIR_LVMINMAX not found. Skipping graph creation."
+            exit "$PROGRAM_NOT_FOUND"
+
         else
             verifyFilePresence "$DIR_GNUPLOT_PROGRAM"
             echo
-            echo "[INFO] Making graphs..."
+            echo "Making graphs..."
 
             gnuplot gnuplot_LVminmax.gp
 
-            echo
-            echo "[INFO] The graph has been successfully created in './graphs'."
+            displayTime "...3. The graph has been created in ./graphs" "$startTime"
         fi
     fi
 }
 
 # Functions calls
 runProgram () {
-    
+
     echo
 
     verifyParameters "$@"
@@ -317,15 +334,12 @@ runProgram () {
 
     sortingData "$@"
     
-    displayTime "Program completed successfully" "$startTime" # modifier les messages plus tard (j'ai une présentation, on verra plus tard)
-    
     makeGraphs "$2" "$3"
 
-    displayTime "Program completed successfully with Graphs" "$startTime"
-    echo
+    cleanFolders
 
-    # cleanFolders
-    rm -f codeC/program_c
+    echo
+    displayTime "Program completed successfully" "$startTime"
 
     exit 0
 }

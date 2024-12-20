@@ -57,7 +57,7 @@ void displayTime(clock_t start, clock_t end, char* message) {
         seconds = 0;
     }
 
-    printf("\n[INFO] %s in %.3fs.\n", message, seconds);
+    printf("\n%s in %.2fs.\n", message, seconds);
 }
 
 
