@@ -13,7 +13,7 @@ uint32_t nbStations = 0;
 void cleanup(void){
     if(stationArray != NULL){
         for (uint32_t i = 0; i < nbStations; i++){
-            if (stationArray[i] != NULL){
+            if(stationArray[i] != NULL){
                 free(stationArray[i]);
             }
             stationArray[i] = NULL;
@@ -23,6 +23,9 @@ void cleanup(void){
     }
     if(mmArray != NULL){
         for (uint32_t i = 0; i < nbStations; i++){
+            if(mmArray[i] != NULL){
+                free(mmArray[i]);    
+            }
             mmArray[i] = NULL;
         }
         free(mmArray);
@@ -33,14 +36,21 @@ void cleanup(void){
     }
 }
 
-void sortMinMax(char* stationType, char* consumerType){
-    if((strcmp(stationType, "lv") == 0) && (strcmp(consumerType, "all") == 0)){
+void allocMinMax(char* consumerType){
+    if(strcmp(consumerType, "all") == 0){
         mmArray = malloc(nbStations * sizeof(pStation));
         if(mmArray == NULL){
             exit_with_message("ERROR: Dynamic min max array allocation failed", ERR_PTR_ALLOC);
         }
+    }
+}
+
+void sortMinMax(char* consumerType){
+    if(strcmp(consumerType, "all") == 0){
+        if(mmArray == NULL){
+            exit_with_message("ERROR: Station min max array is NULL", 123);
+        }
         for(uint32_t i = 0; i < nbStations; i++){
-            mmArray[i] = stationArray[i];
             mmArray[i]->capacity = mmArray[i]->capacity - mmArray[i]->consumption_sum;
         }
         mergeSort(mmArray, nbStations);
@@ -60,9 +70,6 @@ int main(int argc, char* argv[]) {
     // Managing the case where no power plant id is given
     argv[4] = (argv[4] != NULL) ? argv[4] : "EMPTY";
     char* powerPlantID = argv[4];
-    // if(strcmp(stationType, "lv") == 0){
-        
-    // }
 
     verifyArguments(argc, stationType, consumerType, powerPlantID, nbStations);
 
@@ -70,16 +77,23 @@ int main(int argc, char* argv[]) {
     if(stationArray == NULL) {
         exit_with_message("ERROR: Dynamic station array allocation failed", ERR_PTR_ALLOC);
     }
-
+    
+    if(strcmp(consumerType, "all") == 0){
+            allocMinMax(consumerType);
+    }
+    
     globalTree = NULL;
-    globalTree = processStation(DIR_STATION_SORTED, globalTree, stationArray);
+    globalTree = processStation(DIR_STATION_SORTED, globalTree, stationArray, mmArray, consumerType);
     
     mergeSort(stationArray, nbStations);
-    
+
+    if(strcmp(consumerType, "all") == 0){
+            allocMinMax(consumerType);
+    }
     processConsumer(DIR_CONSUMER_SORTED, globalTree);
-    
-    if((strcmp(stationType, "lv") == 0) && (strcmp(consumerType, "all") == 0)){
-        sortMinMax(stationType, consumerType);
+
+    if(strcmp(consumerType, "all") == 0){
+            sortMinMax(consumerType);
     }
 
     outputProcess(stationType, consumerType, powerPlantID, stationArray, nbStations, mmArray);

@@ -13,7 +13,7 @@ typedef AVL* pAVL;
 
 #include "basics.h"
 
-pAVL processStation(const char *filePath, pAVL tree, pStation* stations);
+pAVL processStation(const char *filePath, pAVL tree, pStation* stationArray, pStation* mmArray, char* consumerType);
 void processConsumer(const char *filePath, pAVL tree);
 
 #endif
