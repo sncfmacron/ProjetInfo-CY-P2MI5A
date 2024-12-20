@@ -19,7 +19,7 @@ void verifyArguments(int argc, char* stationType, char* consumerType, char* powe
         exit_with_message("ERROR: Not enough parameters provided.", ERR_INVALID_ARGS);
     }
 
-    if(nbStations < 0) {
+    if(nbStations < 1) {
         exit_with_message("ERROR: Number of stations is invalid.", ERR_INVALID_ARGS);
     }
 

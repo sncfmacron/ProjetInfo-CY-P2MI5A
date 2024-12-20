@@ -161,4 +161,5 @@ void cleanAVL(pAVL a) {
     cleanAVL(a->right);
     // créer fonction pour cleanArray
     free(a);
+    a = NULL;
 }

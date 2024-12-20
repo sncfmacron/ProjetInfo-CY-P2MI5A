@@ -12,11 +12,11 @@ const char* typeToPrint(const char* type){
     }
 
     if(strcmp(type, "all") == 0){
-        return "All";
+        return "all";
     } else if(strcmp(type, "comp") == 0){
-        return "Company";
+        return "company";
     } else if(strcmp(type, "indiv") == 0){
-        return "Individual";
+        return "individual";
     } else if(strcmp(type, "hvb") == 0){
         return "HV-B";
     } else if(strcmp(type, "hva") == 0){
@@ -57,8 +57,7 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
         exit_with_message("ERROR: Output file creation failed.", ERR_FILE_CREATION);
         return NULL;
     } else {
-        fprintf(file, "Station %s:Capacity:%s\n", stationTypeToPrint, consumerTypeToPrint);
-        
+        fprintf(file, "Station %s:Capacity:Load(%s)\n", stationTypeToPrint, consumerTypeToPrint);
     }
 
     return file;
@@ -66,13 +65,13 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 
 
 // Writing calculated data in the output file
-void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
+void writeOutputFile(pStation* stationArray, FILE* file, uint32_t nbStations){
     printf("Writing output data...\n\n");
     clock_t start = clock();
     
  
     for(int i=0; i<nbStations; i++){
-        fprintf(file, "%d:%ld:%ld\n", stations[i]->id, stations[i]->capacity, stations[i]->consumption_sum);
+        fprintf(file, "%d:%ld:%ld\n", stationArray[i]->id, stationArray[i]->capacity, stationArray[i]->consumption_sum);
     }
 
     sleep(2);
@@ -81,34 +80,51 @@ void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
 }
 
 
-// FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
-//     // verif stationArray
-//     fprintf(file, "Station LV:Capacity:Used capacity\n");
-//     // 
+FILE* initLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, uint32_t nbStations) {
+    if(mmArray == NULL){
+        exit_with_message("ERROR: Station min max array is NULL", 31418);
+    }
+    fprintf(file, "Min and Max 'capacity-load' extreme nodes\n");
+    fprintf(file, "Station LV:Capacity:Load(all)\n");
+    uint32_t i = 0, y = 0;
+    uint32_t index[20]; // mettre un define pour 10 max et 10 min puis faire la somme des deux
+    for(i = 0; i < nbStations; i++){
+        for(y = 0; y < 10; y++){ // mettre max du define
+            if(mmArray[y]->id == stationArray[i]->id){
+                index[y] = i;
+            }
+            if(mmArray[nbStations-y]->id == stationArray[i]->id){
+                index[20-y] = i; // mettre la somme des deux define (à la place de 20) - y
+            }
+        }
+    }
+    for(i = 0; i < 20; i++){ // somme de 10 + 10 (define)
+        fprintf(file, "%d:%ld:%ld\n", stationArray[index[i]]->id, stationArray[index[i]]->capacity, stationArray[index[i]]->consumption_sum);
+    }
 
-//     return file;
-// }
+    return file;
+}
 
 // Calls output fonctions
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations) {
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stationArray, uint32_t nbStations, pStation* mmArray) {
     FILE* file = NULL;
     file = initOutputFile(stationType, consumerType, powerPlantID);
     if (file != NULL) {
-        writeOutputFile(stations, file, nbStations);
+        writeOutputFile(stationArray, file, nbStations);
         fclose(file);
     } else {
         exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
     }
 
     // lv_min_max process
-    if(strcmp(consumerType, "all") == 0) {
+    if((strcmp(stationType, "lv") == 0) && (strcmp(consumerType, "all") == 0)){
         FILE* lvMinMax = NULL;
-        // lvMinMax = initLvMinMax(lvMinMax, stations, nbStations);
-        if (file == NULL) {
+        lvMinMax = initLvMinMax(lvMinMax, stationArray, mmArray, nbStations);
+        if (file != NULL) { // CMT: j'ai mit !=, c'est ça normalement non ? It's late so my brain isn't braining anymore
             // fonction pour remplir le fichier
             fclose(lvMinMax);
         } else {
-
+            exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
         }
     }
 }

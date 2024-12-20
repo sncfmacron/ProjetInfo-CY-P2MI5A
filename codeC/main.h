@@ -12,4 +12,11 @@ typedef Station* pStation;
 
 #include "basics.h"
 
+extern pAVL globalTree;
+extern pStation* stationArray;
+extern uint32_t nbStations;
+
+void cleanup(void);
+void sortMinMax(char* stationType, char* consumerType);
+
 #endif
