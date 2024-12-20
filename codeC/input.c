@@ -12,7 +12,7 @@ pAVL processStation(const char *filePath, pAVL tree, pStation* stationArray, pSt
     if (file == NULL) {
         exit_with_message("ERROR : Sorted station file not found.", ERR_MISSING_FILE);
     }
-
+    
     char line[128];     // Buffer for each line of the file
     int id;
     long capacity;
@@ -24,7 +24,6 @@ pAVL processStation(const char *filePath, pAVL tree, pStation* stationArray, pSt
             int height = 0;
             stationArray[i] = createStation(id, capacity);
             tree = insertAVL(tree, stationArray[i], &height);
-            mmArray[i] = NULL;  // to properly free in case consumer type isn't "all"
             if(strcmp(consumerType, "all") == 0){
                 mmArray[i] = createStation(id, capacity);
             }

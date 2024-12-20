@@ -73,50 +73,38 @@ void writeOutputFile(pStation* stationArray, FILE* file, uint32_t nbStations){
         fprintf(file, "%d:%ld:%ld\n", stationArray[i]->id, stationArray[i]->capacity, stationArray[i]->load_sum);
     }
 
-    sleep(2);
     clock_t end = clock();
     displayTime(start, end, "Writing the output data completed successfully");
 }
 
 //
-FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
+FILE* initLvMinMax(FILE* file){
     // Verif stationArray
-    file = fopen("output/lv_all_minmax.csv", "w");
+    file = fopen(DIR_LV_MINMAX, "w");
     // vérif les droits d'écriture
-    fprintf(file, "Station LV:Capacity:Used capacity\n");
     return file;
 }
 
-FILE* initLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, uint32_t nbStations) {
+void writeOutputLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, uint32_t nbStations){
     if(mmArray == NULL || stationArray == NULL){
         exit_with_message("ERROR: Station array is NULL", 31418);
     }
-    fprintf(file, "Min and Max 'capacity-load' extreme nodes\n");
     fprintf(file, "Station LV:Capacity:Load(all)\n");
     uint32_t i = 0, y = 0;
-    uint32_t index[20]; // mettre un define pour 10 max et 10 min puis faire la somme des deux
+    uint32_t index[NB_MINMAX_STATIONS];
     for(i = 0; i < nbStations; i++){
-        for(y = 0; y < 10; y++){ // mettre max du define
+        for(y = 0; y < 10; y++){ // 10 = NB_MINMAX_STATIONS/2, for safety reason we put 10 because 'y' is an int 
             if(mmArray[y]->id == stationArray[i]->id){
                 index[y] = i;
             }
-            if(mmArray[nbStations-y]->id == stationArray[i]->id){
-                index[20-y] = i; // mettre la somme des deux define (à la place de 20) - y
+            if(mmArray[nbStations-1-y]->id == stationArray[i]->id){
+                index[NB_MINMAX_STATIONS-1-y] = i;
             }
         }
     }
-    for(i = 0; i < 20; i++){ // somme de 10 + 10 (define)
+    for(i = 0; i < NB_MINMAX_STATIONS; i++){
         fprintf(file, "%d:%ld:%ld\n", stationArray[index[i]]->id, stationArray[index[i]]->capacity, stationArray[index[i]]->load_sum);
     }
-
-    return file;
-}
-
-void writeOutputLvMinMax(FILE* file, pStation* stations, pStation* mmArray) {
-    for(int i=0; i<NB_MINMAX_STATIONS; i++){
-        fprintf(file, "%d:%ld\n", mmArray[i]->id, mmArray[i]->capacity);
-    }
-
 }
 
 // Calls output fonctions
@@ -133,9 +121,9 @@ void outputProcess(const char* stationType, const char* consumerType, const char
     // lv_min_max process
     if(strcmp(consumerType, "all") == 0){
         FILE* lvMinMax = NULL;
-        lvMinMax = initLvMinMax(lvMinMax, stationArray, nbStations);
+        lvMinMax = initLvMinMax(lvMinMax);
         if (lvMinMax != NULL) { // CMT: j'ai mit !=, c'est ça normalement non ? It's late so my brain isn't braining anymore
-            writeOutputLvMinMax(lvMinMax, stationArray, mmArray);
+            writeOutputLvMinMax(lvMinMax, stationArray, mmArray, nbStations);
             fclose(lvMinMax);
         } else {
             exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
