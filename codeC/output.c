@@ -25,7 +25,7 @@ const char* typeToPrint(const char* type){
         return "LV";
     }
     else {
-        exit_with_message("consumerType or stationType is invalid.", ERR_INVALID_ARGS);
+        exit_with_message("ERROR: 'consumerType' or 'stationType' is invalid.", ERR_INVALID_ARGS);
     }
 
     return NULL;
@@ -67,12 +67,11 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 
 // Writing calculated data in the output file
 void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
-    printf("Writing output data...\n\n");
     clock_t start = clock();
     
  
     for(int i=0; i<nbStations; i++){
-        fprintf(file, "%d:%ld:%ld\n", stations[i]->id, stations[i]->capacity, stations[i]->consumption_sum);
+        fprintf(file, "%d:%ld:%ld\n", stations[i]->id, stations[i]->capacity, stations[i]->load_sum);
     }
 
     sleep(2);
@@ -80,17 +79,27 @@ void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations){
     displayTime(start, end, "Writing the output data completed successfully");
 }
 
+//
+FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
+    // Verif stationArray
+    file = fopen("output/lv_all_minmax.csv", "w");
+    // vérif les droits d'écriture
+    fprintf(file, "Station LV:Capacity:Used capacity\n");
+    return file;
+}
 
-// FILE* initLvMinMax(FILE* file, pStation* stations, uint32_t nbStations) {
-//     // verif stationArray
-//     fprintf(file, "Station LV:Capacity:Used capacity\n");
-//     // 
+void writeOutputLvMinMax(FILE* file, pStation* stations, pStation* mmArray) {
+    for(int i=0; i<NB_MINMAX_STATIONS; i++){
+        fprintf(file, "%d:%ld\n", mmArray[i]->id, mmArray[i]->capacity);
+    }
 
-//     return file;
-// }
+}
 
 // Calls output fonctions
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations) {
+
+// CMT : remplacer stations par stationsArray ?
+
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nbStations, pStation* mmArray) {
     FILE* file = NULL;
     file = initOutputFile(stationType, consumerType, powerPlantID);
     if (file != NULL) {
@@ -103,12 +112,12 @@ void outputProcess(const char* stationType, const char* consumerType, const char
     // lv_min_max process
     if(strcmp(consumerType, "all") == 0) {
         FILE* lvMinMax = NULL;
-        // lvMinMax = initLvMinMax(lvMinMax, stations, nbStations);
-        if (file == NULL) {
-            // fonction pour remplir le fichier
+        lvMinMax = initLvMinMax(lvMinMax, stations, nbStations);
+        if (file != NULL) {
+            writeOutputLvMinMax(lvMinMax, stations, mmArray);
             fclose(lvMinMax);
         } else {
-
+            exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
         }
     }
 }

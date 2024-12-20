@@ -19,7 +19,7 @@ void verifyArguments(int argc, char* stationType, char* consumerType, char* powe
         exit_with_message("ERROR: Not enough parameters provided.", ERR_INVALID_ARGS);
     }
 
-    if(nbStations < 0) {
+    if(nbStations < 1) {
         exit_with_message("ERROR: Number of stations is invalid.", ERR_INVALID_ARGS);
     }
 
@@ -57,7 +57,7 @@ void displayTime(clock_t start, clock_t end, char* message) {
         seconds = 0;
     }
 
-    printf("[INFO] %s in %.3fs.\n", message, seconds);
+    printf("\n[INFO] %s in %.3fs.\n", message, seconds);
 }
 
 
@@ -70,7 +70,7 @@ pStation createStation(int station_id, long capacity) {
     }
     s->id = station_id;
     s->capacity = capacity;
-    s->consumption_sum = 0;
+    s->load_sum = 0;
 
     return s;
 }
