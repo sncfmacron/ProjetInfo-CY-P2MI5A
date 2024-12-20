@@ -116,15 +116,15 @@ void outputProcess(const char* stationType, const char* consumerType, const char
         exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
     }
 
-    // lv_min_max process
-    if((strcmp(stationType, "lv") == 0) && (strcmp(consumerType, "all") == 0)){
-        FILE* lvMinMax = NULL;
-        lvMinMax = initLvMinMax(lvMinMax, stationArray, mmArray, nbStations);
-        if (lvMinMax != NULL) { // CMT: j'ai mit !=, c'est ça normalement non ? It's late so my brain isn't braining anymore
-            // fonction pour remplir le fichier
-            fclose(lvMinMax);
-        } else {
-            exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
-        }
-    }
+    // // lv_min_max process
+    // if((strcmp(stationType, "lv") == 0) && (strcmp(consumerType, "all") == 0)){
+    //     FILE* lvMinMax = NULL;
+    //     lvMinMax = initLvMinMax(lvMinMax, stationArray, mmArray, nbStations);
+    //     if (lvMinMax != NULL) { // CMT: j'ai mit !=, c'est ça normalement non ? It's late so my brain isn't braining anymore
+    //         // fonction pour remplir le fichier
+    //         fclose(lvMinMax);
+    //     } else {
+    //         exit_with_message("ERROR: Output file writing failed.", ERR_FILE_CREATION);
+    //     }
+    // }
 }
