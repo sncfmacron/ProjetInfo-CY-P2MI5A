@@ -1,35 +1,40 @@
 /*
-    Contains constants for security and optimization
+    settings.h : contains constants for security and optimization
 */
 
 
 #ifndef SETTINGS_HEADER
 #define SETTINGS_HEADER
 
-#define ERROR_PIPE 1
+#define ERR_COMPILATION 1
 
-#define ERROR_PTR_ALLOC 2
-#define ERROR_AVL_ALLOC 3
-#define ERROR_FILE_ALLOC 4
+#define ERR_PTR_ALLOC 2
+#define ERR_AVL_ALLOC 3
 
-#define ERROR_INVALID_STATION_TYPE 5
-#define ERROR_INVALID_CONSUMER_TYPE 6
+#define ERR_MISSING_FILE 4
+#define ERR_FILE_CREATION 5
 
-#define ERROR_FILE_WRITE_FAILED 7
+#define ERR_INVALID_STATION_TYPE 6
+#define ERR_INVALID_CONSUMER_TYPE 7
 
-#define ERROR_INVALID_STRING 8
-#define ERROR_INVALID_STATION 9
+#define ERR_FILE_WRITE_FAILED 8
 
-#define MAX_BUFFER_SIZE 2048
+#define ERR_INVALID_STRING 9
+#define ERR_INVALID_STATION 10
 
-#define STATION_HVB 2
-#define STATION_HVA 1
-#define STATION_LV 0
+#define ERR_NULL_AVL 11
 
-#define CONSUMER_INDIV 0
-#define CONSUMER_COMP 1
-#define CONSUMER_ALL 2
+#define ERR_INPUT_FORMAT 12
 
-#define DIR_OUTPUT "./output/"
+#define ERR_INVALID_ARGS 13
+
+
+#define MAX_BUFFER_SIZE 8192  // (8 Ko)
+
+
+#define DIR_STATION_SORTED "tmp/station_sorted.csv"
+#define DIR_CONSUMER_SORTED "tmp/consumer_sorted.csv"
+#define DIR_OUTPUT "output/"
+#define DIR_LV_MINMAX "output/lv_all_minmax.csv"
 
 #endif

@@ -1,79 +1,62 @@
 /*
-    Functions to get data from c-wire.sh
+    input.c : functions to get data from c-wire.sh
 */
 
 
 #include "input.h"
 
 
-// Reading data from stdin with a pipe
-void processData(int stationType) {
-    
-    char buffer[MAX_BUFFER_SIZE];
+// Reading sorted station data from './tmp' directory
+pAVL processStation(const char *filePath, pAVL tree, pStation* stations) {
+    FILE *file = fopen(filePath, "r");
+    if (file == NULL) {
+        exit_with_message("ERROR : Sorted station file not found.", ERR_MISSING_FILE);
+    }
 
-    // On passe pour une pipe pour transmettre les données du shell vers program_c
-    // strok(str, delim) pour séparer l'entrée du shell en différentes chaines de caractères
+    char line[128];     // Buffer for each line of the file
+    int id;
+    long capacity;
+    uint32_t i = 0;         // Incremental value for the stations
+    while (fgets(line, sizeof(line), file)) {
+        // Read the current line with 'sscanf'
+        if (sscanf(line, "%d %ld", &id, &capacity) == 2) {
 
-    /*
-        Il faudra remplacer atol, aoi etc par strol c'est plus safe
-    */
+            int height = 0;
+            stations[i] = createStation(id, capacity);
+            tree = insertAVL(tree, stations[i], &height);
+            i++;
 
-    // On utilise clock de time_h pour mesurer le temps
-    clock_t start = clock();
-    
-
-    while (fgets(buffer, MAX_BUFFER_SIZE, stdin) != NULL) {
-        char *station_id_str = strtok(buffer, " ");
-        char *capacity_str = strtok(NULL, " ");
-        char *load_str = strtok(NULL, "\n");
-    
-        // Si capacity_str différent de "-" alors on étudie bien la capacité
-        if (strcmp(capacity_str, "-") != 0) {
-
-            // Convertir les chaines récupérées en haut en entier ou long
-            int station_id = string_to_int(station_id_str);
-            long capacity = atol(capacity_str);
-
-            pStation s = createStation(station_id, capacity, stationType);
-            printStation(s);
-            //insertAVL(s);
-
-
-        // Sinon on étudie un consommateur
-        } else if(strcmp(capacity_str, "-") == 0) {
-            int station_id = string_to_int(station_id_str);
-            long load = atol(load_str);
-            printf("\n- Station %d consumer : %ld kV\n\n", station_id, load);
-            //calcul(...)
         } else {
-            exit_with_message("ERROR: invalid entry in readData() function.", ERROR_PIPE);
+            exit_with_message("ERROR: Invalid sorted input file format", ERR_INPUT_FORMAT);
         }
     }
 
-    clock_t end = clock();
-    float seconds = getTime(end, start);
-
-    printf("\n--- Data transmitted successfully in %.2f seconds ---\n", seconds);
+    fclose(file);
+    return tree;
 }
 
 
-// Je mets ça ici pour test
-void printStation(pStation s) {
-
-    switch (s->type) {
-        case 2:
-            printf("Station type : HVB\n");
-            break;
-        case 1:
-            printf("Station type : HVA\n");
-            break;
-        case 0:
-            printf("Station type : LV\n");
-            break;
-        default:
-            exit_with_message("ERROR: printed station doesn't exist.", ERROR_PTR_ALLOC);
-            break;
+// Reading sorted consumer data from './tmp' directory
+void processConsumer(const char *filePath, pAVL tree)
+{
+    FILE *file = fopen(filePath, "r");
+    if (file == NULL) {
+        exit_with_message("ERROR : Sorted consumer file not found.", ERR_MISSING_FILE);
     }
-    printf("Station ID: %d\n", s->id);
-    printf("Capacity: %ld kV\n", s->capacity);
+
+    char line[128];
+    int id;
+    long load;
+
+    while (fgets(line, sizeof(line), file)) {
+        if (sscanf(line, "%d %ld", &id, &load) == 2) {
+            if (load > 0) {
+                updateSum(tree, id, load);
+            }
+        }  else {
+            exit_with_message("ERROR: Invalid sorted input file format.", ERR_INPUT_FORMAT);
+        }
+    }
+
+    fclose(file);
 }

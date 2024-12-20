@@ -1,19 +1,35 @@
 /*
-    Tree management
+    tree.c : contains tree management functions
 */
 
 
 #include "tree.h"
 
 
+// Updates a station consumption sum using recursive search in an AVL tree
+void updateSum(pAVL a, uint32_t stationID, long load) {
+    if(a == NULL || a->station == NULL) {
+        exit_with_message("ERROR: station doesn't exist.", ERR_INVALID_STATION);
+    }
+
+    if(a->station->id == stationID) {
+        a->station->consumption_sum += load;
+    } else if(a->station->id > stationID) {
+        updateSum(a->left, stationID, load);
+    } else {
+        updateSum(a->right, stationID, load);
+    }
+}
+
+
 pAVL createAVL(pStation s) {
     if(s == NULL){
-        exit_with_message("ERROR: station pointer is NULL.", ERROR_PTR_ALLOC);
+        exit_with_message("ERROR: station pointer is NULL.", ERR_PTR_ALLOC);
     }
     pAVL a = malloc(sizeof(AVL));
     if(a == NULL)
     {
-        exit_with_message("ERROR: AVL allocation failed.", ERROR_AVL_ALLOC);
+        exit_with_message("ERROR: AVL allocation failed.", ERR_AVL_ALLOC);
     }
 
     a->station = s;
@@ -23,45 +39,55 @@ pAVL createAVL(pStation s) {
     return a;
 }
 
+
 pAVL leftRotation(pAVL a){
-    if(a == NULL){
-        exit_with_message("ERROR: AVL sub-tree doesn't exist", 8);
+    if(a == NULL || a->right == NULL){
+        exit_with_message("ERROR: AVL sub-tree doesn't exist.", ERR_NULL_AVL);
     }
 
-    pAVL pivot = a->right;      // init the pivot as the right child of "a"
-    int ba_a = a->balance;      // temporary balance variable of:
-    int ba_p = pivot->balance;  // the sub-tree "a" (ba_a) and the pivot (ba_p)
+    pAVL pivot = a->right;      // Init the pivot as the right child of 'a'
+    int ba_a = a->balance;      // Temporary balance variable of:
+    int ba_p = pivot->balance;  // The sub-tree 'a' (ba_a) and the pivot (ba_p)
+    if(pivot->left != NULL){
+        a->right = pivot->left; // 'a' takes the left child of the pivot as its right child
+    } else{
+        a->right = NULL;
+    }
+    pivot->left = a;        // Left rotation: the pivot become the parent of 'a'
 
-    a->right = pivot->left; // "a" takes the left child of the pivot as its right child
-    pivot->left = a;        // left rotation: the pivot become the parent of "a"
-
-    a->balance = ba_a - max(ba_p, 0) - 1;               // updated "a" balance
-    pivot->balance = min3(ba_a-2, ba_a+ba_p-2, ba_p-1); // updated pivot balance
+    a->balance = ba_a - max(ba_p, 0) - 1;               // Updated 'a' balance
+    pivot->balance = min3(ba_a-2, ba_a+ba_p-2, ba_p-1); // Updated pivot balance
 
     return pivot;
 }
+
 
 pAVL rightRotation(pAVL a){
-    if(a == NULL){
-        exit_with_message("ERROR: AVL sub-tree doesn't exist", 8);
+    if(a == NULL || a->left == NULL){
+        exit_with_message("ERROR: AVL sub-tree doesn't exist", ERR_NULL_AVL);
     }
 
-    pAVL pivot = a->left;       // init the pivot as the left child of "a"
-    int ba_a = a->balance;      // temporary balance variable of:
-    int ba_p = pivot->balance;  // the sub-tree "a" (ba_a) and the pivot (ba_p)
+    pAVL pivot = a->left;       // Init the pivot as the left child of 'a'
+    int ba_a = a->balance;      // Remporary balance variable of:
+    int ba_p = pivot->balance;  // Rhe sub-tree 'a' (ba_a) and the pivot (ba_p)
 
-    a->left = pivot->right; // "a" takes the right child of the pivot as its left child
-    pivot->right = a;       // right rotation: the pivot become the parent of "a"
+    if(pivot->right != NULL){
+        a->left = pivot->right; // 'a' takes the right child of the pivot as its left child
+    } else{
+        a->left = NULL;
+    }
+    pivot->right = a;       // Rght rotation: the pivot become the parent of 'a'
 
-    a->balance = ba_a - min(ba_p, 0) + 1;               // updated "a" balance
-    pivot->balance = max3(ba_a+2, ba_a+ba_p+2, ba_p+1); // updated pivot balance
+    a->balance = ba_a - min(ba_p, 0) + 1;               // Updated 'a' balance
+    pivot->balance = max3(ba_a+2, ba_a+ba_p+2, ba_p+1); // Updated pivot balance
 
     return pivot;
 }
+
 
 pAVL balanceAVL(pAVL a){
     if(a == NULL){
-        exit_with_message("ERROR: AVL sub-tree doesn't exist", 8);
+        exit_with_message("ERROR: AVL sub-tree doesn't exist.", ERR_NULL_AVL);
     }
     if(a->balance >= 2){                // Left rotation
         if(a->right->balance >= 0){     // Single left rotation
@@ -84,14 +110,18 @@ pAVL balanceAVL(pAVL a){
     return a; // if the AVL is already balanced
 }
 
+
 pAVL insertAVL(pAVL a, pStation s, int* h){
     if(s == NULL){
-        exit_with_message("ERROR: Station doesn't exist", 5);
+        exit_with_message("ERROR: Station doesn't exist.", ERR_INVALID_STATION);
     }
 
     if(a == NULL){
         *h = 1; // new node increase the height of his parent node
         return createAVL(s);
+    }
+    if(a->station == NULL){
+        exit_with_message("ERROR: station doesn't exist.", ERR_INVALID_STATION);
     }
     else if(s->id < a->station->id){
         a->left = insertAVL(a->left, s, h);
@@ -120,14 +150,15 @@ pAVL insertAVL(pAVL a, pStation s, int* h){
     return a;
 }
 
+
 void cleanAVL(pAVL a) {
     if(a == NULL)
     {
         return;
     }
-
+    a->station=NULL;
     cleanAVL(a->left);
     cleanAVL(a->right);
-    free(a->station);
+    // créer fonction pour cleanArray
     free(a);
 }

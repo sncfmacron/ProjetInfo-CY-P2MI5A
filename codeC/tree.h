@@ -1,5 +1,5 @@
 /*
-    Library for tree.h
+    tree.h : library for tree.h
 */
 
 
@@ -11,9 +11,8 @@
 // Structures
 typedef struct Station_struct {
     uint32_t id;
-    long consumption_sum;
     long capacity;
-    uint8_t type; // STATION_HVB, STATION_HVA or STATION_LV
+    long consumption_sum;
 } Station;
 
 typedef struct AVL_struct {
@@ -26,11 +25,12 @@ typedef struct AVL_struct {
 typedef AVL* pAVL;
 typedef Station* pStation;
 
+void updateSum(pAVL a, uint32_t stationID, long load);
 pAVL insertAVL(pAVL a, pStation s, int* h);
 pAVL createAVL(pStation s);
-void cleanAVL(pAVL a);
 pAVL leftRotation(pAVL a);
 pAVL rightRotation(pAVL a);
 pAVL balanceAVL(pAVL a);
+void cleanAVL(pAVL a);
 
 #endif

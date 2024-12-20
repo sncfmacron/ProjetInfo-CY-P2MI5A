@@ -4,11 +4,23 @@
 # Shell script to compile program_c and sort data
 
 
+# Error code declaration
+ERR_INVALID_PARAMETER=100
+ERR_INVALID_FILTER=101
+ERR_FILE_MISSING=102
+ERR_FILE_CREATION=103
+ERR_COMPILATION=104
+PROGRAM_ABORTED=105
+
+
+# Variable declaration to set the text in bold using 'tput'
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+
 # Displays the program help manual
 display_help() {
-    # We use 'tput' to set the text in bold
-    bold=$(tput bold)
-    normal=$(tput sgr0)
+    # We use 'tput' to set the text in bold to make the text more aesthetic
 
     echo "${bold} NAME ${normal}"
     echo "      c-wire - data managing"
@@ -17,7 +29,7 @@ display_help() {
     echo "      This program processes data for an electricity distribution."
     echo ""
     echo "${bold} SYNOPSIS ${normal}"
-    echo "      $0 [file_path.csv] [station_type] [consumer_type] [power_plant_id]"
+    echo "      ./c-wire.sh [file_path.csv] [station_type] [consumer_type] [power_plant_id]"
     echo ""
     echo "${bold} OPTIONS ${normal}"
     echo "     ${bold} [file_path.csv] ${normal}  Location of the input file (required)"
@@ -35,7 +47,7 @@ display_help() {
     echo "      * hva indiv"
     echo ""
     echo "${bold} EXAMPLE ${normal}"
-    echo "      $0 input/DATA_CWIRE.csv lv comp 3"
+    echo "      ./c-wire.sh input/DATA_CWIRE.csv lv comp 3"
     echo ""
     exit 0
 }
@@ -43,12 +55,20 @@ display_help() {
 
 # Displays reduced program help
 display_mini_help() {
-    bold=$(tput bold)
-    normal=$(tput sgr0)
     echo ""
-    echo "${bold}Usage${normal}: $0 [path_file.csv] [station_type] [consumer_type] [power_plant_id]"
-    echo "Use -h parameter to get full help."
-    exit 1
+    echo "Usage: ./c-wire.sh [path_file.csv] [station_type] [consumer_type] [power_plant_id]"
+    echo "Use ${bold}-h${normal} parameter to get full help."
+    exit "$ERR_INVALID_PARAMETER"
+}
+
+
+# Verifies the presence of a file
+verifyFilePresence () {
+    filePath="$1"
+    if [[ ! -f "$filePath" ]]; then
+        echo "ERROR: File $filePath is missing."
+        exit "$ERR_FILE_MISSING"
+    fi
 }
 
 
@@ -64,7 +84,7 @@ verifyParameters() {
     done
 
     # Verifying number of parameters
-    if [ $# -gt 5 ] || [ $# -lt 1 ]; then
+    if [[ $# -gt 5 ]] || [[ $# -lt 1 ]]; then
         echo "You must provide at least the path to your input file, the station type and the consumer type."
         display_mini_help
     fi
@@ -113,27 +133,7 @@ verifyParameters() {
 
 # Clean folders and unused file
 cleanFolders () {
-    rm -rf temp/*
-}
-
-
-# Starts program_c compilation using 'make'
-compilation () {
-    # If program_c doesn't exist we start the compilation
-
-    if [ ! -f codeC/program_c ]; then
-        # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
-        make --no-print-directory -C codeC
-
-        # Checks that compilation has gone well
-        if [ $? -ne 0 ]; then
-            echo "ERROR : compilation error."
-            exit 2
-        fi  
-    else
-        echo "INFO: 'program_c' is already present, compilation is not executed."
-        echo ""
-    fi
+    rm -rf tmp/*
 }
 
 
@@ -142,108 +142,172 @@ processFolders () {
     cleanFolders
 
     # These folders are created if they don't exist. If they exist, nothing happens
-    mkdir -p graphs input temp output
+    mkdir -p graphs input tmp output
 }
 
 
-# Displays the execution time of a function
-displayTime () {
-    # We use 'tput' to set the text in bold
-    bold=$(tput bold)
-    normal=$(tput sgr0)
-
-    START_TIME="$1"
-    END_TIME="$2"
-
-    ELAPSED_TIME=$((END_TIME - START_TIME))
-
-    # Conversion to seconds and milliseconds
-    SECONDS=$((ELAPSED_TIME / 1000000000))
-    MILLISECONDS=$(((ELAPSED_TIME % 1000000000) / 1000000))
-    
-    echo ""
-    echo "--- The program was successfully completed in $bold${SECONDS}.${MILLISECONDS}$normal seconds ---"
-}
-
-
-# Sorting data function and transmission to program_c
-sortingData () {
-
-    # We use 'awk' to sort data through a pipe (standard input) and filters to send only relevant informations.
-    # Options in 'awk' line : -F to indicate separating character, -v to indicate a variable.
-
-    # 'date' command gives the elapsed seconds since 01/01/1970.
-
-    START_TIME=$(date +%s%N)
-
-
-    filePath="$1"
-    stationType="$2"
-    consumerType="$3"
-    powerPlantID="$4"
-
-    case "$2" in
-        hvb)
-            filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" { print $2, $7, $8 }'
-            sleep 2
-            ;;
-        hva)
-            filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" { print $3, $7, $8 }'
-            ;;
-        lv)
-            case "$3" in
-                all)
-                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" { print $4, $7, $8 }'
-                    ;;
-                comp)
-                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" { print $4, $7, $8 }'
-                    ;;
-                indiv)
-                    filter='NR > 2 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" { print $4, $7, $8 }'
-                    ;;
-            esac
-                ;;
-    esac
-
-    # We send data through a pipe with arguments like 'stationType' so the program process the right type of station
-    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$filePath" | ./codeC/program_c "$stationType" "$consumerType" "$powerPlantID"
-
-
-    END_TIME=$(date +%s%N)
-
-    displayTime "$START_TIME" "$END_TIME"
-}
-
-
-# Function to make graphs using output files
-makeGraphs () {
-
-    if [ -f "output/lv_all.csv" ]; then
-        if ! command -v gnuplot &>/dev/null; then
-            echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
-            exit 3
-        else 
-            echo "Gnuplot is installed."
-            # Script pour créer des graphiques (voir branche Guirec)
+# Starts program_c compilation using 'make'
+compilation () {
+    # Compile if the program is absent
+    if [[ ! -f codeC/program_c ]]; then
+        echo "[INFO] 'program_c' is absent, compilation is executed."
+        
+        # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
+        make  --no-print-directory -C codeC
+        
+        # Checks that compilation has gone well
+        if [[ $? -ne 0 ]]; then
+            echo "ERROR : Compilation error."
+            exit "$ERR_COMPILATION"
         fi
     fi
 }
 
 
-# Function calls
-verifyParameters "$@"
+# Displays the execution time of a function
+displayTime() {
+    local timeMsg="$1"
+    local startTime="$2"
+    local endTime=$(date +%s%N)
 
-processFolders
+    local elapsedTime=$((endTime - startTime))
 
-compilation "$2" "$3"
+    local seconds=$((elapsedTime / 1000000000))
+    local milliseconds=$(((elapsedTime % 1000000000) / 1000000))
 
-sortingData "$@"
+    echo
+    echo "[INFO] ${timeMsg} in $seconds.${milliseconds:1:3} seconds."
+}
 
-cleanFolders
 
-makeGraphs
+# Produces the data filter corresponding to the request
+awkFilter () {
+    case "$2" in
+        hvb) 
+            filter='
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $7 != "-" { print $2, $7 > "tmp/station_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $2 != "-" && $3 == "-" && $8 != "-" { print $2, $8 > "tmp/consumer_sorted.csv" }
+            '
+            ;;
+        hva)
+            filter='
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $7 != "-" { print $3, $7 > "tmp/station_sorted.csv" }
+            NR > 1 && (custom_id == "" || $1 == custom_id) && $3 != "-" && $4 == "-" && $8 != "-" { print $3, $8 > "tmp/consumer_sorted.csv" }
+            '
+            ;;
+        lv)
+            case "$3" in
+                all)
+                    filter='
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv" }
+                    '
+                    ;;
+                comp)
+                    filter='
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv" }
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $6 == "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv" }
+                    '
+                    ;;
+                indiv)
+                    filter='
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $7 != "-" { print $4, $7 > "tmp/station_sorted.csv"}
+                    NR > 1 && (custom_id == "" || $1 == custom_id) && $4 != "-" && $5 == "-" && $8 != "-" { print $4, $8 > "tmp/consumer_sorted.csv"}
+                    '
+                    ;;
+            esac
+                ;;
+    esac
 
-# Je mets ça pour pouvoir test plus facilement
-rm codeC/program_c
+    if [[ "$filter" == "" ]]; then
+        echo "ERROR: Data filter creation failed."
+        exit "$ERR_INVALID_FILTER"
+    fi
+}
+# CHANGER SORTED EN EXTRACTED par exemple et mettre en variable (en define (comme en C))
+# Count the number of lines in the sorted file
+stationCount () {
+    verifyFilePresence "tmp/station_sorted.csv"
+    stationNumber=$(wc -l < tmp/station_sorted.csv)
+}
 
-exit 0
+# Sorting data function
+sortingData () {
+    # We use 'awk' to sort data in temporary '.csv' files, read by program_c and filters only relevant informations.
+    # Options in 'awk' line : -F to indicate separating character, -v to indicate a variable.
+
+    # 'date' command gives the elapsed seconds since 01/01/1970.
+
+    local startTime=$(date +%s%N)
+
+    inputFilePath="$1"
+    stationType="$2"
+    consumerType="$3"
+    powerPlantID="$4"
+
+    echo "Starting data processing for station type '$stationType' and consumer type '$consumerType'..."
+
+    awkFilter "$@"
+
+    awk -F ';' -v custom_id="$powerPlantID" "$filter" "$inputFilePath" > /dev/null
+
+    verifyFilePresence "tmp/station_sorted.csv"
+
+    verifyFilePresence "tmp/consumer_sorted.csv"
+
+    displayTime "$inputFilePath sorted" "$startTime"
+
+    stationCount
+
+    codeC/program_c $stationType $consumerType $stationNumber $powerPlantID
+}
+
+# Function to make graphs using output files
+makeGraphs () {
+    local stationType="$1"
+    local consumerType="$2"
+
+    if [[ "$1" == "lv" && "$2" == "all" ]]; then
+       if ! command -v gnuplot &>/dev/null; then
+            echo "Gnuplot is not installed. Use 'sudo apt install gnuplot' to install it."
+            exit 1
+        else
+            verifyFilePresence "gnuplot_LVminmax.gp"
+            echo ""
+            echo "Making graphs..."
+
+            gnuplot gnuplot_LVminmax.gp
+
+            echo ""
+            echo "[INFO] The graph has been successfully created in './graphs'."
+        fi
+    fi
+}
+
+# Functions calls
+runProgram () {
+    
+    echo
+
+    verifyParameters "$@"
+
+    processFolders
+
+    compilation
+
+    # Start processing
+    startTime=$(date +%s%N)
+
+    sortingData "$@"
+    
+    displayTime "Program completed successfully" "$startTime" # modifier les messages plus tard (j'ai une présentation, on verra plus tard)
+    
+    makeGraphs "$2" "$3"
+
+    displayTime "Program completed successfully with Graphs" "$startTime"
+    echo
+
+    exit 0
+}
+
+runProgram "$@"
