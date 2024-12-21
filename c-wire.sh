@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-# Shell script to compile program_c and sort data
+# c-wire.sh : shell script to compile program_c and sort data
 
 
 # Error code declaration
@@ -290,11 +290,6 @@ sortingData () {
     codeC/program_c $stationType $consumerType $stationNumber $powerPlantID
 }
 
-
-getMaxLoad () {
-    maxLoad=$(tail -n 1 "$DIR_LVMINMAX" | awk -F ':' '{print $3}')
-}
-
 # Function to make graphs using output files
 makeGraphs () {
     local filePath="$1"
@@ -317,15 +312,13 @@ makeGraphs () {
             echo
             echo "Making graphs..."
 
-            getMaxLoad
-
-            gnuplot -e "maxLoad=${maxLoad}" gnuplot_LVminmax.gp
+            gnuplot gnuplot_LVminmax.gp
 
             # Checks that gnuplot program has gone well
             if [[ $? -ne 0 ]]; then
                 echo "${bold}[ERROR]${normal} Gnuplot error."
             else
-                displayTime "...3. The graph has been created in ${blue}./graphs${normal}" "$startTime"
+                displayTime "...3. Graphs has been created in ${blue}./graphs${normal}" "$startTime"
             fi
         fi
     fi
