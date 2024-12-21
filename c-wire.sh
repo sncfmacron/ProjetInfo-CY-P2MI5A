@@ -7,24 +7,23 @@
 # Error code declaration
 
 ERR_INVALID_PARAMETER=100
-ERR_INVALID_FILTER=101
-ERR_FILE_MISSING=102
-ERR_FILE_CREATION=103
-ERR_COMPILATION=104
-PROGRAM_ABORTED=105
-PROGRAM_NOT_FOUND=106
+ERR_FILE_MISSING=101
+ERR_INVALID_FILTER=102
+ERR_COMPILATION=103
 
 # Directories declaration
 
-DIR_EXTRACTED_STATION="tmp/extracted_station.csv"
-DIR_EXTRACTED_CONSUMER="tmp/extracted_consumer.csv"
-DIR_GNUPLOT_PROGRAM="gnuplot_LVminmax.gp"
-DIR_LVMINMAX="output/lv_all_minmax.csv"
+DIR_EXTRACTED_STATION="tmp/extracted_station.csv"       # Temporary file to store extracted stations
+DIR_EXTRACTED_CONSUMER="tmp/extracted_consumer.csv"     # Temporary file to store extracted consumers
+DIR_GNUPLOT_PROGRAM="gnuplot_LVminmax.gp"               # Path to the Gnuplot program
+DIR_LV_MIN_MAX="output/lv_all_minmax.csv"               # Path to the file used to make graphs
 
-# Variable declaration to set the text in bold or in red using 'tput'
+# Variable declaration to define the text color and appearance in the terminal
 
 bold=$(tput bold)
 normal=$(tput sgr0)
+underline='\e[4m'
+
 yellow='\033[1;33m'
 red='\033[1;31m'
 darkred='\033[0;31m'
@@ -32,18 +31,16 @@ blue='\033[1;36m'
 normalColor='\033[0m'
 
 
-# Displays the program help manual
-display_help() {
-    # We use 'tput' to set the text in bold to make the text more aesthetic
-
+# Display the c-wire help manual
+displayHelp() {
     echo "${bold} NAME ${normal}"
-    echo "      c-wire - data managing"
+    echo "      c-wire - Data managing"
     echo
     echo "${bold} DESCRIPTION ${normal}"
     echo "      This program processes data for an electricity distribution."
     echo
     echo "${bold} SYNOPSIS ${normal}"
-    echo "      $0 [FILE_PATH.csv] [STATION_TYPE] [CONSUMER_TYPE] [POWER_PLANT_ID] ..."
+    echo -e "      $0 [${underline}FILE_PATH.csv${normal}] [${underline}STATION_TYPE${normal}] [${underline}CONSUMER_TYPE${normal}] [${underline}POWER_PLANT_ID${normal}] ..."
     echo
     echo "${bold} OPTIONS ${normal}"
     echo "     ${bold} [FILE_PATH.csv] ${normal}  Location of the input file (required)"
@@ -67,18 +64,25 @@ display_help() {
     echo
     echo "${bold} EXAMPLE ${normal}"
     echo "      $0 input/DATA_CWIRE.csv lv comp 3"
-    echo
     exit 0
 }
 
-# Displays reduced program help
-display_mini_help() {
-    echo "Usage: $0 [path_file.csv] [station_type] [consumer_type] [power_plant_id]"
-    echo "Use -h parameter to get full help."
+# Display the reduced c-wire help manual
+displayMiniHelp() {
+    echo
+    echo "Usage: $0 [FILE_PATH.csv] [STATION_TYPE] [CONSUMER_TYPE] [POWER_PLANT_ID] ..."
+    echo "Use ${bold}-h${normal} option for full help."
     exit "$ERR_INVALID_PARAMETER"
 }
 
-# Verifies the presence of a file
+# Display the program version
+displayVersion () {
+    echo "c-wire ${bold}v1.6.0${normal}"
+    echo "Written by Nathan Choupin, Romain Michaut-Joyeux and Guirec Vetier | MI5-A group." 
+    exit 0
+}
+
+# Verify the presence of the specified file, exit the program if the file is missing
 verifyFilePresence () {
     filePath="$1"
     if [[ ! -f "$filePath" ]]; then
@@ -87,25 +91,18 @@ verifyFilePresence () {
     fi
 }
 
-# Displays the program version
-displayVersion () {
-    echo "c-wire ${bold}v1.6.0${normal}"
-    echo "Written by Nathan Choupin, Romain Michaut-Joyeux and Guirec Vetier." 
-    exit 0
-}
-
-# Parameters verification
+# Validate parameters to run the program, exit the program if the parameters are invalid
 verifyParameters() {
-    # Verifies if "-h" is present
+    # Check if "-h" is present
     for option in "$@"; do
         case $option in
             -h) 
-                display_help
+                displayHelp
             ;;
         esac
     done
 
-    # Verifies if "--version" is present
+    # Check if "--version" is present
     for option in "$@"; do
         case $option in
             --version) 
@@ -114,59 +111,59 @@ verifyParameters() {
         esac
     done
 
-    # Verifying number of parameters
+    # Verify the number of parameters
     if [[ $# -gt 5 ]] || [[ $# -lt 1 ]]; then
         echo -e "[${darkred}WARNING${normal}] You must provide at least the path to your input file, the station type and the consumer type."
-        display_mini_help
+        displayMiniHelp
     fi
 
-    # Verifying first parameter
+    # Verify the first parameter
     if [[ ! -f "$1" ]]; then
         echo -e "[${darkred}WARNING${normal}] The first option must indicate a path to a valid '.csv' file."
-        display_mini_help
+        displayMiniHelp
     fi
 
-    # Verifying second parameter
+    # Verify the second parameter
     case "$2" in
         hva|hvb|lv)
             ;;
         *)
             echo -e "[${darkred}WARNING${normal}] Second option must be ${red}hva${normal}, ${red}hvb${normal}, or ${red}lv${normal}."
-            display_mini_help
+            displayMiniHelp
             ;;
     esac
 
-    # Verifying third parameter
+    # Verify the third parameter
     case "$3" in
         comp|indiv|all)
-            # Preventing invalid combinations
+            # Prevent invalid combinations
             if [[ "$2" == "hvb" && "$3" == "all" ]] || [[ "$2" == "hvb" && "$3" == "indiv" ]] || [[ "$2" == "hva" && "$3" == "all" ]] || [[ "$2" == "hva" && "$3" == "indiv" ]]; then
                 echo -e "[${darkred}WARNING${normal}] The following combinations are forbidden: ${red}hvb all${normal}, ${red}hvb indiv${normal}, ${red}hva all${normal}, and ${red}hva indiv${normal}."
-                display_mini_help
+                displayMiniHelp
             fi
             ;;
         *)
             echo -e "[${darkred}WARNING${normal}] The third option must be ${red}comp${normal}, ${red}indiv${normal}, or ${red}all${normal}."
-            display_mini_help
+            displayMiniHelp
             ;;
     esac
 
-    # Verifying fourth parameter (valid powerplant identifier)
-    # 'grep' checks if the id exists in input file
+    # Verify the fourth parameter if it is provided (valid power plant identifier)
+    # The grep command checks if the identifier exists in the first column of the input file
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
-            echo -e "[${darkred}WARNING${normal}] The fourth option must be a valid power plant identifier."
-            display_mini_help
+            echo -e "$[${darkred}WARNING${normal}] '"$4"' is not a valid power plant identifier."
+            displayMiniHelp
         fi
     fi
 }
 
-# Clean folders and unused file
+# Clean temporary folder before and after program execution
 cleanFolders () {
     rm -rf tmp/*
 }
 
-# Prepares directories for program execution
+# Set up directories for program execution
 processFolders () {
     cleanFolders
 
@@ -174,17 +171,17 @@ processFolders () {
     mkdir -p graphs input tmp output
 }
 
-# Starts program_c compilation using 'make'
+# Start the C program compilation using make to automate the build process
 compilation () {
-    # Compile if the program is absent
+    # Start compilation only if the executable program is absent
     if [[ ! -f codeC/program_c ]]; then
         echo -e "${bold}[INFO]${normal} ${yellow}program_c${normal} is absent, compilation is executed."
         echo
         
-        # --no-print-directory option is used to avoid 'make' sending messages when browsing files.
+        # '--no-print-directory' option is used to avoid make sending information messages when browsing files.
         make  --no-print-directory -C codeC
         
-        # Checks that compilation has gone well
+        # Check that compilation has been completed successfully and stop the program if necessary
         if [[ $? -ne 0 ]]; then
             echo "${bold}[ERROR]${normal} Compilation error."
             exit "$ERR_COMPILATION"
@@ -192,7 +189,8 @@ compilation () {
     fi
 }
 
-# Displays the execution time of a function
+# Display the execution time of a function with a precision of two decimal
+# date command gives the nanoseconds elapsed since 01/01/1970
 displayTime() {
     local timeMsg="$1"
     local startTime="$2"
@@ -200,6 +198,7 @@ displayTime() {
 
     local elapsedTime=$((endTime - startTime))
 
+    # Converting nanoseconds into seconds and milliseconds
     local seconds=$((elapsedTime / 1000000000))
     local milliseconds=$(((elapsedTime % 1000000000) / 1000000))
 
@@ -207,7 +206,8 @@ displayTime() {
     echo -e "${timeMsg} in $seconds.${milliseconds:1:3}s."
 }
 
-# Produces the data filter corresponding to the request
+# Create two filters for consumers and stations to extract only the data required for the user's requested analysis
+# We added a condition that checks if the user has specified a power plant plant id or not
 awkFilter () {
     case "$2" in
         hvb) 
@@ -246,24 +246,23 @@ awkFilter () {
                 ;;
     esac
 
+    # Exit the program if the filter is empty
     if [[ "$filter" == "" ]]; then
         echo "${bold}[ERROR]${normal} Data filter creation failed."
         exit "$ERR_INVALID_FILTER"
     fi
 }
 
-# Count the number of lines in the sorted file
+# Count the number of lines in the sorted file. This will be useful for allocating memory in the C program
 stationCount () {
     verifyFilePresence "$DIR_EXTRACTED_STATION"
     stationNumber=$(wc -l < "$DIR_EXTRACTED_STATION")
 }
 
-# Sorting data function
+# Sort relevant data from input file
 sortingData () {
-    # We use 'awk' to sort data in temporary '.csv' files, read by program_c and filters only relevant informations.
-    # Options in 'awk' line : -F to indicate separating character, -v to indicate a variable.
-
-    # 'date' command gives the elapsed seconds since 01/01/1970.
+    # We use awk to extract and write data in two temporary '.csv' files, read by the C program for processing
+    # Options in awk line : -F to indicate the separating character and -v to indicate a variable
 
     local startTime=$(date +%s%N)
 
@@ -275,10 +274,13 @@ sortingData () {
     echo
     echo -e "Starting data processing for station type ${red}$stationType${normalColor} and consumer type ${red}$consumerType${normalColor}..."
 
+    # Creating filters to extract only relevant informations
     awkFilter "$@"
 
+    # Redirecting to /dev/null prevents standard output from appearing and keeps terminal clean
     awk -F ';' -v custom_id="$powerPlantID" -v stationFile="$DIR_EXTRACTED_STATION" -v consumerFile="$DIR_EXTRACTED_CONSUMER" "$filter" "$inputFilePath" > /dev/null
 
+    # Check if the extraction and the writing has been completed successfully
     verifyFilePresence "$DIR_EXTRACTED_STATION"
 
     verifyFilePresence "$DIR_EXTRACTED_STATION"
@@ -287,36 +289,39 @@ sortingData () {
 
     stationCount
 
+    # We run the C program with the useful parameters
     codeC/program_c $stationType $consumerType $stationNumber $powerPlantID
 }
 
-# Function to make graphs using output files
+# Create graphs using output files in case of "lv all" analysis
 makeGraphs () {
+    verifyFilePresence "$DIR_GNUPLOT_PROGRAM"
+
     local filePath="$1"
     local stationType="$2"
     local consumerType="$3"
     local startTime=$(date +%s%N)
 
+    # Check if the user has typed "lv all" and verify that gnuplot is present on the user's computer
     if [[ "$stationType" == "lv" && "$consumerType" == "all" ]]; then
         if ! command -v gnuplot &>/dev/null; then
             echo
             echo -e "[${darkred}WARNING${normal}] Gnuplot is not installed. Type ${yellow}sudo apt install gnuplot${normal} to install it."
 
-        elif [[ ! -f "$DIR_LVMINMAX" ]]; then
+        elif [[ ! -f "$DIR_LV_MIN_MAX" ]]; then
             echo
-            echo -e "[${darkred}WARNING${normal}] File $DIR_LVMINMAX not found : skipping graph creation..."
-            exit "$PROGRAM_NOT_FOUND"
-
+            echo -e "[${darkred}WARNING${normal}] File $DIR_LV_MIN_MAX not found : skipping graph creation..."
+            
         else
-            verifyFilePresence "$DIR_GNUPLOT_PROGRAM"
             echo
             echo "Making graphs..."
 
+            # Start Gnuplot program
             gnuplot gnuplot_LVminmax.gp
 
-            # Checks that gnuplot program has gone well
+            # Checks that gnuplot program has been completed successfully
             if [[ $? -ne 0 ]]; then
-                echo "${bold}[ERROR]${normal} Gnuplot error."
+                echo "${bold}[ERROR]${normal} Gnuplot error: see program output for more information."
             else
                 displayTime "...3. Graphs has been created in ${blue}./graphs${normal}" "$startTime"
             fi
@@ -324,7 +329,7 @@ makeGraphs () {
     fi
 }
 
-# Functions calls
+# Main function: calls all functions
 runProgram () {
 
     echo
@@ -335,7 +340,7 @@ runProgram () {
 
     compilation
 
-    # Start processing
+    # Start processing data
     startTime=$(date +%s%N)
 
     sortingData "$@"
