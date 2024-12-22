@@ -41,9 +41,9 @@ To run the program, use `./c-wire.sh [FILE_PATH.csv] [STATION_TYPE] [CONSUMER_TY
 ## EXAMPLES
 Example 1: `./c-wire.sh input/DATA_CWIRE.csv hva comp`. 
 
-Example 2: `./c-wire.sh input/DATA_CWIRE.csv lv indiv 4`
+Example 2: `./c-wire.sh input/DATA_CWIRE.csv lv indiv 4`.
 
-Example 3: `./c-wire.sh input/DATA_CWIRE.csv lv all`
+Example 3: `./c-wire.sh input/DATA_CWIRE.csv lv all`.
 
 ## Overview
 - The script `c-wire.sh` allows you to enter options to identify specific stations, checks the integrity of all files and sorts the useful data for station processing. It launches compilation using `make` and produces graphics using `GnuPlot` in case of **lv all**. It ensures the existence of required directories (`tmp`, `graphs`, `output`) or creates them as needed.
@@ -59,3 +59,5 @@ Example 3: `./c-wire.sh input/DATA_CWIRE.csv lv all`
 - `settings.h` contains multiple constants used to guarantee program security and optimization.
 
 - `tree.c` contains functions for AVL tree management.
+
+- The script `gnuplot_LVminmax.gp` is used to generate bar graphs of the 10 most and 10 least loaded stations from the program's output data, if the user types the combination “lv all”.
