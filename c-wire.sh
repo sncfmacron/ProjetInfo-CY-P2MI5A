@@ -362,6 +362,7 @@ runProgram () {
 
     echo
     displayTime "Program completed successfully" "$startTime"
+    echo
 
     exit 0
 }
