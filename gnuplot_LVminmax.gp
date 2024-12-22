@@ -19,7 +19,7 @@ set grid ytics                          # Add grid lines on the y axis
 
 set xtics 1                             # Set the tick marks on the x axis to appear every 1 unit
 
-set xlabel "Station Order (ID)"         # Set the label for the x axis (Station IDs)
+set xlabel "Station Order"              # Set the label for the x axis
 set ylabel "Load (kWh)"                 # Set the label for the y axis (Load)
 
 set yrange [0:*]                        # Set the Y-axis range to start from 0, and auto scale upwards
