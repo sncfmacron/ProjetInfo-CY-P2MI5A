@@ -60,4 +60,4 @@ Example 3: `./c-wire.sh input/DATA_CWIRE.csv lv all`.
 
 - `tree.c` contains functions for AVL tree management.
 
-- The script `gnuplot_LVminmax.gp` script is used to generate bar graphs of the 10 most and 10 least loaded stations from the program's output data, if the user types the combination “lv all”.
+- The script `gnuplot_LVminmax.gp` is used to generate bar graphs of the 10 most and 10 least loaded stations from the program's output data, if the user types the combination “lv all”.
