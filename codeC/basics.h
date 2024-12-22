@@ -1,5 +1,5 @@
 /*
-    basics.h : contains the basic structures and libraries
+    basics.h: contains the basic structures and libraries
 */
 
 
@@ -18,7 +18,7 @@
 typedef struct Station_struct Station;
 typedef Station* pStation;
 
-
+// Include of others headers
 #include "input.h"
 #include "output.h"
 #include "settings.h"
@@ -27,7 +27,7 @@ typedef Station* pStation;
 
 // Functions declaration
 void exit_with_message(const char *message, int error_code);
-void verifyArguments(int argc, char* stationType, char* consumerType, char* powerPlantID, uint32_t nbStations);
+void verifyArguments(int argc, char* stationType, char* consumerType, uint32_t nbStations, char* powerPlantID);
 int string_to_int(const char* string);
 void displayTime(clock_t start, clock_t end, char* message);
 pStation createStation(int station_id, long capacity);

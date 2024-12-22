@@ -1,5 +1,5 @@
 /*
-    main.h : main program library
+    main.h: main program library
 */
 
 
@@ -12,10 +12,12 @@ typedef Station* pStation;
 
 #include "basics.h"
 
+// Exclusive arguments for main.c
 extern pAVL globalTree;
 extern pStation* stationArray;
 extern uint32_t nbStations;
 
+// Function declaration
 void cleanup(void);
 
 #endif

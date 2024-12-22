@@ -1,5 +1,5 @@
 /*
-    tree.h : library for tree.h
+    tree.h: library for tree.h
 */
 
 
@@ -22,9 +22,11 @@ typedef struct AVL_struct {
     int balance;
 } AVL;
 
+// Typedef for easier understanding of the code
 typedef AVL* pAVL;
 typedef Station* pStation;
 
+// Functions declaration
 void updateSum(pAVL a, uint32_t stationID, long load);
 pAVL createAVL(pStation s);
 pAVL leftRotation(pAVL a);

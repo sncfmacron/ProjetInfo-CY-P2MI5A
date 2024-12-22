@@ -294,7 +294,7 @@ filterData () {
 }
 
 # Create graphs using output files in case of "lv all" analysis
-makeGraphs () {
+makeGraphs() {
     verifyFilePresence "$DIR_GNUPLOT_PROGRAM"
 
     local filePath="$1"
@@ -302,7 +302,7 @@ makeGraphs () {
     local consumerType="$3"
     local startTime=$(date +%s%N)
 
-    # Check if the user has typed "lv all" and verify that gnuplot is present on the user's computer
+    # Vérifier si l'utilisateur demande "lv all" et si gnuplot est présent sur la machine
     if [[ "$stationType" == "lv" && "$consumerType" == "all" ]]; then
         if ! command -v gnuplot &>/dev/null; then
             echo
@@ -310,24 +310,37 @@ makeGraphs () {
 
         elif [[ ! -f "$DIR_LV_MIN_MAX" ]]; then
             echo
-            echo -e "[${darkred}WARNING${normal}] File $DIR_LV_MIN_MAX not found : skipping graph creation..."
+            echo -e "[${darkred}WARNING${normal}] File $DIR_LV_MIN_MAX not found: skipping graph creation..."
             
         else
             echo
-            echo "Making graphs..."
+            echo "...3. Preparing temporary data file and making graphs..."
 
-            # Start Gnuplot program
+            # Préparation du fichier temporaire
+            local tempFile="tmp/lv_all_minmax_prepared.dat"
+            local counter=1
+            while IFS=":" read -r station capacity load; do
+                if (( counter <= 10 )); then
+                    echo "$load 1" >> "$tempFile"  # 1 = rouge (Underproduction)
+                else
+                    echo "$load 2" >> "$tempFile"  # 2 = vert (Overproduction)
+                fi
+                counter=$((counter + 1))
+            done < <(awk 'NR > 1' "$DIR_LV_MIN_MAX")
+
+            # Lancer Gnuplot
             gnuplot gnuplot_LVminmax.gp
 
-            # Checks that gnuplot program has been completed successfully
+            # Vérifier si Gnuplot s'est terminé avec succès
             if [[ $? -ne 0 ]]; then
                 echo "${bold}[ERROR]${normal} Gnuplot error: see program output for more information."
             else
-                displayTime "...3. Graphs has been created in ${blue}./graphs${normal}" "$startTime"
+                displayTime "...4. Graphs have been created in ${blue}./graphs${normal}" "$startTime"
             fi
         fi
     fi
 }
+
 
 # Main function: calls all functions
 runProgram () {
@@ -352,6 +365,7 @@ runProgram () {
     echo
     displayTime "Program completed successfully" "$startTime"
     rm -f codeC/program_c
+    echo
     exit 0
 }
 

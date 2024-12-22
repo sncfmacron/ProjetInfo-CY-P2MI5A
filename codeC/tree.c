@@ -1,5 +1,5 @@
 /*
-    tree.c : contains tree management functions
+    tree.c: contains tree management functions
 */
 
 
@@ -24,14 +24,13 @@ void updateSum(pAVL a, uint32_t stationID, long load) {
     }
 }
 
-
+// Create the AVL ruled by stations ID
 pAVL createAVL(pStation s) {
     if(s == NULL){
-        exit_with_message("ERROR: station pointer is NULL.", ERR_PTR_ALLOC);
+        exit_with_message("ERROR: station pointer is NULL.", ERR_INVALID_STATION);
     }
     pAVL a = malloc(sizeof(AVL));
-    if(a == NULL)
-    {
+    if(a == NULL){
         exit_with_message("ERROR: AVL allocation failed.", ERR_AVL_ALLOC);
     }
 
@@ -42,7 +41,7 @@ pAVL createAVL(pStation s) {
     return a;
 }
 
-
+// In case the AVL isn't balanced
 pAVL leftRotation(pAVL a){
     if(a == NULL || a->right == NULL){
         exit_with_message("ERROR: AVL sub-tree doesn't exist.", ERR_NULL_AVL);
@@ -56,7 +55,7 @@ pAVL leftRotation(pAVL a){
     } else{
         a->right = NULL;
     }
-    pivot->left = a;        // Left rotation: the pivot become the parent of 'a'
+    pivot->left = a;            // Left rotation: the pivot become the parent of 'a'
 
     a->balance = ba_a - max(ba_p, 0) - 1;               // Updated 'a' balance
     pivot->balance = min3(ba_a-2, ba_a+ba_p-2, ba_p-1); // Updated pivot balance
@@ -64,22 +63,22 @@ pAVL leftRotation(pAVL a){
     return pivot;
 }
 
-
+// In case the AVL isn't balanced
 pAVL rightRotation(pAVL a){
     if(a == NULL || a->left == NULL){
         exit_with_message("ERROR: AVL sub-tree doesn't exist", ERR_NULL_AVL);
     }
 
     pAVL pivot = a->left;       // Init the pivot as the left child of 'a'
-    int ba_a = a->balance;      // Remporary balance variable of:
-    int ba_p = pivot->balance;  // Rhe sub-tree 'a' (ba_a) and the pivot (ba_p)
+    int ba_a = a->balance;      // Temporary balance variable of:
+    int ba_p = pivot->balance;  // The sub-tree 'a' (ba_a) and the pivot (ba_p)
 
     if(pivot->right != NULL){
         a->left = pivot->right; // 'a' takes the right child of the pivot as its left child
     } else{
         a->left = NULL;
     }
-    pivot->right = a;       // Rght rotation: the pivot become the parent of 'a'
+    pivot->right = a;           // Right rotation: the pivot become the parent of 'a'
 
     a->balance = ba_a - min(ba_p, 0) + 1;               // Updated 'a' balance
     pivot->balance = max3(ba_a+2, ba_a+ba_p+2, ba_p+1); // Updated pivot balance
@@ -87,12 +86,12 @@ pAVL rightRotation(pAVL a){
     return pivot;
 }
 
-
+// To keep the AVL rule we need to balance it if an added stations unbalance it
 pAVL balanceAVL(pAVL a){
     if(a == NULL){
         exit_with_message("ERROR: AVL sub-tree doesn't exist.", ERR_NULL_AVL);
-    }
-    if(a->right != NULL && a->balance >= 2){                // Left rotation
+    }   // Left rotation:
+    if(a->right != NULL && a->balance >= 2){
         if(a->right->balance >= 0){     // Single left rotation
             return leftRotation(a);
         }
@@ -100,8 +99,8 @@ pAVL balanceAVL(pAVL a){
             a->right = rightRotation(a->right);
             return leftRotation(a);
         }
-    }
-    if(a->left != NULL && a->balance <= -2){               // Right rotation
+    }   // Right rotation:
+    if(a->left != NULL && a->balance <= -2){    
         if(a->left->balance <= 0){      // Single right rotation
             return rightRotation(a);
         }
@@ -110,17 +109,17 @@ pAVL balanceAVL(pAVL a){
             return rightRotation(a); 
         }
     }
-    return a; // if the AVL is already balanced
+    return a;   // If the AVL is already balanced
 }
 
-
+// Insert new stations into the AVL (ruled by station ID)
 pAVL insertAVL(pAVL a, pStation s, int* h){
     if(s == NULL){
         exit_with_message("ERROR: Station doesn't exist.", ERR_INVALID_STATION);
     }
 
     if(a == NULL){
-        *h = 1; // new node increase the height of his parent node
+        *h = 1; // New node increase the height of his parent node
         return createAVL(s);
     }
     if(a->station == NULL){
@@ -128,11 +127,11 @@ pAVL insertAVL(pAVL a, pStation s, int* h){
     }
     else if(s->id < a->station->id){
         a->left = insertAVL(a->left, s, h);
-        *h = (*h) * (*h) * (-1);    // make the height negative
+        *h = (*h) * (*h) * (-1);    // Make the height negative
     }
     else if(s->id > a->station->id){
         a->right = insertAVL(a->right, s, h);
-        *h = (*h) * (*h);           // make the height positive
+        *h = (*h) * (*h);           // Make the height positive
     }
     else{
         *h = 0;
@@ -140,12 +139,12 @@ pAVL insertAVL(pAVL a, pStation s, int* h){
     }
 
     if(*h != 0){
-        a->balance += *h;
+        a->balance += *h;   // Update the avl node balance
 
         if((*h == -1 && a->balance >= 0) || (*h == 1 && a->balance <= 0)){ // if the node is balanced
             *h = 0;
         }
-        else{
+        else{   // if the node isn't balanced
             a = balanceAVL(a);
             *h = (a->balance == 0) ? 0 : 1;
         }
@@ -153,7 +152,7 @@ pAVL insertAVL(pAVL a, pStation s, int* h){
     return a;
 }
 
-
+// Function called at the exit of the code C
 void cleanAVL(pAVL a) {
     if(a == NULL){
         return;
