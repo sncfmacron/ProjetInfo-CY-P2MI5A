@@ -152,7 +152,7 @@ verifyParameters() {
     # The grep command checks if the identifier exists in the first column of the input file
     if [ -n "$4" ]; then
         if ! grep -q "^$4;" "$1"; then
-            echo -e "$[${darkred}WARNING${normal}] '"$4"' is not a valid power plant identifier."
+            echo -e "[${darkred}WARNING${normal}] '"$4"' is not a valid power plant identifier."
             displayMiniHelp
         fi
     fi
@@ -316,10 +316,23 @@ makeGraphs () {
             echo
             echo "Making graphs..."
 
+            # Generate a special data file to display colors in the graph using awk
+            # A third column is generated for the program gnuplot to know which color to use (green or red)
+            local tempFile="tmp/lv_all_minmax_prepared.dat"
+            local counter=1
+            while IFS=":" read -r station capacity load; do
+                if [[ counter -le 10 ]]; then
+                    echo "$station $load 1" >> "$tempFile"  # 1 = red (underproduction)
+                else
+                    echo "$station $load 2" >> "$tempFile"  # 2 = green (overproduction)
+                fi
+                counter=$((counter + 1))
+            done < <(awk 'NR > 1' "$DIR_LV_MIN_MAX")
+
             # Start Gnuplot program
             gnuplot gnuplot_LVminmax.gp
 
-            # Checks that gnuplot program has been completed successfully
+            # Check that gnuplot program has been completed successfully
             if [[ $? -ne 0 ]]; then
                 echo "${bold}[ERROR]${normal} Gnuplot error: see program output for more information."
             else
