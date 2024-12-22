@@ -361,11 +361,8 @@ runProgram () {
     
     makeGraphs "$1" "$2" "$3"
 
-    # cleanFolders
-
     echo
     displayTime "Program completed successfully" "$startTime"
-    rm -f codeC/program_c
     echo
     exit 0
 }
