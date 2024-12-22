@@ -19,10 +19,6 @@ void verifyArguments(int argc, char* stationType, char* consumerType, char* powe
         exit_with_message("ERROR: Not enough parameters provided.", ERR_INVALID_ARGS);
     }
 
-    if(nbStations < 1) {
-        exit_with_message("ERROR: Number of stations is invalid.", ERR_INVALID_ARGS);
-    }
-
     if(stationType == NULL) {
         exit_with_message("ERROR: Invalid station type.", ERR_INVALID_ARGS);
     }
@@ -34,14 +30,15 @@ void verifyArguments(int argc, char* stationType, char* consumerType, char* powe
     if(powerPlantID == NULL) {
         exit_with_message("ERROR: Invalid power plant ID.", ERR_INVALID_ARGS);
     }
-    return ;
+    if(nbStations < 1) {
+        exit_with_message("ERROR: Number of stations is invalid.", ERR_INVALID_ARGS);
+    }
 }
 
 
 // Transforms string to int
 int string_to_int(const char* string) {
     if(string == NULL) {
-        // If station id is not given, 0 is returned by default because the string is null
         return 0;
     } else {
         return atoi(string);
@@ -50,7 +47,13 @@ int string_to_int(const char* string) {
 
 // Displays execution time of a function
 void displayTime(clock_t start, clock_t end, char* message) {
-    float seconds = (float)(end - start) / CLOCKS_PER_SEC;
+    if(message == NULL){
+        exit_with_message("ERROR: NULL message pointer", 2);
+    }
+    if(end < start){
+        exit_with_message("ERROR: Invalid clock", 12);
+    }
+    double seconds = (double)(end - start) / CLOCKS_PER_SEC;
 
     // To avoid displaying a negative number when processing too fast
     if(seconds < 0) {
@@ -60,14 +63,17 @@ void displayTime(clock_t start, clock_t end, char* message) {
     printf("\n%s in %.2fs.\n", message, seconds);
 }
 
-
 // Creates a station pointer
 pStation createStation(int station_id, long capacity) {
+    if(station_id < 1 || capacity < 1){
+        exit_with_message("ERROR: Invalid station init arguments", 233);
+    }
 
     pStation s = malloc(sizeof(Station));
     if(s == NULL){
         exit_with_message("ERROR: Station allocation failed.", ERR_PTR_ALLOC);
     }
+
     s->id = station_id;
     s->capacity = capacity;
     s->load_sum = 0;
@@ -98,33 +104,37 @@ int min(int a, int b) {
     return (a < b) ? a : b;
 }
 
-void merge(pStation* stations, uint32_t start, uint32_t middle, uint32_t end){
+void merge(pStation* stationArray, uint32_t start, uint32_t middle, uint32_t end){
+    if(stationArray == NULL){
+        exit_with_message("ERROR: Stations array is NULL", 32);
+    }
+
     uint32_t temp_size = end - start + 1; // Calculate size correctly
     pStation* temp = malloc(temp_size * sizeof(pStation));
     if(temp == NULL){
-        exit_with_message("ERROR: Temporary station array allocation failed", 666);
+        exit_with_message("ERROR: Temporary station array allocation failed", ERR_PTR_ALLOC);
     }
 
     uint32_t i, indexA = start, indexB = middle + 1;
 
     // Copy the first half of the array into temp
     for(i = start; i <= middle; i++){
-        temp[i - start] = stations[i];  // Use a local index in temp
+        temp[i - start] = stationArray[i];  // Use a local index in temp
     }
 
     // Copy the second half of the array into temp
     for(i = middle + 1; i <= end; i++){
-        temp[i - start] = stations[i];  // Use a local index in temp
+        temp[i - start] = stationArray[i];  // Use a local index in temp
     }
 
     // Merge the two halves back into the original array
     i = start;  // Start index for the merge process
     while(indexA <= middle && indexB <= end){
         if(temp[indexA - start]->capacity <= temp[indexB - start]->capacity){
-            stations[i] = temp[indexA - start];
+            stationArray[i] = temp[indexA - start];
             indexA++;
         } else{
-            stations[i] = temp[indexB - start];
+            stationArray[i] = temp[indexB - start];
             indexB++;
         }
         i++;
@@ -132,14 +142,14 @@ void merge(pStation* stations, uint32_t start, uint32_t middle, uint32_t end){
 
     // Copy any remaining elements in the first half
     while(indexA <= middle){
-        stations[i] = temp[indexA - start];
+        stationArray[i] = temp[indexA - start];
         indexA++;
         i++;
     }
 
     // Copy any remaining elements in the second half
     while(indexB <= end){
-        stations[i] = temp[indexB - start];
+        stationArray[i] = temp[indexB - start];
         indexB++;
         i++;
     }
@@ -148,28 +158,36 @@ void merge(pStation* stations, uint32_t start, uint32_t middle, uint32_t end){
 }
 
 
-void mergeSortRecursive(pStation* stations, uint32_t start, uint32_t end){
-    if(stations == NULL){
+void mergeSortRecursive(pStation* stationArray, uint32_t start, uint32_t end){
+    if(stationArray == NULL){
         exit_with_message("ERROR: Stations array is NULL", 9999);
     }
     uint32_t middle;
     if(start < end){
         middle = (start + end) / 2;
-        mergeSortRecursive(stations, start, middle);
-        mergeSortRecursive(stations, middle+1, end);
-        merge(stations, start, middle, end);
+        mergeSortRecursive(stationArray, start, middle);
+        mergeSortRecursive(stationArray, middle+1, end);
+        merge(stationArray, start, middle, end);
     }
 }
 
 
-void mergeSort(pStation* stations, uint32_t nb_stations){
-    if(stations == NULL){
+void mergeSort(pStation* stationArray, uint32_t nbStations){
+    if(stationArray == NULL){
         exit_with_message("ERROR: Stations array is NULL", 99999);
     }
-    mergeSortRecursive(stations, 0, nb_stations-1);
+    if(nbStations < 1){
+        exit_with_message("ERROR: Number of stations is invalid.", ERR_INVALID_ARGS);
+    }
+
+    mergeSortRecursive(stationArray, 0, nbStations-1);
 }
 
 pStation* allocMinMax(char* consumerType, pStation* mmArray, uint32_t nbStations){
+    if(nbStations < 1){
+        exit_with_message("ERROR: Number of stations is invalid.", ERR_INVALID_ARGS);
+    }
+
     if(strcmp(consumerType, "all") == 0){
         mmArray = malloc(nbStations * sizeof(pStation));
         if(mmArray == NULL){
@@ -180,6 +198,16 @@ pStation* allocMinMax(char* consumerType, pStation* mmArray, uint32_t nbStations
 }
 
 void sortMinMax(char* consumerType, pStation* mmArray, pStation* stationArray, uint32_t nbStations){
+    if(mmArray == NULL){
+        exit_with_message("ERROR: Stations min max array is NULL", 99999);
+    }
+    if(stationArray == NULL){
+        exit_with_message("ERROR: Stations array is NULL", 99999);
+    }
+    if(nbStations < 1){
+        exit_with_message("ERROR: Number of stations is invalid.", ERR_INVALID_ARGS);
+    }
+    
     if(strcmp(consumerType, "all") == 0){
         if(mmArray == NULL){
             exit_with_message("ERROR: Station min max array is NULL", 123);

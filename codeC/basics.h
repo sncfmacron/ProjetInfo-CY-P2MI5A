@@ -28,11 +28,10 @@ typedef Station* pStation;
 // Functions declaration
 void exit_with_message(const char *message, int error_code);
 void verifyArguments(int argc, char* stationType, char* consumerType, char* powerPlantID, uint32_t nbStations);
-int getStationType(const char *station);
+int string_to_int(const char* string);
 void displayTime(clock_t start, clock_t end, char* message);
 pStation createStation(int station_id, long capacity);
 
-int string_to_int(const char* string);
 
 int max3(int a, int b, int c);
 int min3(int a, int b, int c);

@@ -11,6 +11,9 @@ void updateSum(pAVL a, uint32_t stationID, long load) {
     if(a == NULL || a->station == NULL) {
         exit_with_message("ERROR: station doesn't exist.", ERR_INVALID_STATION);
     }
+    if(stationID < 1 || load < 1){
+        exit_with_message("ERROR: Invalid arguments", ERR_INVALID_ARGS);
+    }
 
     if(a->station->id == stationID) {
         a->station->load_sum += load;
@@ -89,7 +92,7 @@ pAVL balanceAVL(pAVL a){
     if(a == NULL){
         exit_with_message("ERROR: AVL sub-tree doesn't exist.", ERR_NULL_AVL);
     }
-    if(a->balance >= 2){                // Left rotation
+    if(a->right != NULL && a->balance >= 2){                // Left rotation
         if(a->right->balance >= 0){     // Single left rotation
             return leftRotation(a);
         }
@@ -98,7 +101,7 @@ pAVL balanceAVL(pAVL a){
             return leftRotation(a);
         }
     }
-    if(a->balance <= -2){               // Right rotation
+    if(a->left != NULL && a->balance <= -2){               // Right rotation
         if(a->left->balance <= 0){      // Single right rotation
             return rightRotation(a);
         }
@@ -152,14 +155,12 @@ pAVL insertAVL(pAVL a, pStation s, int* h){
 
 
 void cleanAVL(pAVL a) {
-    if(a == NULL)
-    {
+    if(a == NULL){
         return;
     }
     a->station=NULL;
     cleanAVL(a->left);
     cleanAVL(a->right);
-    // créer fonction pour cleanArray
     free(a);
     a = NULL;
 }

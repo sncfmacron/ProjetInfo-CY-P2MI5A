@@ -27,7 +27,7 @@
 #define ERR_INPUT_FORMAT 12
 
 #define ERR_INVALID_ARGS 13
-
+#define ERR_NULL_POINTER 14
 
 #define MAX_BUFFER_SIZE 8192  // (8 Ko)
 

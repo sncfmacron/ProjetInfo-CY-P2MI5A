@@ -17,6 +17,6 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
 void writeOutputFile(pStation* stations, FILE* file, uint32_t nbStations);
 FILE* initLvMinMax(FILE* file);
 void writeOutputLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, uint32_t nbStations);
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, uint32_t nb_stations, pStation* mmArray);
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stations, pStation* mmArray, uint32_t nb_stations);
 
 #endif

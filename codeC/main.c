@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
     
     mergeSort(stationArray, nbStations);
     
-    outputProcess(stationType, consumerType, powerPlantID, stationArray, nbStations, mmArray);
+    outputProcess(stationType, consumerType, powerPlantID, stationArray, mmArray, nbStations);
     
     return 0;
 }

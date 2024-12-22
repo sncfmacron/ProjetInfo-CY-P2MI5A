@@ -8,7 +8,7 @@
 // function for cosmetic purpose in the output .csv file
 const char* typeToPrint(const char* type){
     if (type == NULL) {
-        exit_with_message("ConsumerType is NULL.", ERR_INVALID_ARGS);
+        exit_with_message("ERROR: NULL pointer passed as argument", ERR_NULL_POINTER);
     }
 
     if(strcmp(type, "all") == 0){
@@ -32,6 +32,9 @@ const char* typeToPrint(const char* type){
 }
 
 void createPath(const char* stationType, const char* consumerType, const char* powerPlantID, char* path, int sizePath) {
+    if(stationType == NULL || consumerType == NULL || powerPlantID == NULL || path == NULL){
+        exit_with_message("ERROR: NULL pointer passed as argument", ERR_NULL_POINTER);
+    }
     if(powerPlantID != NULL && strcmp(powerPlantID, "EMPTY") !=  0) {
         snprintf(path, sizePath, "%s%s_%s_%s.csv", DIR_OUTPUT, stationType, consumerType, powerPlantID);
     } else {
@@ -42,6 +45,9 @@ void createPath(const char* stationType, const char* consumerType, const char* p
 
 // Initializes a file, generates its name and header
 FILE* initOutputFile(const char* stationType, const char* consumerType, const char* powerPlantID) {
+    if(stationType == NULL || consumerType == NULL || powerPlantID == NULL){
+        exit_with_message("ERROR: NULL pointer passed as argument", ERR_NULL_POINTER);
+    }
     char path[64];
     // Create the right file name (e.g. “hva_comp_2.csv”)
     int sizePath = sizeof(path);
@@ -55,7 +61,6 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
     const char* stationTypeToPrint = typeToPrint(stationType);
     if(file == NULL) {
         exit_with_message("ERROR: Output file creation failed.", ERR_FILE_CREATION);
-        return NULL;
     } else {
         fprintf(file, "Station %s:Capacity:Load(%s)\n", stationTypeToPrint, consumerTypeToPrint);
     }
@@ -63,11 +68,14 @@ FILE* initOutputFile(const char* stationType, const char* consumerType, const ch
     return file;
 }
 
-
+// CMT: faire la même chose pour l'entièreté du C ? comme pour le tri des arbres etc (je parle de la clock)
 // Writing calculated data in the output file
 void writeOutputFile(pStation* stationArray, FILE* file, uint32_t nbStations){
+    if(stationArray == NULL || file == NULL || nbStations < 1){
+        exit_with_message("ERROR: NULL pointer passed as argument", ERR_NULL_POINTER);
+    }
+
     clock_t start = clock();
-    
  
     for(int i=0; i<nbStations; i++){
         fprintf(file, "%d:%ld:%ld\n", stationArray[i]->id, stationArray[i]->capacity, stationArray[i]->load_sum);
@@ -79,9 +87,10 @@ void writeOutputFile(pStation* stationArray, FILE* file, uint32_t nbStations){
 
 //
 FILE* initLvMinMax(FILE* file){
-    // Verif stationArray
     file = fopen(DIR_LV_MINMAX, "w");
-    // vérif les droits d'écriture
+    if(file == NULL) {
+        exit_with_message("ERROR: Output file creation failed.", ERR_FILE_CREATION);
+    }
     return file;
 }
 
@@ -108,7 +117,10 @@ void writeOutputLvMinMax(FILE* file, pStation* stationArray, pStation* mmArray, 
 }
 
 // Calls output fonctions
-void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stationArray, uint32_t nbStations, pStation* mmArray) {
+void outputProcess(const char* stationType, const char* consumerType, const char* powerPlantID, pStation* stationArray, pStation* mmArray, uint32_t nbStations) {
+    if(stationType == NULL || consumerType == NULL || powerPlantID == NULL || stationArray == NULL || mmArray == NULL || nbStations < 1){
+       exit_with_message("ERROR: NULL pointer passed as argument", ERR_NULL_POINTER); 
+    }
     FILE* file = NULL;
     file = initOutputFile(stationType, consumerType, powerPlantID);
     if (file != NULL) {
