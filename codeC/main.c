@@ -51,9 +51,8 @@ void sortMinMax(char* consumerType){
             exit_with_message("ERROR: Station min max array is NULL", 123);
         }
         for(uint32_t i = 0; i < nbStations; i++){
-            mmArray[i]->capacity = mmArray[i]->capacity - mmArray[i]->load_sum;
+            mmArray[i]->capacity = mmArray[i]->capacity - stationArray[i]->load_sum;
         }
-        mergeSort(mmArray, nbStations);
     }
 }
 

@@ -4,9 +4,9 @@ tmp/
 tmp/*
 test/
 output/
-output/*.csv
+output/*
 input/GROS.csv
 program_c
-input/*.csv
+input/*
 graphs/
 graphs/*
