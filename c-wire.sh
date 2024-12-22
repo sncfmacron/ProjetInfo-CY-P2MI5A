@@ -302,7 +302,7 @@ makeGraphs() {
     local consumerType="$3"
     local startTime=$(date +%s%N)
 
-    # Vérifier si l'utilisateur demande "lv all" et si gnuplot est présent sur la machine
+    # Check if the user requests 'lv all' and if gnuplot is present on the machine
     if [[ "$stationType" == "lv" && "$consumerType" == "all" ]]; then
         if ! command -v gnuplot &>/dev/null; then
             echo
@@ -322,9 +322,9 @@ makeGraphs() {
             local counter=1
             while IFS=":" read -r station capacity load; do
                 if [[ counter -le 10 ]]; then
-                    echo "$station $load 1" >> "$tempFile"  # 1 = red (underproduction)
+                    echo "$counter $load 1" >> "$tempFile"  # 1 = red (overproduction)
                 else
-                    echo "$station $load 2" >> "$tempFile"  # 2 = green (overproduction)
+                    echo "$counter $load 2" >> "$tempFile"  # 2 = green (underproduction)
                 fi
                 counter=$((counter + 1))
             done < <(awk 'NR > 1' "$DIR_LV_MIN_MAX")
@@ -361,7 +361,7 @@ runProgram () {
     
     makeGraphs "$1" "$2" "$3"
 
-    cleanFolders
+    # cleanFolders
 
     echo
     displayTime "Program completed successfully" "$startTime"
