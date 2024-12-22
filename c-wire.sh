@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-# c-wire.sh : shell script to compile program_c and sort data
+# c-wire.sh : shell script to compile program_c and filter data
 
 
 # Error code declaration
@@ -253,14 +253,14 @@ awkFilter () {
     fi
 }
 
-# Count the number of lines in the sorted file. This will be useful for allocating memory in the C program
+# Count the number of lines in the filtered file. This will be useful for allocating memory in the C program
 stationCount () {
     verifyFilePresence "$DIR_EXTRACTED_STATION"
     stationNumber=$(wc -l < "$DIR_EXTRACTED_STATION")
 }
 
-# Sort relevant data from input file
-sortingData () {
+# Filter relevant data from input file
+filterData () {
     # We use awk to extract and write data in two temporary '.csv' files, read by the C program for processing
     # Options in awk line : -F to indicate the separating character and -v to indicate a variable
 
@@ -343,7 +343,7 @@ runProgram () {
     # Start processing data
     startTime=$(date +%s%N)
 
-    sortingData "$@"
+    filterData "$@"
     
     makeGraphs "$1" "$2" "$3"
 

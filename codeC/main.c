@@ -36,26 +36,6 @@ void cleanup(void){
     }
 }
 
-void allocMinMax(char* consumerType){
-    if(strcmp(consumerType, "all") == 0){
-        mmArray = malloc(nbStations * sizeof(pStation));
-        if(mmArray == NULL){
-            exit_with_message("ERROR: Dynamic min max array allocation failed", ERR_PTR_ALLOC);
-        }
-    }
-}
-
-void sortMinMax(char* consumerType){
-    if(strcmp(consumerType, "all") == 0){
-        if(mmArray == NULL){
-            exit_with_message("ERROR: Station min max array is NULL", 123);
-        }
-        for(uint32_t i = 0; i < nbStations; i++){
-            mmArray[i]->capacity = mmArray[i]->capacity - stationArray[i]->load_sum;
-        }
-    }
-}
-
 int main(int argc, char* argv[]) {
     if (atexit(cleanup) != 0) {
         fprintf(stderr, "Cannot register cleanup function\n");
@@ -78,16 +58,16 @@ int main(int argc, char* argv[]) {
     }
     
     if(strcmp(consumerType, "all") == 0){
-        allocMinMax(consumerType);
+        mmArray = allocMinMax(consumerType, mmArray, nbStations);
     }
     
     globalTree = NULL;
-    globalTree = processStation(DIR_STATION_SORTED, globalTree, stationArray, mmArray, consumerType);
+    globalTree = processStation(DIR_STATION_FILTERED, globalTree, stationArray, mmArray, consumerType);
     
-    processConsumer(DIR_CONSUMER_SORTED, globalTree);
+    processConsumer(DIR_CONSUMER_FILTERED, globalTree);
     
     if(strcmp(consumerType, "all") == 0){
-        sortMinMax(consumerType);
+        sortMinMax(consumerType, mmArray, stationArray, nbStations);
     }
     
     mergeSort(stationArray, nbStations);

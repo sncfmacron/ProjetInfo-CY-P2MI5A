@@ -168,3 +168,25 @@ void mergeSort(pStation* stations, uint32_t nb_stations){
     }
     mergeSortRecursive(stations, 0, nb_stations-1);
 }
+
+pStation* allocMinMax(char* consumerType, pStation* mmArray, uint32_t nbStations){
+    if(strcmp(consumerType, "all") == 0){
+        mmArray = malloc(nbStations * sizeof(pStation));
+        if(mmArray == NULL){
+            exit_with_message("ERROR: Dynamic min max array allocation failed", ERR_PTR_ALLOC);
+        }
+    }
+    return mmArray;
+}
+
+void sortMinMax(char* consumerType, pStation* mmArray, pStation* stationArray, uint32_t nbStations){
+    if(strcmp(consumerType, "all") == 0){
+        if(mmArray == NULL){
+            exit_with_message("ERROR: Station min max array is NULL", 123);
+        }
+        for(uint32_t i = 0; i < nbStations; i++){
+            mmArray[i]->capacity = mmArray[i]->capacity - stationArray[i]->load_sum;
+        }
+    }
+    mergeSort(mmArray, nbStations);
+}

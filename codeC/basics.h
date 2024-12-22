@@ -43,4 +43,7 @@ void merge(pStation* stations, uint32_t start, uint32_t middle, uint32_t end);
 void mergeSortRecursive(pStation* stations, uint32_t start, uint32_t end);
 void mergeSort(pStation* stations, uint32_t nb_stations);
 
+pStation* allocMinMax(char* consumerType, pStation* mmArray, uint32_t nbStations);
+void sortMinMax(char* consumerType, pStation* mmArray, pStation* stationArray, uint32_t nbStations);
+
 #endif
