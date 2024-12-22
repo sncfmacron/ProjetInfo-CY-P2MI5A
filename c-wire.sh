@@ -40,7 +40,7 @@ displayHelp() {
     echo "      This program processes data for an electricity distribution."
     echo
     echo "${bold} SYNOPSIS ${normal}"
-    echo -e "      $0 [${underline}FILE_PATH.csv${normal}] [${underline}STATION_TYPE${normal}] [${underline}CONSUMER_TYPE${normal}] [${underline}POWER_PLANT_ID${normal}] ..."
+    echo -e "      $0 [${underline}FILE_PATH.csv${normal}] [${underline}STATION_TYPE${normal}] [${underline}CONSUMER_TYPE${normal}] <${underline}POWER_PLANT_ID${normal}> ..."
     echo
     echo "${bold} OPTIONS ${normal}"
     echo "     ${bold} [FILE_PATH.csv] ${normal}  Location of the input file (required)"
@@ -51,9 +51,7 @@ displayHelp() {
     echo
     echo "     ${bold} [POWER_PLANT_ID] ${normal} Filters the results for a specific power plant ID (optional)"
     echo
-    echo "     ${bold} -h ${normal}               Displays help manual"
-    echo
-    echo "     ${bold} --version ${normal}        Displays program version"
+    echo "     ${bold} -h ${normal}               Displays help manual (can be placed anywhere)"
     echo
     echo "${bold} WARNING ${normal}"
     echo "      The following combinations are forbidden:"
@@ -70,7 +68,7 @@ displayHelp() {
 # Display the reduced c-wire help manual
 displayMiniHelp() {
     echo
-    echo "Usage: $0 [FILE_PATH.csv] [STATION_TYPE] [CONSUMER_TYPE] [POWER_PLANT_ID] ..."
+    echo "Usage: $0 [FILE_PATH.csv] [STATION_TYPE] [CONSUMER_TYPE] <POWER_PLANT_ID> ..."
     echo "Use ${bold}-h${normal} option for full help."
     exit "$ERR_INVALID_PARAMETER"
 }
