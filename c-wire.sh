@@ -49,7 +49,7 @@ displayHelp() {
     echo
     echo "     ${bold} [CONSUMER_TYPE] ${normal}  Type of consumer to process: 'all', 'comp' or 'indiv' (required)"
     echo
-    echo "     ${bold} [POWER_PLANT_ID] ${normal} Filters the results for a specific power plant ID (optional)"
+    echo "     ${bold} <POWER_PLANT_ID> ${normal} Filters the results for a specific power plant ID (optional)"
     echo
     echo "     ${bold} -h ${normal}               Displays help manual (can be placed anywhere)"
     echo
